@@ -26,7 +26,7 @@ class CircleBackButton extends StatelessWidget {
       child: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
         color: iconColor ?? AppColors.onSurface,
-        onPressed: onPressed ?? () => Get.back(),
+        onPressed: onPressed ?? () => Navigator.maybePop(context),
       ),
     );
   }

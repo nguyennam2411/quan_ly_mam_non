@@ -6,6 +6,7 @@ import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 import 'package:quan_ly_mam_non/core/values/app_assets.dart';
 import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import '../controllers/main_controller.dart';
+import '../../notifications/controllers/notification_controller.dart';
 
 // --- Model dữ liệu cho mỗi Tab ---
 class _NavItemData {
@@ -58,10 +59,26 @@ class MainView extends GetView<MainController> {
   }
 
   // --- Factory Method: tạo BottomNavigationBarItem từ model dữ liệu ---
-  static BottomNavigationBarItem _buildNavItem(_NavItemData data) {
+  BottomNavigationBarItem _buildNavItem(int index, _NavItemData data) {
+    final notificationController = Get.find<NotificationController>();
+
     return BottomNavigationBarItem(
-      icon: _buildSvgIcon(data.outlinedIcon, AppColors.outline),
-      activeIcon: _buildSvgIcon(data.filledIcon, AppColors.primary),
+      icon: Obx(() {
+        final icon = _buildSvgIcon(
+          controller.currentIndex.value == index ? data.filledIcon : data.outlinedIcon, 
+          controller.currentIndex.value == index ? AppColors.primary : AppColors.outline
+        );
+
+        // Chỉ hiện badge cho Tab Thông báo (Index 2)
+        if (index == 2 && notificationController.unreadCount > 0) {
+          return Badge(
+            label: Text(notificationController.unreadCount.toString()),
+            backgroundColor: AppColors.error,
+            child: icon,
+          );
+        }
+        return icon;
+      }),
       label: data.label,
     );
   }
@@ -90,7 +107,7 @@ class MainView extends GetView<MainController> {
           fontSize: AppConstants.navFontSize
         ),
         elevation: AppConstants.navElevation,
-        items: _navItems.map(_buildNavItem).toList(),
+        items: List<BottomNavigationBarItem>.generate(_navItems.length, (index) => _buildNavItem(index, _navItems[index])),
       )),
     );
   }

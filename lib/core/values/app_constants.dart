@@ -4,6 +4,7 @@ class AppConstants {
   AppConstants._();
 
   // Padding & Margins
+  static const double paddingXXS = 2.0;
   static const double paddingXS = 4.0;
   static const double paddingS = 8.0;
   static const double paddingM = 16.0;
@@ -67,6 +68,8 @@ class AppConstants {
   static const int otpCountdownSeconds = 60;
 
   // Spacing helper widgets
+  static const Widget spacingXXS = SizedBox(height: paddingXXS);
+  static const Widget spacingXS = SizedBox(height: paddingXS);
   static const Widget spacingS = SizedBox(height: paddingS);
   static const Widget spacingM = SizedBox(height: paddingM);
   static const Widget spacingL = SizedBox(height: paddingL);

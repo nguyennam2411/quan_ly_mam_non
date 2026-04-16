@@ -51,5 +51,12 @@ class AppColors {
   static const Color success = Color(0xFF2E7D32);
   static const Color onSuccess = Color(0xFFF1F8F1);
   static const Color successContainer = Color(0xFFC8E6C9);
+  
+  // Warning (Vàng/Cam)
+  static const Color warning = Color(0xFFED9700);
+  static const Color onWarning = Colors.white;
+
+  // Transparent
+  static const Color transparent = Colors.transparent;
 }
 

@@ -175,6 +175,7 @@ class ParentHomeView extends StatelessWidget {
   }
 
   Widget _buildFeatureSection(BuildContext context) {
+    final studentService = ParentStudentService.to;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -194,7 +195,17 @@ class ParentHomeView extends StatelessWidget {
           childAspectRatio: 1.5,
           children: [
             _buildFeatureCard(Icons.calendar_today_rounded, 'Lịch học', () {}),
-            _buildFeatureCard(Icons.restaurant_rounded, 'Thực đơn', () {}),
+            _buildFeatureCard(Icons.restaurant_rounded, 'Thực đơn', () {
+              final student = studentService.selectedStudent.value;
+              if (student != null) {
+                Get.toNamed(Routes.MEAL_PLAN, arguments: {
+                  'gradeId': student.gradeId,
+                  'title': 'Thực đơn Khối ${student.gradeName}',
+                });
+              } else {
+                Get.snackbar('Thông báo', 'Vui lòng chọn bé để xem thực đơn');
+              }
+            }),
             _buildFeatureCard(Icons.assignment_ind_rounded, 'Xin nghỉ học', () {
               Get.toNamed(Routes.PARENT_LEAVE_REQUEST);
             }),
@@ -202,6 +213,9 @@ class ParentHomeView extends StatelessWidget {
               Get.toNamed(Routes.PARENT_ACTIVITY_LOG);
             }),
             _buildFeatureCard(Icons.payment_rounded, 'Học phí', () {}),
+            _buildFeatureCard(Icons.timeline_rounded, 'Chuyên cần', () {
+              Get.toNamed(Routes.PARENT_ATTENDANCE_HISTORY);
+            }),
           ],
         ),
       ],

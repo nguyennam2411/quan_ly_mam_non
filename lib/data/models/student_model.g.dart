@@ -13,6 +13,8 @@ StudentModel _$StudentModelFromJson(Map<String, dynamic> json) => StudentModel(
   parentId: json['parent_id'] as String?,
   avatarUrl: json['avatar_url'] as String?,
   classroomName: json['classroomName'] as String?,
+  gradeId: json['gradeId'] as String?,
+  gradeName: json['gradeName'] as String?,
 );
 
 Map<String, dynamic> _$StudentModelToJson(StudentModel instance) =>

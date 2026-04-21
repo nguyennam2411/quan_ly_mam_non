@@ -106,6 +106,14 @@ class AppStrings {
   static const String attendanceNotice = 'Lưu ý';
   static const String attendanceWarning = 'Thông báo';
 
+  static const String statsMonthlyRatio = 'Tỷ lệ trong tháng';
+  static const String statsWeeklyTrend = 'Biến động trong tuần';
+  static const String statsSchoolDays = 'Số ngày học';
+  static const String statsAttendanceRate = 'Tỷ lệ đi học';
+  static const String statsNoData = 'Không có dữ liệu';
+  static const String statsWeeklyNoData = 'Không có dữ liệu tuần này';
+  static const String statsChange = 'Thay đổi';
+
   // Dialogs
   static const String dialogConfirmTitle = 'Xác nhận';
   static const String dialogWarningTitle = 'Cảnh báo';

@@ -27,6 +27,14 @@ class AttendanceMainView extends GetView<AttendanceController> {
                 fontWeight: FontWeight.bold,
               ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () => controller.goToStatistics(),
+            icon: const Icon(Icons.bar_chart_rounded, color: AppColors.primary),
+            tooltip: 'Thống kê',
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         child: Padding(

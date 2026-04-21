@@ -100,4 +100,26 @@ class AttendanceRepository {
       );
     }
   }
+
+  // Lấy dữ liệu thống kê từ hàm RPC đã được tổng hợp trên DB
+  Future<List<Map<String, dynamic>>> getAttendanceStatsReport({
+    required String classroomId,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    final response = await Supabase.instance.client.rpc(
+      'get_attendance_stats_v2',
+      params: {
+        'p_classroom_id': classroomId,
+        'p_start_date': startDate.toIso8601String().split('T')[0],
+        'p_end_date': endDate.toIso8601String().split('T')[0],
+      },
+    );
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  Future<List<AttendanceModel>> getStudentAbsentHistory(String studentId) async {
+    final response = await _provider.getAbsentRecordsByStudent(studentId);
+    return response.map((item) => AttendanceModel.fromJson(item)).toList();
+  }
 }

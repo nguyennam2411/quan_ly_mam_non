@@ -258,4 +258,12 @@ class AttendanceController extends GetxController {
     await fetchAttendanceList();
     Get.toNamed(Routes.ATTENDANCE_HISTORY);
   }
+
+  Future<void> goToStatistics() async {
+    if (currentClassId.isEmpty) {
+      Get.snackbar(AppStrings.attendanceWarning, AppStrings.attendanceNoClass);
+      return;
+    }
+    Get.toNamed(Routes.ATTENDANCE_STATISTIC);
+  }
 }

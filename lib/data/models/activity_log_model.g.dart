@@ -25,6 +25,9 @@ ActivityLogModel _$ActivityLogModelFromJson(Map<String, dynamic> json) =>
       likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
       commentCount: (json['commentCount'] as num?)?.toInt() ?? 0,
       isLiked: json['isLiked'] as bool? ?? false,
+      comments: (json['comments'] as List<dynamic>?)
+          ?.map((e) => ActivityCommentModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$ActivityLogModelToJson(ActivityLogModel instance) =>
@@ -35,4 +38,7 @@ Map<String, dynamic> _$ActivityLogModelToJson(ActivityLogModel instance) =>
       'student_id': ?instance.studentId,
       'content': instance.content,
       'created_at': ?instance.createdAt?.toIso8601String(),
+      'likeCount': instance.likeCount,
+      'commentCount': instance.commentCount,
+      'isLiked': instance.isLiked,
     };

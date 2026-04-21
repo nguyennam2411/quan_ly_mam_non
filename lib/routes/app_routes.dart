@@ -9,11 +9,14 @@ abstract class Routes {
 
   // Hệ thống chung (Main Dashboard)
   static const MAIN_DASHBOARD = '/dashboard';
+  static const MEAL_PLAN = '/meal-plan';
+  static const PARENT_ATTENDANCE_HISTORY = '/parent/attendance-history';
 
   // Chức năng Điểm danh (Teacher)
   static const ATTENDANCE_MAIN = '/teacher/attendance';
   static const ATTENDANCE_LIST = '/teacher/attendance/list';
   static const ATTENDANCE_HISTORY = '/teacher/attendance/history';
+  static const ATTENDANCE_STATISTIC = '/teacher/attendance/statistic';
   
   // Chức năng Phụ huynh
   static const PARENT_LEAVE_REQUEST = '/parent/leave-request';

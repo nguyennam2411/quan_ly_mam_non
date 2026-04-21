@@ -81,7 +81,7 @@ class TeacherHomeView extends StatelessWidget {
             _buildFeatureCard(
               Icons.how_to_reg_rounded, 
               'Điểm danh',
-              onTap: () => Get.toNamed('/teacher/attendance'),
+              onTap: () => Get.toNamed(Routes.ATTENDANCE_MAIN),
             ),
             _buildFeatureCard(
               Icons.event_busy_rounded, 
@@ -92,6 +92,14 @@ class TeacherHomeView extends StatelessWidget {
               Icons.history_edu_rounded, 
               'Nhật ký hoạt động',
               onTap: () => Get.toNamed(Routes.TEACHER_ACTIVITY_LOG),
+            ),
+            _buildFeatureCard(
+              Icons.restaurant_menu_rounded, 
+              'Thực đơn',
+              onTap: () => Get.toNamed(Routes.MEAL_PLAN, arguments: {
+                'gradeId': AuthService.to.gradeId.value,
+                'title': 'Thực đơn của lớp',
+              }),
             ),
             _buildFeatureCard(Icons.edit_calendar_rounded, 'Lịch hoạt động'),
             _buildFeatureCard(Icons.health_and_safety_rounded, 'Sức khỏe bé'),

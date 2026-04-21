@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import '../../../data/providers/notification_provider.dart';
-import '../../../data/repositories/notification_repository.dart';
+import 'package:quan_ly_mam_non/data/providers/notification_provider.dart';
+import 'package:quan_ly_mam_non/data/repositories/notification_repository.dart';
 import '../controllers/notification_controller.dart';
 
 class NotificationBinding extends Bindings {

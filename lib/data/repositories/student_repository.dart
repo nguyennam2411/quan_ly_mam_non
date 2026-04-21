@@ -15,4 +15,9 @@ class StudentRepository {
     final response = await _provider.getStudentById(studentId);
     return StudentModel.fromJson(response);
   }
+
+  Future<List<StudentModel>> getStudentsByClassroom(String classroomId) async {
+    final response = await _provider.getStudentsByClassroom(classroomId);
+    return response.map((json) => StudentModel.fromJson(json)).toList();
+  }
 }

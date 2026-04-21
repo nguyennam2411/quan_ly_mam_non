@@ -21,5 +21,9 @@ abstract class Routes {
 
   // Chức năng Giáo viên (Tiếp tục)
   static const TEACHER_LEAVE_REQUEST = '/teacher/leave-request';
+  static const TEACHER_ACTIVITY_LOG = '/teacher/activity-log';
+  static const TEACHER_ADD_ACTIVITY_LOG = '/teacher/activity-log/add';
 
+  // Nhật ký (Parent)
+  static const PARENT_ACTIVITY_LOG = '/parent/activity-log';
 }

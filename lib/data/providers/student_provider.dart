@@ -23,4 +23,14 @@ class StudentProvider {
     
     return response;
   }
+
+  Future<List<Map<String, dynamic>>> getStudentsByClassroom(String classroomId) async {
+    final response = await _client
+        .from(AppDatabase.tableStudents)
+        .select()
+        .eq(AppDatabase.colClassroomId, classroomId)
+        .order(AppDatabase.colName);
+    
+    return List<Map<String, dynamic>>.from(response);
+  }
 }

@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../routes/app_routes.dart';
 import '../values/app_database.dart';
 import '../values/user_role.dart';
+import 'parent_student_service.dart';
 
 class AuthService extends GetxService {
   static AuthService get to => Get.find();
@@ -86,6 +87,15 @@ class AuthService extends GetxService {
         print("Error fetching classroom: $e");
       }
     }
+
+    // MỚI: Tự động tải danh sách con nếu là Phụ huynh
+    if (userRole.value == UserRole.parent) {
+      try {
+        ParentStudentService.to.fetchStudents();
+      } catch (e) {
+        print("Error fetching students: $e");
+      }
+    }
   }
 
   Future<String> fetchUserRole() async {
@@ -111,6 +121,11 @@ class AuthService extends GetxService {
     userRole.value = '';
     classroomId.value = '';
     userProfile.clear();
+
+    // MỚI: Xóa thông tin con khi đăng xuất
+    try {
+      ParentStudentService.to.clear();
+    } catch (_) {}
   }
 
   Future<void> signOut() async {

@@ -65,4 +65,14 @@ class AppDatabase {
   static const String colIsRead = 'is_read';
   static const String colType = 'type';
   static const String colReferenceId = 'reference_id';
+
+  // Activity Logs
+  static const String tableActivityLogs = 'activity_logs';
+  static const String tableActivityImages = 'activity_images';
+  static const String tableActivityLikes = 'activity_likes';
+  static const String tableActivityComments = 'activity_comments';
+  
+  static const String colActivityId = 'activity_id';
+  static const String colActivityLogId = 'activity_log_id';
+  static const String colImageUrl = 'image_url';
 }

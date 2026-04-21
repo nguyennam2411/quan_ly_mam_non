@@ -43,4 +43,10 @@ class ParentStudentService extends GetxService {
   void selectStudent(StudentModel student) {
     selectedStudent.value = student;
   }
+
+  void clear() {
+    students.clear();
+    selectedStudent.value = null;
+    isLoading.value = false;
+  }
 }

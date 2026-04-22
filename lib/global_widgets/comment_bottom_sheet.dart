@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
-import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import 'package:quan_ly_mam_non/data/models/activity_comment_model.dart';
 import 'package:quan_ly_mam_non/data/models/activity_log_model.dart';
-import '../../controllers/parent_activity_log_controller.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class CommentBottomSheet extends StatefulWidget {
-  final ActivityLogModel log;
+  final ActivityLogModel activityLog;
+  final Function(String content) onSend;
+  final Future<List<ActivityCommentModel>> Function() getComments;
 
-  const CommentBottomSheet({super.key, required this.log});
+  const CommentBottomSheet({
+    super.key,
+    required this.activityLog,
+    required this.onSend,
+    required this.getComments,
+  });
 
   @override
   State<CommentBottomSheet> createState() => _CommentBottomSheetState();
 }
 
 class _CommentBottomSheetState extends State<CommentBottomSheet> {
-  final controller = Get.find<ParentActivityLogController>();
   final textController = TextEditingController();
   final focusNode = FocusNode();
   
@@ -31,7 +34,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
   }
 
   Future<void> _loadComments() async {
-    final result = await controller.getComments(widget.log.id!);
+    final result = await widget.getComments();
     if (mounted) {
       setState(() {
         comments = result;
@@ -47,7 +50,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
     textController.clear();
     focusNode.unfocus();
     
-    await controller.addComment(widget.log, content);
+    await widget.onSend(content);
     _loadComments(); // Refresh list
   }
 
@@ -110,7 +113,9 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                   radius: 16,
                                   backgroundColor: AppColors.primaryContainer,
                                   child: Text(
-                                    comment.userName?.substring(0, 1) ?? 'U',
+                                    comment.userName?.isNotEmpty == true 
+                                        ? comment.userName!.substring(0, 1).toUpperCase() 
+                                        : 'U',
                                     style: TextStyle(
                                       color: AppColors.onPrimaryContainer,
                                       fontSize: 12,

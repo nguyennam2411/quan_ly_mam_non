@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import 'package:quan_ly_mam_non/routes/app_routes.dart';
+import 'package:quan_ly_mam_non/data/models/activity_log_model.dart';
 import '../controllers/teacher_activity_log_controller.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -61,7 +62,7 @@ class TeacherActivityLogView extends GetView<TeacherActivityLogController> {
     );
   }
 
-  Widget _buildActivityCard(BuildContext context, dynamic log) {
+  Widget _buildActivityCard(BuildContext context, ActivityLogModel log) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -124,6 +125,29 @@ class TeacherActivityLogView extends GetView<TeacherActivityLogController> {
             _buildImageGrid(log.images!),
 
           const SizedBox(height: 12),
+
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Row(
+              children: [
+                TextButton.icon(
+                  onPressed: () => controller.toggleLike(log),
+                  icon: Icon(
+                    log.isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                    size: 20,
+                    color: log.isLiked ? Colors.red : null,
+                  ),
+                  label: Text('${log.likeCount > 0 ? log.likeCount : ''} Yêu thích'),
+                ),
+                TextButton.icon(
+                  onPressed: () => controller.showComments(log),
+                  icon: const Icon(Icons.mode_comment_outlined, size: 20),
+                  label: Text('${log.commentCount > 0 ? log.commentCount : ''} Bình luận'),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

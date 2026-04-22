@@ -27,6 +27,12 @@ class StudentModel {
 
   @JsonKey(includeToJson: false)
   final String? gradeName;
+  
+  @JsonKey(name: AppDatabase.colBirthday)
+  final DateTime? birthday;
+
+  @JsonKey(name: AppDatabase.colGender)
+  final String? gender; 
 
   StudentModel({
     required this.id, 
@@ -37,6 +43,8 @@ class StudentModel {
     this.classroomName,
     this.gradeId,
     this.gradeName,
+    this.birthday,
+    this.gender,
   });
 
   factory StudentModel.fromJson(Map<String, dynamic> json) {
@@ -62,6 +70,10 @@ class StudentModel {
       classroomName: cName,
       gradeId: gId,
       gradeName: gName,
+      birthday: json[AppDatabase.colBirthday] != null 
+          ? DateTime.parse(json[AppDatabase.colBirthday]) 
+          : null,
+      gender: json[AppDatabase.colGender] as String?,
     );
   }
   Map<String, dynamic> toJson() => _$StudentModelToJson(this);

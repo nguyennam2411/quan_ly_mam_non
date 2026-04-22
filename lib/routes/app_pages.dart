@@ -38,6 +38,12 @@ import '../modules/parent/leave_request/views/parent_leave_request_view.dart';
 import '../modules/parent/leave_request/views/create_leave_request_view.dart';
 import '../modules/parent/activity_log/bindings/parent_activity_log_binding.dart';
 import '../modules/parent/activity_log/views/parent_activity_log_view.dart';
+import '../modules/parent/health/bindings/parent_health_binding.dart';
+import '../modules/parent/health/views/parent_health_view.dart';
+
+// Teacher Health
+import '../modules/teacher/health/bindings/health_binding.dart';
+import '../modules/teacher/health/views/health_input_view.dart';
 
 class AppPages {
   static const INITIAL = Routes.SPLASH;
@@ -151,6 +157,20 @@ class AppPages {
       name: Routes.MEAL_PLAN,
       page: () => const MealPlanView(),
       binding: MealPlanBinding(),
+    ),
+
+    // 11. Teacher Health
+    GetPage(
+      name: Routes.TEACHER_HEALTH,
+      page: () => const HealthInputView(),
+      binding: HealthBinding(),
+    ),
+
+    // 12. Parent Health
+    GetPage(
+      name: Routes.PARENT_HEALTH,
+      page: () => const ParentHealthView(),
+      binding: ParentHealthBinding(),
     ),
   ];
 }

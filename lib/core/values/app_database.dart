@@ -45,6 +45,8 @@ class AppDatabase {
   // --- Students Columns ---
   static const String colClassroomId = 'classroom_id';
   static const String colParentId = 'parent_id';
+  static const String colBirthday = 'dob';     
+  static const String colGender = 'gender';         
 
   // --- Attendance Columns ---
   static const String colStudentId = 'student_id';

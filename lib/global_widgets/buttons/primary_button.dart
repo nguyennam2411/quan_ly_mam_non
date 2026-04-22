@@ -7,11 +7,14 @@ class PrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
 
+  final IconData? trailingIcon;
+
   const PrimaryButton({
     super.key,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
+    this.trailingIcon,
   });
 
   @override
@@ -26,12 +29,21 @@ class PrimaryButton extends StatelessWidget {
                 size: AppConstants.buttonIconSize,
                 color: Colors.white,
               )
-            : Text(
-                text,
-                style: const TextStyle(
-                  fontSize: AppConstants.buttonFontSize,
-                  fontWeight: FontWeight.bold,
-                ),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    text,
+                    style: const TextStyle(
+                      fontSize: AppConstants.buttonFontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (trailingIcon != null) ...[
+                    const SizedBox(width: AppConstants.paddingS),
+                    Icon(trailingIcon, size: 20),
+                  ]
+                ],
               ),
       ),
     );

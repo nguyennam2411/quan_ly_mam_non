@@ -42,7 +42,7 @@ class LoginController extends GetxController {
       );
 
       // 3. Khởi tạo/Cập nhật Role trong AuthService
-      await AuthService.to.fetchUserRole();
+      await AuthService.to.refreshUserData();
       
       // 4. Điều hướng TẤT CẢ về Main Dashboard (Module dùng chung vừa tạo!)
       Get.offAllNamed(Routes.MAIN_DASHBOARD);

@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 import 'package:quan_ly_mam_non/core/services/auth_service.dart';
 import 'package:quan_ly_mam_non/core/values/user_role.dart';
 import 'package:quan_ly_mam_non/modules/shared/profile/profile_view.dart';
+import 'package:quan_ly_mam_non/modules/parent/home/views/parent_home_view.dart';
+import 'package:quan_ly_mam_non/modules/teacher/teacher_home/views/teacher_home_view.dart';
+import 'package:quan_ly_mam_non/modules/shared/notifications/views/notification_view.dart';
 
 class MainController extends GetxController {
   var currentIndex = 0.obs;
@@ -11,12 +14,21 @@ class MainController extends GetxController {
   List<Widget> get pages {
     final role = AuthService.to.userRole.value;
     
-    // Hiện tại cả 2 role đều dùng chung 1 layout placeholder
-    // Sau này sẽ thay thế bằng các View thực tế (DashboardTeacher, DashboardParent, ...)
+    // Sử dụng View tương ứng cho tab Home (index 0)
     if (UserRole.isTeacher(role)) {
-      return [const SizedBox(), const SizedBox(), const SizedBox(), const ProfileView()];
+      return [
+        const TeacherHomeView(), 
+        const SizedBox(), 
+        const NotificationView(), 
+        const ProfileView()
+      ];
     } else {
-      return [const SizedBox(), const SizedBox(), const SizedBox(), const ProfileView()];
+      return [
+        const ParentHomeView(), 
+        const SizedBox(), 
+        const NotificationView(), 
+        const ProfileView()
+      ];
     }
   }
 

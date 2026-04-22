@@ -16,7 +16,7 @@ class SplashController extends GetxController {
 
     if (AuthService.to.isLoggedIn) {
       // Nếu đã login, cập nhật Role và vào Dashboard dùng chung
-      await AuthService.to.fetchUserRole();
+      await AuthService.to.refreshUserData();
       Get.offAllNamed(Routes.MAIN_DASHBOARD);
     } else {
       // Chưa login thì ra màn hình đăng nhập

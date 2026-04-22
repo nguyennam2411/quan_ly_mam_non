@@ -13,15 +13,14 @@ class ActivityLogProvider {
           *, 
           ${AppDatabase.tableActivityImages}(*), 
           students(*),
-          activity_likes!left(count), 
-          activity_comments!left(count),
-          isLiked:activity_likes!left(user_id)
+          like_count:activity_likes(count),
+          comment_count:activity_comments(count),
+          my_like:activity_likes(id)
         ''')
         .eq(AppDatabase.colClassroomId, classroomId)
-        .eq('activity_likes.user_id', userId ?? '')
         .order(AppDatabase.colCreatedAt, ascending: false);
     
-    return _processResponse(response);
+    return _processResponse(response, userId);
   }
 
   Future<List<Map<String, dynamic>>> getLogsByStudent(String studentId, String classroomId) async {

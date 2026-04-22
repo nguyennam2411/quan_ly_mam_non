@@ -26,13 +26,13 @@ class ParentHealthView extends GetView<ParentHealthController> {
               ),
         ),
       ),
-      body: Obx(() {
+      body: Obx(() { 
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
-        return RefreshIndicator(
+        return RefreshIndicator( 
           onRefresh: controller.fetchHistory,
-          child: SingleChildScrollView(
+          child: SingleChildScrollView( 
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(AppConstants.paddingL),
             child: Column(
@@ -51,7 +51,8 @@ class ParentHealthView extends GetView<ParentHealthController> {
       }),
     );
   }
-
+  
+  // Xây dựng thẻ tóm tắt
   Widget _buildSummaryCard(BuildContext context) {
     final latest = controller.latestRecord;
     if (latest == null) {
@@ -73,7 +74,8 @@ class ParentHealthView extends GetView<ParentHealthController> {
         ),
       );
     }
-
+    
+    // Lấy màu sắc cho BMI
     final bmiColor = _bmiColor(latest.bmiCategoryLabel);
     return Container(
       padding: const EdgeInsets.all(AppConstants.paddingL),
@@ -146,7 +148,8 @@ class ParentHealthView extends GetView<ParentHealthController> {
       ),
     );
   }
-
+  
+  // Xây dựng thẻ hiển thị thông tin
   Widget _buildMetricItem(String label, String value, IconData icon) {
     return Column(
       children: [
@@ -160,7 +163,8 @@ class ParentHealthView extends GetView<ParentHealthController> {
       ],
     );
   }
-
+  
+  // Xây dựng biểu đồ tăng trưởng
   Widget _buildGrowthChart(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,7 +208,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
                   ],
                 ),
               )
-            : const SizedBox.shrink()),
+            : const SizedBox.shrink()), 
         AppConstants.spacingM,
         Container(
           padding: const EdgeInsets.all(AppConstants.paddingL),
@@ -245,7 +249,8 @@ class ParentHealthView extends GetView<ParentHealthController> {
       ],
     );
   }
-
+  
+  // Xây dựng tab chuyển đổi giữa chiều cao và cân nặng
   Widget _buildChartTab(BuildContext context, int index, String label, IconData icon) {
     return Expanded(
       child: Obx(() {
@@ -278,7 +283,8 @@ class ParentHealthView extends GetView<ParentHealthController> {
       }),
     );
   }
-
+  
+  // Xây dựng danh sách lịch sử đo lường
   Widget _buildHistoryList(BuildContext context, List<HealthRecordModel> history) {
     if (history.isEmpty) return const SizedBox();
 
@@ -297,7 +303,8 @@ class ParentHealthView extends GetView<ParentHealthController> {
       ],
     );
   }
-
+  
+  // Xây dựng từng mục trong danh sách lịch sử
   Widget _buildHistoryItem(BuildContext context, HealthRecordModel record) {
     final bmiColor = _bmiColor(record.bmiCategoryLabel);
     return Container(
@@ -368,7 +375,8 @@ class ParentHealthView extends GetView<ParentHealthController> {
       ),
     );
   }
-
+  
+  // Lấy màu sắc cho BMI
   Color _bmiColor(String label) {
     switch (label) {
       case 'Bình thường':

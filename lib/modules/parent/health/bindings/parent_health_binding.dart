@@ -7,7 +7,7 @@ class ParentHealthBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<HealthRecordRepository>(
-      () => HealthRecordRepository(provider: HealthRecordProvider()),
+      () => HealthRecordRepository(provider: HealthRecordProvider()), 
     );
     Get.lazyPut<ParentHealthController>(
       () => ParentHealthController(repository: Get.find()),

@@ -80,6 +80,7 @@ class HealthInputView extends GetView<HealthController> {
     );
   }
 
+  // Xây dựng bộ chọn tháng
   Widget _buildMonthSelector(BuildContext context) {
     return Obx(() {
       final month = controller.selectedMonth.value;
@@ -119,6 +120,7 @@ class HealthInputView extends GetView<HealthController> {
     });
   }
 
+  // Xây dựng bảng tiêu đề
   Widget _buildTableHeader(BuildContext context) {
     final style = Theme.of(context).textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.bold,
@@ -141,6 +143,7 @@ class HealthInputView extends GetView<HealthController> {
     );
   }
 
+  // Xây dựng hàng hiển thị thông tin học sinh
   Widget _buildStudentRow(BuildContext context, int index) {
     final row = controller.rows[index];
     return Container(
@@ -256,6 +259,7 @@ class HealthInputView extends GetView<HealthController> {
     );
   }
 
+  // Xây dựng ô nhập liệu
   Widget _buildNumberField({
     required TextEditingController controller,
     required String hint,
@@ -289,6 +293,7 @@ class HealthInputView extends GetView<HealthController> {
     );
   }
 
+  // Lấy màu sắc cho BMI
   Color _getBmiColor(String label) {
     switch (label) {
       case 'Bình thường':
@@ -302,7 +307,8 @@ class HealthInputView extends GetView<HealthController> {
         return AppColors.outlineVariant;
     }
   }
-
+  
+  // Hiển thị hộp thoại chọn tháng
   Future<void> _showMonthPicker(BuildContext context) async {
     final picked = await showDatePicker(
       context: context,

@@ -53,6 +53,7 @@ class ParentHealthController extends GetxController {
     return months.toDouble();
   }
 
+  // Xử lý dữ liệu để vẽ biểu đồ
   List<AppLineData> buildChartLines(bool isHeight) {
     final student = _studentService.selectedStudent.value;
     if (history.isEmpty || student == null) return [];
@@ -61,14 +62,23 @@ class ParentHealthController extends GetxController {
     final gender = student.gender;
     final isBoy = gender?.toUpperCase() == 'MALE';
 
-    // XÓA LÔ-GIC CẬP NHẬT Ở ĐÂY ĐỂ TRÁNH LỖI BUILD CYCLE
-    // isMissingInfo.value = birthday == null || gender == null;
+    // Lọc danh sách: Mỗi tháng/năm chỉ lấy 1 bản ghi mới nhất để vẽ biểu đồ
+    final Map<String, HealthRecordModel> monthlyLatest = {};
+    for (var record in history) {
+      final key = '${record.date.year}-${record.date.month}';
+      // Do history đã được sắp xếp theo date asc (trong provider), nên bản ghi sau sẽ tự động là bản ghi mới nhất của tháng đó.
+      monthlyLatest[key] = record;
+    }
 
-    // Đường của bé
-    final babySpots = history.map((record) {
+    final filteredHistory = monthlyLatest.values.toList();
+    // Sắp xếp lại danh sách đã lọc theo thời gian để vẽ đường line đúng hướng
+    filteredHistory.sort((a, b) => a.date.compareTo(b.date));
+
+    // Đường của bé (vẽ từ danh sách đã lọc)
+    final babySpots = filteredHistory.map((record) {
       final x = birthday != null 
           ? _calculateMonthAge(birthday, record.date) 
-          : history.indexOf(record).toDouble(); 
+          : filteredHistory.indexOf(record).toDouble(); 
       
       final value = isHeight
           ? record.height * 100 // m → cm
@@ -76,7 +86,7 @@ class ParentHealthController extends GetxController {
       return FlSpot(x, value);
     }).toList();
 
-    // Sắp xếp các điểm đo theo tháng tuổi tăng dần
+    // Đảm bảo các điểm vẽ biểu đồ theo thứ tự X tăng dần
     babySpots.sort((a, b) => a.x.compareTo(b.x));
 
     List<FlSpot> medianSpots = [];
@@ -87,18 +97,18 @@ class ParentHealthController extends GetxController {
     if (!isMissingInfo.value) {
       final whoData = WhoGrowthData.getChartPoints(isBoy: isBoy, isHeight: isHeight);
       double maxBabyMonth = babySpots.isNotEmpty ? babySpots.last.x : 0;
-
+      // Lấy dữ liệu WHO đến tháng của bé + 6 tháng
       for (var point in whoData) {
         final x = point['month']!;
         if (x <= maxBabyMonth + 6) {
-          medianSpots.add(FlSpot(x, point['median']!));
-          plus2Spots.add(FlSpot(x, point['plus2']!));
+          medianSpots.add(FlSpot(x, point['median']!)); 
+          plus2Spots.add(FlSpot(x, point['plus2']!)); 
           minus2Spots.add(FlSpot(x, point['minus2']!));
         }
       }
     }
 
-    final lines = <AppLineData>[];
+    final lines = <AppLineData>[]; 
     
     // Chỉ thêm các đường WHO vào danh sách nếu có dữ liệu
     if (medianSpots.isNotEmpty) {
@@ -140,7 +150,7 @@ class ParentHealthController extends GetxController {
 
     return lines;
   }
-
+  // Xây dựng chú thích cho biểu đồ
   List<Map<String, dynamic>> buildLegend(bool isHeight) {
     final legend = [
       {'label': _studentService.selectedStudent.value?.name ?? 'Của bé', 'color': AppColors.primary, 'isDashed': false},

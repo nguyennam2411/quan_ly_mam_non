@@ -80,6 +80,7 @@ class HealthController extends GetxController {
     super.onClose();
   }
 
+  // Lấy dữ liệu từ API
   Future<void> fetchData() async {
     if (classroomId.isEmpty) {
       debugPrint('HealthController: classroomId is empty, skipping fetch.');
@@ -133,6 +134,7 @@ class HealthController extends GetxController {
     }
   }
 
+  // Lưu dữ liệu
   Future<void> saveAll() async {
     final records = <Map<String, dynamic>>[];
     final now = DateTime.now();
@@ -186,7 +188,7 @@ class HealthController extends GetxController {
 
   void changeMonth(DateTime month) {
     selectedMonth.value = month;
-    fetchData();
+    fetchData(); 
   }
 
   void prevMonth() {

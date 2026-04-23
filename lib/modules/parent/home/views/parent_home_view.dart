@@ -218,6 +218,9 @@ class ParentHomeView extends StatelessWidget {
             }),
             _buildFeatureCard(Icons.health_and_safety_rounded, 'Sức khoẻ bé', () {
               Get.toNamed(Routes.PARENT_HEALTH);
+            }), // <--- MÌNH ĐÃ THÊM DẤU ĐÓNG NGOẶC BỊ THIẾU Ở ĐÂY
+            _buildFeatureCard(Icons.medication_rounded, 'Dặn thuốc', () {
+              Get.toNamed(Routes.PARENT_MEDICATION_REQUEST);
             }),
           ],
         ),

@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'app_routes.dart';
 
-// Common & Shared
+// --- Common & Shared ---
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
 import '../modules/shared/main_dashboard/bindings/main_binding.dart';
@@ -10,7 +10,7 @@ import '../modules/shared/main_dashboard/views/main_view.dart';
 import '../modules/shared/meal_plans/bindings/meal_plan_binding.dart';
 import '../modules/shared/meal_plans/views/meal_plan_view.dart';
 
-// Auth
+// --- Auth ---
 import '../modules/auth/login/bindings/login_binding.dart';
 import '../modules/auth/login/views/login_view.dart';
 import '../modules/auth/forgot_password/bindings/forgot_password_binding.dart';
@@ -18,34 +18,47 @@ import '../modules/auth/forgot_password/views/forgot_password_view.dart';
 import '../modules/auth/forgot_password/views/otp_verification_view.dart';
 import '../modules/auth/forgot_password/views/reset_password_view.dart';
 
-// Teacher
+// --- Teacher ---
 import '../modules/teacher/attendance/bindings/attendance_binding.dart';
 import '../modules/teacher/attendance/views/attendance_main_view.dart';
 import '../modules/teacher/attendance/views/attendance_list_view.dart';
 import '../modules/teacher/attendance/views/attendance_history_view.dart';
 import '../modules/teacher/attendance/views/attendance_statistic_view.dart';
+
 import '../modules/teacher/leave_request/bindings/teacher_leave_request_binding.dart';
 import '../modules/teacher/leave_request/views/teacher_leave_request_view.dart';
+
+import '../modules/teacher/medication_request/bindings/teacher_medication_request_binding.dart';
+import '../modules/teacher/medication_request/views/teacher_medication_request_view.dart';
+
 import '../modules/teacher/activity_log/bindings/teacher_activity_log_binding.dart';
 import '../modules/teacher/activity_log/views/teacher_activity_log_view.dart';
 import '../modules/teacher/activity_log/views/add_activity_log_view.dart';
 
-// Parent
-import '../modules/parent/attendance_history/bindings/attendance_history_binding.dart';
-import '../modules/parent/attendance_history/views/attendance_history_view.dart' as parent_history;
-import '../modules/parent/leave_request/bindings/parent_leave_request_binding.dart';
-import '../modules/parent/leave_request/views/parent_leave_request_view.dart';
-import '../modules/parent/leave_request/views/create_leave_request_view.dart';
-import '../modules/parent/activity_log/bindings/parent_activity_log_binding.dart';
-import '../modules/parent/activity_log/views/parent_activity_log_view.dart';
-import '../modules/parent/health/bindings/parent_health_binding.dart';
-import '../modules/parent/health/views/parent_health_view.dart';
-
-// Teacher Health
 import '../modules/teacher/health/bindings/health_binding.dart';
 import '../modules/teacher/health/views/health_input_view.dart';
 
+// --- Parent ---
+import '../modules/parent/attendance_history/bindings/attendance_history_binding.dart';
+import '../modules/parent/attendance_history/views/attendance_history_view.dart' as parent_history;
+
+import '../modules/parent/leave_request/bindings/parent_leave_request_binding.dart';
+import '../modules/parent/leave_request/views/parent_leave_request_view.dart';
+import '../modules/parent/leave_request/views/create_leave_request_view.dart';
+
+import '../modules/parent/medication_request/bindings/parent_medication_request_binding.dart';
+import '../modules/parent/medication_request/views/parent_medication_request_view.dart';
+import '../modules/parent/medication_request/views/create_medication_request_view.dart';
+
+import '../modules/parent/activity_log/bindings/parent_activity_log_binding.dart';
+import '../modules/parent/activity_log/views/parent_activity_log_view.dart';
+
+import '../modules/parent/health/bindings/parent_health_binding.dart';
+import '../modules/parent/health/views/parent_health_view.dart';
+
+
 class AppPages {
+  // Màn hình khởi đầu khi mở App
   static const INITIAL = Routes.SPLASH;
 
   static final routes = [
@@ -114,7 +127,14 @@ class AppPages {
       binding: TeacherLeaveRequestBinding(),
     ),
 
-    // 6. Teacher Activity Log
+    // 6. Teacher Medication Request
+    GetPage(
+      name: Routes.TEACHER_MEDICATION_REQUEST,
+      page: () => const TeacherMedicationRequestView(),
+      binding: TeacherMedicationRequestBinding(),
+    ),
+
+    // 7. Teacher Activity Log
     GetPage(
       name: Routes.TEACHER_ACTIVITY_LOG,
       page: () => const TeacherActivityLogView(),
@@ -126,14 +146,21 @@ class AppPages {
       binding: TeacherActivityLogBinding(),
     ),
 
-    // 7. Parent Attendance History
+    // 8. Teacher Health
+    GetPage(
+      name: Routes.TEACHER_HEALTH,
+      page: () => const HealthInputView(),
+      binding: HealthBinding(),
+    ),
+
+    // 9. Parent Attendance History
     GetPage(
       name: Routes.PARENT_ATTENDANCE_HISTORY,
       page: () => const parent_history.AttendanceHistoryView(),
       binding: AttendanceHistoryBinding(),
     ),
 
-    // 8. Parent Leave Request
+    // 10. Parent Leave Request
     GetPage(
       name: Routes.PARENT_LEAVE_REQUEST,
       page: () => const ParentLeaveRequestView(),
@@ -145,32 +172,37 @@ class AppPages {
       binding: ParentLeaveRequestBinding(),
     ),
 
-    // 9. Parent Activity Log
+    // 11. Parent Medication Request
+    GetPage(
+      name: Routes.PARENT_MEDICATION_REQUEST,
+      page: () => const ParentMedicationRequestView(),
+      binding: ParentMedicationRequestBinding(),
+    ),
+    GetPage(
+      name: Routes.PARENT_CREATE_MEDICATION_REQUEST,
+      page: () => const CreateMedicationRequestView(),
+      binding: ParentMedicationRequestBinding(),
+    ),
+
+    // 12. Parent Activity Log
     GetPage(
       name: Routes.PARENT_ACTIVITY_LOG,
       page: () => const ParentActivityLogView(),
       binding: ParentActivityLogBinding(),
     ),
 
-    // 10. Shared Meal Plan
-    GetPage(
-      name: Routes.MEAL_PLAN,
-      page: () => const MealPlanView(),
-      binding: MealPlanBinding(),
-    ),
-
-    // 11. Teacher Health
-    GetPage(
-      name: Routes.TEACHER_HEALTH,
-      page: () => const HealthInputView(),
-      binding: HealthBinding(),
-    ),
-
-    // 12. Parent Health
+    // 13. Parent Health
     GetPage(
       name: Routes.PARENT_HEALTH,
       page: () => const ParentHealthView(),
       binding: ParentHealthBinding(),
+    ),
+
+    // 14. Shared Meal Plan
+    GetPage(
+      name: Routes.MEAL_PLAN,
+      page: () => const MealPlanView(),
+      binding: MealPlanBinding(),
     ),
   ];
 }

@@ -7,6 +7,7 @@ class AppDatabase {
   static const String approved = 'APPROVED';
   static const String rejected = 'REJECTED';
   static const String cancelled = 'CANCELLED';
+  static const String completed = 'APPROVED';
 
   // Attendance Status
   static const String statusPresent = 'PRESENT';
@@ -57,6 +58,13 @@ class AppDatabase {
   static const String colApprovedBy = 'approved_by';
   static const String colApprovedAt = 'approved_at';
   static const String colEvidenceUrl = 'evidence_url';
+
+  // Medication Requests Columns
+  static const String tableMedicationRequests = 'medication_requests';
+  static const String colMedicineName = 'medicine_name';
+  static const String colDosage = 'dosage';
+  static const String colTime = 'time';
+  static const String colPrescriptionImage = 'prescription_image';
 
 
   // Notifications Columns

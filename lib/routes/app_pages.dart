@@ -23,8 +23,13 @@ import '../modules/teacher/attendance/views/attendance_history_view.dart';
 import '../modules/parent/leave_request/bindings/parent_leave_request_binding.dart';
 import '../modules/parent/leave_request/views/parent_leave_request_view.dart';
 import '../modules/parent/leave_request/views/create_leave_request_view.dart';
+import '../modules/parent/medication_request/bindings/parent_medication_request_binding.dart';
+import '../modules/parent/medication_request/views/parent_medication_request_view.dart';
+import '../modules/parent/medication_request/views/create_medication_request_view.dart';
 import '../modules/teacher/leave_request/bindings/teacher_leave_request_binding.dart';
 import '../modules/teacher/leave_request/views/teacher_leave_request_view.dart';
+import '../modules/teacher/medication_request/bindings/teacher_medication_request_binding.dart';
+import '../modules/teacher/medication_request/views/teacher_medication_request_view.dart';
 import '../modules/teacher/activity_log/bindings/teacher_activity_log_binding.dart';
 import '../modules/teacher/activity_log/views/teacher_activity_log_view.dart';
 import '../modules/teacher/activity_log/views/add_activity_log_view.dart';
@@ -103,11 +108,28 @@ class AppPages {
       binding: ParentLeaveRequestBinding(),
     ),
 
+    GetPage(
+      name: Routes.PARENT_MEDICATION_REQUEST,
+      page: () => const ParentMedicationRequestView(),
+      binding: ParentMedicationRequestBinding(),
+    ),
+    GetPage(
+      name: Routes.PARENT_CREATE_MEDICATION_REQUEST,
+      page: () => const CreateMedicationRequestView(),
+      binding: ParentMedicationRequestBinding(),
+    ),
+
+
     // 7. Chức năng Giáo viên
     GetPage(
       name: Routes.TEACHER_LEAVE_REQUEST,
       page: () => const TeacherLeaveRequestView(),
       binding: TeacherLeaveRequestBinding(),
+    ),
+    GetPage(
+      name: Routes.TEACHER_MEDICATION_REQUEST,
+      page: () => const TeacherMedicationRequestView(),
+      binding: TeacherMedicationRequestBinding(),
     ),
 
     // 8. Nhật ký hoạt động (Teacher)

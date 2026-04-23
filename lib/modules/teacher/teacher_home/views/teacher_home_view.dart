@@ -89,6 +89,11 @@ class TeacherHomeView extends StatelessWidget {
               onTap: () => Get.toNamed(Routes.TEACHER_LEAVE_REQUEST),
             ),
             _buildFeatureCard(
+              Icons.medication_rounded, 
+              'Dặn thuốc',
+              onTap: () => Get.toNamed(Routes.TEACHER_MEDICATION_REQUEST),
+            ),
+            _buildFeatureCard(
               Icons.history_edu_rounded, 
               'Nhật ký hoạt động',
               onTap: () => Get.toNamed(Routes.TEACHER_ACTIVITY_LOG),

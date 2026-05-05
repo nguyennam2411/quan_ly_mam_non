@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import '../../../core/values/app_database.dart';
+import '../../../core/utils/date_helper.dart';
 import 'activity_comment_model.dart';
 import 'activity_image_model.dart';
 import 'student_model.dart';
@@ -23,7 +24,7 @@ class ActivityLogModel {
   @JsonKey(name: AppDatabase.colContent)
   final String content;
 
-  @JsonKey(name: AppDatabase.colCreatedAt)
+  @JsonKey(name: AppDatabase.colCreatedAt, fromJson: DateHelper.parseUtcNullable)
   final DateTime? createdAt;
 
   // Joined fields
@@ -82,7 +83,7 @@ class ActivityLogModel {
       studentId: json[AppDatabase.colStudentId],
       content: json[AppDatabase.colContent],
       createdAt: json[AppDatabase.colCreatedAt] != null 
-          ? DateTime.parse(json[AppDatabase.colCreatedAt]) 
+          ? DateHelper.parseUtcNullable(json[AppDatabase.colCreatedAt]) 
           : null,
       images: imageList,
       student: json['students'] != null ? StudentModel.fromJson(json['students']) : null,

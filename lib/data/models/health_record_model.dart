@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import '../../../core/values/app_database.dart';
+import '../../../core/utils/date_helper.dart';
 
 part 'health_record_model.g.dart';
 
@@ -27,7 +28,7 @@ class HealthRecordModel {
   @JsonKey(name: AppDatabase.colBmi)
   final double bmi;
   
-  @JsonKey(name: AppDatabase.colDate)
+  @JsonKey(name: AppDatabase.colDate, fromJson: DateHelper.parseUtc)
   final DateTime date;
   
   @JsonKey(name: AppDatabase.colTeacherId)
@@ -36,7 +37,7 @@ class HealthRecordModel {
   @JsonKey(name: AppDatabase.colNote)
   final String? note;
   
-  @JsonKey(name: AppDatabase.colCreatedAt)
+  @JsonKey(name: AppDatabase.colCreatedAt, fromJson: DateHelper.parseUtc)
   final DateTime createdAt;
 
   // Tên bé từ join query (không lưu vào DB)

@@ -101,7 +101,11 @@ class TeacherHomeView extends StatelessWidget {
                 'title': 'Thực đơn của lớp',
               }),
             ),
-            _buildFeatureCard(Icons.edit_calendar_rounded, 'Lịch hoạt động'),
+            _buildFeatureCard(
+              Icons.schedule_rounded, 
+              'Thời khóa biểu',
+              onTap: () => Get.toNamed(Routes.TEACHER_SCHEDULE),
+            ),
             _buildFeatureCard(
               Icons.health_and_safety_rounded,
               'Sức khoẻ bé',

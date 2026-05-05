@@ -194,7 +194,9 @@ class ParentHomeView extends StatelessWidget {
           crossAxisSpacing: 16,
           childAspectRatio: 1.5,
           children: [
-            _buildFeatureCard(Icons.calendar_today_rounded, 'Lịch học', () {}),
+            _buildFeatureCard(Icons.schedule_rounded, 'Lịch sinh hoạt', () {
+              Get.toNamed(Routes.PARENT_STUDENT_SCHEDULE);
+            }),
             _buildFeatureCard(Icons.restaurant_rounded, 'Thực đơn', () {
               final student = studentService.selectedStudent.value;
               if (student != null) {

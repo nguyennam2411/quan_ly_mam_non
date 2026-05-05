@@ -69,28 +69,41 @@ class LeaveRequestDetailContent extends StatelessWidget {
         ],
 
         // Evidence
-        if (request.evidenceUrl != null && request.evidenceUrl!.isNotEmpty)
+        if (request.images.isNotEmpty)
           _buildSection(
             context,
             label: AppStrings.leaveRequestEvidenceInfo,
-            content: GestureDetector(
-              onTap: () => AppImageViewer.show(
-                imageUrl: request.evidenceUrl,
-                title: AppStrings.leaveRequestEvidenceTitle,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppConstants.radiusM),
-                child: Image.network(
-                  request.evidenceUrl!,
-                  width: double.infinity,
-                  height: 220,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    height: 100,
-                    color: AppColors.surfaceVariant,
-                    child: const Icon(Icons.image_not_supported_outlined, color: AppColors.outline),
-                  ),
-                ),
+            content: SizedBox(
+              height: 120,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: request.images.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final imageUrl = request.images[index];
+                  return GestureDetector(
+                    onTap: () => AppImageViewer.show(
+                      imageUrls: request.images,
+                      initialIndex: index,
+                      title: AppStrings.leaveRequestEvidenceTitle,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppConstants.radiusM),
+                      child: Image.network(
+                        imageUrl,
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 120,
+                          height: 120,
+                          color: AppColors.surfaceVariant,
+                          child: const Icon(Icons.image_not_supported_outlined, color: AppColors.outline),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -101,7 +114,7 @@ class LeaveRequestDetailContent extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     String sentAt = '';
     if (request.createdAt != null) {
-      sentAt = DateFormat('HH:mm - dd/MM/yyyy').format(request.createdAt!);
+      sentAt = DateFormat('HH:mm - dd/MM/yyyy').format(request.createdAt!.toLocal());
     }
 
     return Row(

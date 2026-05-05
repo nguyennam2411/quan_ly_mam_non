@@ -13,8 +13,8 @@ HealthRecordModel _$HealthRecordModelFromJson(Map<String, dynamic> json) =>
       height: (json['height'] as num).toDouble(),
       weight: (json['weight'] as num).toDouble(),
       bmi: (json['bmi'] as num).toDouble(),
-      date: DateTime.parse(json['date'] as String),
-      createdAt: DateTime.parse(json['created_at'] as String),
+      date: DateHelper.parseUtc(json['date']),
+      createdAt: DateHelper.parseUtc(json['created_at']),
       teacherId: json['teacher_id'] as String?,
       note: json['note'] as String?,
     );

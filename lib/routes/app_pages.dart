@@ -45,6 +45,13 @@ import '../modules/parent/health/views/parent_health_view.dart';
 import '../modules/teacher/health/bindings/health_binding.dart';
 import '../modules/teacher/health/views/health_input_view.dart';
 
+// Schedules & Lessons
+import '../modules/teacher/schedule_management/bindings/schedule_mgmt_binding.dart';
+import '../modules/teacher/schedule_management/views/schedule_mgmt_view.dart';
+import '../modules/teacher/schedule_management/views/lesson_editor_view.dart';
+import '../modules/parent/student_schedule/bindings/student_schedule_binding.dart';
+import '../modules/parent/student_schedule/views/student_schedule_view.dart';
+
 class AppPages {
   static const INITIAL = Routes.SPLASH;
 
@@ -171,6 +178,25 @@ class AppPages {
       name: Routes.PARENT_HEALTH,
       page: () => const ParentHealthView(),
       binding: ParentHealthBinding(),
+    ),
+
+    // 13. Teacher Schedule Management
+    GetPage(
+      name: Routes.TEACHER_SCHEDULE,
+      page: () => const ScheduleMgmtView(),
+      binding: ScheduleMgmtBinding(),
+    ),
+    GetPage(
+      name: Routes.TEACHER_LESSON_EDITOR,
+      page: () => const LessonEditorView(),
+      binding: ScheduleMgmtBinding(), // Dùng chung binding để có cả 2 controller
+    ),
+
+    // 14. Parent Student Schedule
+    GetPage(
+      name: Routes.PARENT_STUDENT_SCHEDULE,
+      page: () => const StudentScheduleView(),
+      binding: StudentScheduleBinding(),
     ),
   ];
 }

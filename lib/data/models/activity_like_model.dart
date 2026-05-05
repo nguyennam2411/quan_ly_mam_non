@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import '../../../core/utils/date_helper.dart';
 
 part 'activity_like_model.g.dart';
 
@@ -9,7 +10,7 @@ class ActivityLikeModel {
   final String activityLogId;
   @JsonKey(name: 'user_id')
   final String userId;
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: DateHelper.parseUtc)
   final DateTime createdAt;
 
   ActivityLikeModel({

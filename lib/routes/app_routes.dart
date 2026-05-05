@@ -31,4 +31,9 @@ abstract class Routes {
   // Nhật ký (Parent)
   static const PARENT_ACTIVITY_LOG = '/parent/activity-log';
   static const PARENT_HEALTH = '/parent/health';
+  static const PARENT_STUDENT_SCHEDULE = '/parent/student-schedule';
+
+  // Thời khóa biểu & Bài học
+  static const TEACHER_SCHEDULE = '/teacher/schedule';
+  static const TEACHER_LESSON_EDITOR = '/teacher/lesson-editor';
 }

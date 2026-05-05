@@ -102,7 +102,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
               const Icon(Icons.monitor_heart_rounded, color: Colors.white70, size: 16),
               const SizedBox(width: 6),
               Text(
-                'Lần đo gần nhất — ${DateFormat('dd/MM/yyyy').format(latest.date)}',
+                'Lần đo gần nhất — ${DateFormat('dd/MM/yyyy').format(latest.date.toLocal())}',
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
@@ -331,7 +331,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  DateFormat('dd/MM/yyyy').format(record.date),
+                  DateFormat('dd/MM/yyyy').format(record.date.toLocal()),
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.onSurface,

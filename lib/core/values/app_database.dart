@@ -11,6 +11,10 @@ class AppDatabase {
   static const String statusPresent = 'PRESENT';
   static const String statusAbsentUnexcused = 'ABSENT_UNEXCUSED';
   static const String statusAbsentExcused = 'ABSENT_EXCUSED';
+  
+  // --- Lesson Status ---
+  static const String statusDraft = 'draft';
+  static const String statusPublished = 'published';
 
   // --- Attendance Method ---
   static const String methodManual = 'MANUAL';
@@ -28,7 +32,9 @@ class AppDatabase {
   static const String tableRoles = 'roles';
   static const String tableGrades = 'grades';          
   static const String tableHealthRecords = 'health_records'; 
-  static const String tableMealPlans = 'meal_plans';     
+  static const String tableMealPlans = 'meal_plans';  
+  static const String tableSchedules = 'schedules';
+  static const String tableLessons = 'lessons';   
 
   // --- Common Columns ---
   static const String colId = 'id';
@@ -41,6 +47,7 @@ class AppDatabase {
   static const String colDate = 'date';
   static const String colTeacherId = 'teacher_id';      
   static const String colNote = 'note';
+  static const String colScheduleId = 'schedule_id';
 
   // --- Students Columns ---
   static const String colClassroomId = 'classroom_id';
@@ -60,7 +67,7 @@ class AppDatabase {
   static const String colCancelReason = 'cancel_reason';
   static const String colApprovedBy = 'approved_by';
   static const String colApprovedAt = 'approved_at';
-  static const String colEvidenceUrl = 'evidence_url';
+  static const String colImages = 'images';
 
   // --- Notifications Columns ---
   static const String colTitle = 'title';
@@ -98,4 +105,18 @@ class AppDatabase {
   static const String colBreakfastTime = 'breakfast_time';
   static const String colLunchTime = 'lunch_time';
   static const String colSnackTime = 'snack_time';
+
+  // --- Schedules Columns ---
+  static const String colStartTime = 'start_time';
+  static const String colEndTime = 'end_time';
+  static const String colActivityName = 'activity_name';
+  static const String colIsLessonSlot = 'is_lesson_slot';
+
+  // --- Lessons Columns ---
+  static const String colObjectives = 'objectives';
+  static const String colLessonImages = 'images';
+  static const String colYoutubeUrl = 'youtube_url';
+  static const String colAttachmentUrl = 'attachment_url';
+  static const String colPreparation = 'preparation';
+  static const String colProcedures = 'procedures';
 }

@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/values/app_constants.dart';
 import '../../../../../core/values/app_database.dart';
-import '../../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../../core/values/app_strings.dart';
+import '../../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../../global_widgets/headers/page_header.dart';
 import '../controllers/attendance_history_controller.dart';
 
 class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
@@ -14,21 +16,14 @@ class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: const CircleBackButton(),
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          'Chuyên cần',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.onBackground,
-              ),
-        ),
-      ),
+      appBar: const MainAppBar(title: AppStrings.attendanceHistoryTitle),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const PageHeader(
+            title: AppStrings.attendanceHistoryTitle,
+            subtitle: AppStrings.attendanceHistorySubtitle,
+          ),
           _buildStatsHeader(),
           Expanded(
             child: Obx(() {
@@ -55,6 +50,7 @@ class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
       ),
     );
   }
+
 
   Widget _buildStatsHeader() {
     return Container(

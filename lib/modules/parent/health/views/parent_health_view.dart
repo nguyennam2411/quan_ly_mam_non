@@ -3,8 +3,11 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
+import '../../../../core/values/app_database.dart';
+import '../../../../core/values/app_strings.dart';
 import '../../../../data/models/health_record_model.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/headers/page_header.dart';
 import '../../../../global_widgets/charts/app_line_chart.dart';
 import '../controllers/parent_health_controller.dart';
 
@@ -15,17 +18,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: Text(
-          'Sức khoẻ & Phát triển',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-      ),
+      appBar: const MainAppBar(title: AppStrings.healthTitle),
       body: Obx(() { 
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -34,15 +27,26 @@ class ParentHealthView extends GetView<ParentHealthController> {
           onRefresh: controller.fetchHistory,
           child: SingleChildScrollView( 
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(AppConstants.paddingL),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSummaryCard(context),
-                AppConstants.spacingXL,
-                _buildGrowthChart(context),
-                AppConstants.spacingXL,
-                _buildHistoryList(context, controller.history.toList()),
+                const PageHeader(
+                  title: AppStrings.healthTitle,
+                  subtitle: AppStrings.healthSubtitle,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingL),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSummaryCard(context),
+                      AppConstants.spacingXL,
+                      _buildGrowthChart(context),
+                      AppConstants.spacingXL,
+                      _buildHistoryList(context, controller.history.toList()),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: AppConstants.paddingXXL),
               ],
             ),
@@ -52,6 +56,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
     );
   }
   
+
   // Xây dựng thẻ tóm tắt
   Widget _buildSummaryCard(BuildContext context) {
     final latest = controller.latestRecord;

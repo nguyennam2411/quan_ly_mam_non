@@ -52,6 +52,10 @@ import '../modules/teacher/schedule_management/views/lesson_editor_view.dart';
 import '../modules/parent/student_schedule/bindings/student_schedule_binding.dart';
 import '../modules/parent/student_schedule/views/student_schedule_view.dart';
 
+// Student QR
+import '../modules/parent/student_qr/bindings/student_qr_binding.dart';
+import '../modules/parent/student_qr/views/student_qr_view.dart';
+
 class AppPages {
   static const INITIAL = Routes.SPLASH;
 
@@ -197,6 +201,13 @@ class AppPages {
       name: Routes.PARENT_STUDENT_SCHEDULE,
       page: () => const StudentScheduleView(),
       binding: StudentScheduleBinding(),
+    ),
+
+    // 15. Parent Student QR
+    GetPage(
+      name: Routes.PARENT_STUDENT_QR,
+      page: () => const StudentQrView(),
+      binding: StudentQrBinding(),
     ),
   ];
 }

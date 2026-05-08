@@ -43,4 +43,19 @@ class DateHelper {
     if (date == null) return '';
     return DateFormat('HH:mm').format(date.toLocal());
   }
+
+  /// Định dạng hiển thị đầy đủ: Thứ, ngày dd/MM/yyyy
+  static String formatFullDate(DateTime date) {
+    final days = {
+      DateTime.monday: 'Thứ Hai',
+      DateTime.tuesday: 'Thứ Ba',
+      DateTime.wednesday: 'Thứ Tư',
+      DateTime.thursday: 'Thứ Năm',
+      DateTime.friday: 'Thứ Sáu',
+      DateTime.saturday: 'Thứ Bảy',
+      DateTime.sunday: 'Chủ Nhật',
+    };
+    final weekday = days[date.weekday];
+    return '$weekday, ngày ${DateFormat('dd/MM/yyyy').format(date)}';
+  }
 }

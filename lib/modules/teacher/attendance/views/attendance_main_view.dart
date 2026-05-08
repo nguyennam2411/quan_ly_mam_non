@@ -5,7 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/calendar/app_calendar_picker.dart';
 import '../controllers/attendance_controller.dart';
 import '../widgets/calendar_legend.dart';
@@ -17,16 +17,8 @@ class AttendanceMainView extends GetView<AttendanceController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: Text(
-          AppStrings.attendanceTitle,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
+      appBar: MainAppBar(
+        title: AppStrings.attendanceTitle,
         actions: [
           IconButton(
             onPressed: () => controller.goToStatistics(),

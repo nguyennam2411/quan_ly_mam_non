@@ -49,6 +49,8 @@ class AppDatabase {
   static const String colNote = 'note';
   static const String colScheduleId = 'schedule_id';
 
+  static const String colCode = 'code';
+
   // --- Students Columns ---
   static const String colClassroomId = 'classroom_id';
   static const String colParentId = 'parent_id';

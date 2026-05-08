@@ -5,6 +5,7 @@ import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/core/values/app_database.dart';
 import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import 'package:quan_ly_mam_non/core/utils/dialog.dart';
+import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
 import 'package:quan_ly_mam_non/global_widgets/images/image_picker_grid.dart';
 import 'package:quan_ly_mam_non/global_widgets/buttons/primary_button.dart';
 import 'package:quan_ly_mam_non/modules/teacher/schedule_management/controllers/lesson_editor_controller.dart';
@@ -20,10 +21,8 @@ class LessonEditorView extends GetView<LessonEditorController> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Soạn bài học', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        elevation: 0,
+      appBar: MainAppBar(
+        title: 'Soạn bài học',
         actions: [
           Obx(() => controller.isSaving.value
               ? const SizedBox(

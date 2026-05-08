@@ -3,8 +3,14 @@ import 'package:get/get.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/services/parent_student_service.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/date_helper.dart';
 import '../../../../core/values/app_constants.dart';
+import '../../../../core/values/app_database.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../../global_widgets/home/home_section_header.dart';
+import '../../../../global_widgets/home/quick_feature_card.dart';
+import '../../../../global_widgets/home/home_welcome_header.dart';
+import '../../../../global_widgets/buttons/action_pill_button.dart';
 
 class ParentHomeView extends StatelessWidget {
   const ParentHomeView({super.key});
@@ -23,29 +29,8 @@ class ParentHomeView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Welcome Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Xin chào Phụ huynh',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        user?.email ?? '...',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              HomeWelcomeHeader(
+                userName: AuthService.to.userProfile[AppDatabase.colName] ?? "Phụ huynh học sinh",
               ),
               
               const SizedBox(height: 24),
@@ -58,22 +43,158 @@ class ParentHomeView extends StatelessWidget {
               // Status Card (Dựa trên bé đang chọn)
               Obx(() {
                 final student = studentService.selectedStudent.value;
+                if (student == null) return const SizedBox.shrink();
+
                 return Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(AppConstants.paddingM),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: AppColors.primaryContainer,
-                    borderRadius: BorderRadius.circular(AppConstants.radiusL),
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.08),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Stack(
                     children: [
-                      Text(
-                        '${student?.name ?? "bé"}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.onPrimaryContainer,
+                      // Decoration Icon
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.child_care_rounded,
+                            color: AppColors.onPrimaryContainer,
+                            size: 32,
+                          ),
                         ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text(
+                              'THÔNG TIN BÉ',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.onPrimaryContainer,
+                                letterSpacing: 1.1,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              // Avatar
+                              Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.onPrimaryContainer.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: CircleAvatar(
+                                  radius: 32,
+                                  backgroundColor: Colors.white.withOpacity(0.5),
+                                  backgroundImage: student.avatarUrl != null
+                                      ? NetworkImage(student.avatarUrl!)
+                                      : null,
+                                  child: student.avatarUrl == null
+                                      ? const Icon(Icons.person,
+                                          size: 35, color: AppColors.onPrimaryContainer)
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              // Details
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      student.name,
+                                      style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.onPrimaryContainer,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.cake_rounded,
+                                            size: 16, color: AppColors.onPrimaryContainer),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          student.birthday != null
+                                              ? DateHelper.formatDate(student.birthday!)
+                                              : 'Chưa cập nhật',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.onPrimaryContainer,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.school_rounded,
+                                            size: 16, color: AppColors.onPrimaryContainer),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Lớp: ${student.classroomName ?? "..."}',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.onPrimaryContainer,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          // Buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ActionPillButton(
+                                  icon: Icons.qr_code_rounded,
+                                  label: 'QR bé',
+                                  onTap: () => Get.toNamed(Routes.PARENT_STUDENT_QR, arguments: student.id),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ActionPillButton(
+                                  icon: Icons.person_pin_rounded,
+                                  label: 'Hồ sơ',
+                                  onTap: () {},
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -98,9 +219,9 @@ class ParentHomeView extends StatelessWidget {
         Text(
           'Chọn con',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.onSurfaceVariant,
-          ),
+                fontWeight: FontWeight.bold,
+                color: AppColors.onSurfaceVariant,
+              ),
         ),
         const SizedBox(height: 12),
         Obx(() {
@@ -113,53 +234,71 @@ class ParentHomeView extends StatelessWidget {
           }
 
           return SizedBox(
-            height: 90,
+            height: 52,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: service.students.length,
+              clipBehavior: Clip.none,
               itemBuilder: (context, index) {
                 final student = service.students[index];
-                
+
                 return Obx(() {
                   final isSelected = service.selectedStudent.value?.id == student.id;
-                  
+
                   return GestureDetector(
                     onTap: () => service.selectStudent(student),
-                    child: Container(
-                      width: 70,
-                      margin: const EdgeInsets.only(right: 16),
-                      child: Column(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      margin: const EdgeInsets.only(right: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.primary : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isSelected ? AppColors.primary : AppColors.primary.withOpacity(0.1),
+                          width: 1.5,
+                        ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                )
+                              ]
+                            : [],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(3),
+                            padding: const EdgeInsets.all(1.5),
                             decoration: BoxDecoration(
+                              color: isSelected ? Colors.white.withOpacity(0.3) : AppColors.primary.withOpacity(0.1),
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                color: isSelected ? AppColors.primary : Colors.transparent,
-                                width: 2,
-                              ),
                             ),
                             child: CircleAvatar(
-                              radius: 25,
-                              backgroundColor: AppColors.surfaceContainerHigh,
-                              backgroundImage: student.avatarUrl != null 
-                                  ? NetworkImage(student.avatarUrl!) 
+                              radius: 14,
+                              backgroundColor: Colors.white,
+                              backgroundImage: student.avatarUrl != null
+                                  ? NetworkImage(student.avatarUrl!)
                                   : null,
-                              child: student.avatarUrl == null 
-                                  ? const Icon(Icons.person, color: AppColors.primary) 
+                              child: student.avatarUrl == null
+                                  ? Icon(Icons.person,
+                                      size: 16,
+                                      color: isSelected ? AppColors.primary : AppColors.primary)
                                   : null,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(width: 10),
                           Text(
                             student.name.split(' ').last,
                             style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: isSelected ? AppColors.primary : AppColors.onSurface,
+                              fontSize: 14,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                              color: isSelected ? Colors.white : AppColors.onSurface,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -179,82 +318,64 @@ class ParentHomeView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Tiện ích',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        const HomeSectionHeader(title: 'Tiện ích hệ thống'),
         const SizedBox(height: 16),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 1.5,
+          crossAxisCount: 4,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 0.85,
           children: [
-            _buildFeatureCard(Icons.schedule_rounded, 'Lịch sinh hoạt', () {
-              Get.toNamed(Routes.PARENT_STUDENT_SCHEDULE);
-            }),
-            _buildFeatureCard(Icons.restaurant_rounded, 'Thực đơn', () {
-              final student = studentService.selectedStudent.value;
-              if (student != null) {
-                Get.toNamed(Routes.MEAL_PLAN, arguments: {
-                  'gradeId': student.gradeId,
-                  'title': 'Thực đơn Khối ${student.gradeName}',
-                });
-              } else {
-                Get.snackbar('Thông báo', 'Vui lòng chọn bé để xem thực đơn');
-              }
-            }),
-            _buildFeatureCard(Icons.assignment_ind_rounded, 'Xin nghỉ học', () {
-              Get.toNamed(Routes.PARENT_LEAVE_REQUEST);
-            }),
-            _buildFeatureCard(Icons.history_edu_rounded, 'Nhật ký của bé', () {
-              Get.toNamed(Routes.PARENT_ACTIVITY_LOG);
-            }),
-            _buildFeatureCard(Icons.payment_rounded, 'Học phí', () {}),
-            _buildFeatureCard(Icons.timeline_rounded, 'Chuyên cần', () {
-              Get.toNamed(Routes.PARENT_ATTENDANCE_HISTORY);
-            }),
-            _buildFeatureCard(Icons.health_and_safety_rounded, 'Sức khoẻ bé', () {
-              Get.toNamed(Routes.PARENT_HEALTH);
-            }),
+            QuickFeatureCard(
+              icon: Icons.schedule_rounded,
+              label: 'Sinh hoạt',
+              onTap: () => Get.toNamed(Routes.PARENT_STUDENT_SCHEDULE),
+            ),
+            QuickFeatureCard(
+              icon: Icons.restaurant_rounded,
+              label: 'Thực đơn',
+              onTap: () {
+                final student = studentService.selectedStudent.value;
+                if (student != null) {
+                  Get.toNamed(Routes.MEAL_PLAN, arguments: {
+                    'gradeId': student.gradeId,
+                    'title': 'Thực đơn Khối ${student.gradeName}',
+                  });
+                } else {
+                  Get.snackbar('Thông báo', 'Vui lòng chọn bé để xem thực đơn');
+                }
+              },
+            ),
+            QuickFeatureCard(
+              icon: Icons.assignment_ind_rounded,
+              label: 'Xin nghỉ',
+              onTap: () => Get.toNamed(Routes.PARENT_LEAVE_REQUEST),
+            ),
+            QuickFeatureCard(
+              icon: Icons.history_edu_rounded,
+              label: 'Nhật ký',
+              onTap: () => Get.toNamed(Routes.PARENT_ACTIVITY_LOG),
+            ),
+            QuickFeatureCard(
+              icon: Icons.payment_rounded,
+              label: 'Học phí',
+              onTap: () {},
+            ),
+            QuickFeatureCard(
+              icon: Icons.timeline_rounded,
+              label: 'Chuyên cần',
+              onTap: () => Get.toNamed(Routes.PARENT_ATTENDANCE_HISTORY),
+            ),
+            QuickFeatureCard(
+              icon: Icons.health_and_safety_rounded,
+              label: 'Sức khỏe',
+              onTap: () => Get.toNamed(Routes.PARENT_HEALTH),
+            ),
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildFeatureCard(IconData icon, String label, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppConstants.radiusM),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(AppConstants.radiusM),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: AppColors.primary),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

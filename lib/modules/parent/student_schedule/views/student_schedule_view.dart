@@ -7,6 +7,8 @@ import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import 'package:quan_ly_mam_non/global_widgets/calendar/app_calendar_picker.dart';
 import 'package:quan_ly_mam_non/modules/parent/student_schedule/controllers/student_schedule_controller.dart';
 import 'package:quan_ly_mam_non/modules/parent/student_schedule/widgets/student_schedule_tile.dart';
+import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
+import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 
 class StudentScheduleView extends GetView<StudentScheduleController> {
   const StudentScheduleView({super.key});
@@ -15,18 +17,9 @@ class StudentScheduleView extends GetView<StudentScheduleController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(
-          'Lịch sinh hoạt của bé',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: AppColors.background,
-      ),
+      appBar: const MainAppBar(title: AppStrings.scheduleTitle),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildCompactHeader(context),
           
@@ -76,6 +69,7 @@ class StudentScheduleView extends GetView<StudentScheduleController> {
       ),
     );
   }
+
 
   Widget _buildCompactHeader(BuildContext context) {
     return Container(

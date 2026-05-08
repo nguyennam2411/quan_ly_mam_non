@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/charts/app_bar_chart.dart';
 import '../../../../global_widgets/charts/app_pie_chart.dart';
 import '../controllers/attendance_statistic_controller.dart';
@@ -16,17 +16,7 @@ class AttendanceStatisticView extends GetView<AttendanceStatisticController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: Text(
-          'Thống kê chuyên cần',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-      ),
+      appBar: const MainAppBar(title: 'Thống kê chuyên cần'),
       body: Obx(() {
         if (controller.isLoading.value && controller.monthlyRawData.isEmpty) {
           return const Center(child: CircularProgressIndicator());

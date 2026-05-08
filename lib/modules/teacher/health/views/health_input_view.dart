@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/headers/page_header.dart';
 import '../controllers/health_controller.dart';
+import '../../../../core/values/app_strings.dart';
 
 class HealthInputView extends GetView<HealthController> {
   const HealthInputView({super.key});
@@ -13,16 +15,8 @@ class HealthInputView extends GetView<HealthController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: Text(
-          'Sức khoẻ & Phát triển',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
+      appBar: MainAppBar(
+        title: AppStrings.healthTitle,
         actions: [
           Obx(() => controller.isSaving.value
               ? const Padding(
@@ -45,6 +39,10 @@ class HealthInputView extends GetView<HealthController> {
       ),
       body: Column(
         children: [
+          const PageHeader(
+            title: AppStrings.healthTitle,
+            subtitle: AppStrings.healthTeacherSubtitle,
+          ),
           _buildMonthSelector(context),
           _buildTableHeader(context),
           Expanded(

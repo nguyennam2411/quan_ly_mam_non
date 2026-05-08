@@ -6,7 +6,8 @@ import '../../../../core/values/app_constants.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/headers/page_header.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/leave_request/leave_request_filter_tabs.dart';
 import '../../../../global_widgets/leave_request/leave_request_card.dart';
@@ -20,22 +21,14 @@ class ParentLeaveRequestView extends GetView<ParentLeaveRequestController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: Text(
-          AppStrings.leaveRequestTitle,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-          ),
-        ),
-      ),
+      appBar: const MainAppBar(title: AppStrings.leaveRequestTitle),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(context),
+          const PageHeader(
+            title: AppStrings.leaveRequestTitle,
+            subtitle: AppStrings.leaveRequestSubtitle,
+          ),
           _buildFilterAndSort(context),
           AppConstants.spacingM,
           Expanded(child: _buildRequestList(context)),
@@ -50,38 +43,7 @@ class ParentLeaveRequestView extends GetView<ParentLeaveRequestController> {
       ),
     );
   }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppConstants.horizontalPadding,
-        AppConstants.paddingL, // Thêm padding trên
-        AppConstants.horizontalPadding,
-        0,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.leaveRequestTitle,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: AppColors.onBackground,
-            ),
-          ),
-          AppConstants.spacingXS,
-          Text(
-            AppStrings.leaveRequestSubtitle,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
-          ),
-          AppConstants.spacingL,
-        ],
-      ),
-    );
-  }
-
+  
   Widget _buildFilterAndSort(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),

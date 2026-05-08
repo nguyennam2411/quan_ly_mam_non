@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../controllers/attendance_controller.dart';
@@ -29,17 +29,8 @@ class AttendanceHistoryView extends GetView<AttendanceController> {
       },
       child: Scaffold(
         backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: Text(
-          AppStrings.attendanceHistoryTitle,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        centerTitle: true,
+      appBar: MainAppBar(
+        title: AppStrings.attendanceHistoryTitle,
         actions: [
           if (!controller.isFuture)
             Obx(() => IconButton(

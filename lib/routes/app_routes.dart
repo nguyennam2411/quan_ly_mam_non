@@ -36,4 +36,7 @@ abstract class Routes {
   // Thời khóa biểu & Bài học
   static const TEACHER_SCHEDULE = '/teacher/schedule';
   static const TEACHER_LESSON_EDITOR = '/teacher/lesson-editor';
+  
+  // Student QR
+  static const PARENT_STUDENT_QR = '/parent/student-qr';
 }

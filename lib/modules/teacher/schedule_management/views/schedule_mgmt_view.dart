@@ -8,6 +8,8 @@ import 'package:quan_ly_mam_non/global_widgets/calendar/app_calendar_picker.dart
 import 'package:quan_ly_mam_non/modules/teacher/schedule_management/controllers/schedule_mgmt_controller.dart';
 import 'package:quan_ly_mam_non/modules/teacher/schedule_management/widgets/schedule_slot_card.dart';
 
+import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
+
 class ScheduleMgmtView extends GetView<ScheduleMgmtController> {
   const ScheduleMgmtView({super.key});
 
@@ -15,17 +17,7 @@ class ScheduleMgmtView extends GetView<ScheduleMgmtController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(
-          'Thời khóa biểu',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: AppColors.background,
-      ),
+      appBar: const MainAppBar(title: 'Thời khóa biểu'),
       body: Column(
         children: [
           _buildCompactHeader(context),

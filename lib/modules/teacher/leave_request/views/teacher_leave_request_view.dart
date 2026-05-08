@@ -5,7 +5,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/headers/page_header.dart';
 import '../../../../global_widgets/inputs/app_search_bar.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/leave_request/leave_request_filter_tabs.dart';
@@ -20,22 +21,14 @@ class TeacherLeaveRequestView extends GetView<TeacherLeaveRequestController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: Text(
-          AppStrings.leaveRequestTeacherHeader,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-          ),
-        ),
-      ),
+      appBar: const MainAppBar(title: AppStrings.leaveRequestTeacherHeader),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(context),
+          const PageHeader(
+            title: AppStrings.leaveRequestTeacherHeader,
+            subtitle: AppStrings.leaveRequestTeacherSubtitle,
+          ),
           _buildSearchAndFilter(context),
           AppConstants.spacingM,
           Expanded(child: _buildRequestList(context)),
@@ -44,36 +37,6 @@ class TeacherLeaveRequestView extends GetView<TeacherLeaveRequestController> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppConstants.horizontalPadding,
-        AppConstants.paddingL, // Thêm padding trên
-        AppConstants.horizontalPadding,
-        0,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.leaveRequestTeacherHeader,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: AppColors.onBackground,
-            ),
-          ),
-          AppConstants.spacingXS,
-          Text(
-            AppStrings.leaveRequestTeacherSubtitle,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
-          ),
-          AppConstants.spacingL,
-        ],
-      ),
-    );
-  }
 
   Widget _buildSearchAndFilter(BuildContext context) {
     return Padding(

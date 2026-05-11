@@ -212,7 +212,9 @@ class ParentHomeView extends StatelessWidget {
             _buildFeatureCard(Icons.history_edu_rounded, 'Nhật ký của bé', () {
               Get.toNamed(Routes.PARENT_ACTIVITY_LOG);
             }),
-            _buildFeatureCard(Icons.payment_rounded, 'Học phí', () {}),
+            _buildFeatureCard(Icons.payment_rounded, 'Học phí', () {
+              Get.toNamed(Routes.PARENT_INVOICE);
+            }),
             _buildFeatureCard(Icons.timeline_rounded, 'Chuyên cần', () {
               Get.toNamed(Routes.PARENT_ATTENDANCE_HISTORY);
             }),

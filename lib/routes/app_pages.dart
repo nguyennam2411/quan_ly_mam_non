@@ -38,6 +38,9 @@ import '../modules/teacher/activity_log/views/add_activity_log_view.dart';
 import '../modules/teacher/health/bindings/health_binding.dart';
 import '../modules/teacher/health/views/health_input_view.dart';
 
+import '../modules/teacher/invoice/bindings/teacher_invoice_binding.dart';
+import '../modules/teacher/invoice/views/teacher_invoice_view.dart';
+
 // --- Parent ---
 import '../modules/parent/attendance_history/bindings/attendance_history_binding.dart';
 import '../modules/parent/attendance_history/views/attendance_history_view.dart' as parent_history;
@@ -49,6 +52,9 @@ import '../modules/parent/leave_request/views/create_leave_request_view.dart';
 import '../modules/parent/medication_request/bindings/parent_medication_request_binding.dart';
 import '../modules/parent/medication_request/views/parent_medication_request_view.dart';
 import '../modules/parent/medication_request/views/create_medication_request_view.dart';
+
+import '../modules/parent/invoice/bindings/parent_invoice_binding.dart';
+import '../modules/parent/invoice/views/parent_invoice_view.dart';
 
 import '../modules/parent/activity_log/bindings/parent_activity_log_binding.dart';
 import '../modules/parent/activity_log/views/parent_activity_log_view.dart';
@@ -153,6 +159,13 @@ class AppPages {
       binding: HealthBinding(),
     ),
 
+    // 8b. Teacher Invoice
+    GetPage(
+      name: Routes.TEACHER_INVOICE,
+      page: () => const TeacherInvoiceView(),
+      binding: TeacherInvoiceBinding(),
+    ),
+
     // 9. Parent Attendance History
     GetPage(
       name: Routes.PARENT_ATTENDANCE_HISTORY,
@@ -182,6 +195,13 @@ class AppPages {
       name: Routes.PARENT_CREATE_MEDICATION_REQUEST,
       page: () => const CreateMedicationRequestView(),
       binding: ParentMedicationRequestBinding(),
+    ),
+
+    // 11b. Parent Invoice
+    GetPage(
+      name: Routes.PARENT_INVOICE,
+      page: () => const ParentInvoiceView(),
+      binding: ParentInvoiceBinding(),
     ),
 
     // 12. Parent Activity Log

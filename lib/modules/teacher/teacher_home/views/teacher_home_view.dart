@@ -108,6 +108,11 @@ class TeacherHomeView extends StatelessWidget {
             ),
             _buildFeatureCard(Icons.edit_calendar_rounded, 'Lịch hoạt động'),
             _buildFeatureCard(
+              Icons.payment_rounded,
+              'Học phí',
+              onTap: () => Get.toNamed(Routes.TEACHER_INVOICE),
+            ),
+            _buildFeatureCard(
               Icons.health_and_safety_rounded,
               'Sức khoẻ bé',
               onTap: () => Get.toNamed(Routes.TEACHER_HEALTH),

@@ -13,13 +13,13 @@ MedicationRequestModel _$MedicationRequestModelFromJson(
   studentId: json['student_id'] as String,
   parentId: json['parent_id'] as String,
   approvedBy: json['approved_by'] as String?,
-  medicineName: json['medicine_name'] as String? ?? 'Chưa cập nhật',
-  dosage: json['dosage'] as String? ?? '',
-  time: json['time'] as String? ?? '',
+  medicineName: json['medicine_name'] as String,
+  dosage: json['dosage'] as String,
+  time: json['time'] as String,
   note: json['note'] as String?,
-  date: json['date'] as String? ?? '2024-01-01',
+  date: json['date'] as String,
   prescriptionImage: json['prescription_image'] as String?,
-  status: json['status'] as String? ?? 'PENDING',
+  status: json['status'] as String,
   createdAt: json['created_at'] == null
       ? null
       : DateTime.parse(json['created_at'] as String),

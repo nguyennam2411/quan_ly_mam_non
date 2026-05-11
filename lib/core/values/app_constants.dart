@@ -76,4 +76,10 @@ class AppConstants {
   static const Widget spacingXL = SizedBox(height: paddingXL);
   static const Widget spacingXXL = SizedBox(height: paddingXXL);
   static const Widget spacingXXXL = SizedBox(height: paddingXXXL);
+
+  // --- Tuition Config (Cấu hình học phí) ---
+  static const double baseFixedFee = 1500000.0;    // Học phí cố định
+  static const double baseSanitationFee = 100000.0;// Vệ sinh phí
+  static const double baseDailyMealFee = 50000.0;  // Đơn giá ăn 1 ngày
+  static const int expectedSchoolDays = 22;        // Số ngày đi học dự kiến/tháng
 }

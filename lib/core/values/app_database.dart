@@ -100,4 +100,29 @@ class AppDatabase {
   static const String colBreakfastTime = 'breakfast_time';
   static const String colLunchTime = 'lunch_time';
   static const String colSnackTime = 'snack_time';
+
+  // --- Medication Requests (Đơn thuốc) ---
+  static const String tableMedicationRequests = 'medication_requests';
+  static const String colMedicineName = 'medicine_name'; 
+  static const String colDosage = 'dosage';            
+  static const String colTime = 'time';              
+  static const String colPrescriptionImage = 'prescription_image'; 
+
+  // --- Invoices & Payments (Học phí) ---
+  static const String tableInvoices = 'invoices';
+  static const String tablePayments = 'payments';
+  
+  static const String colMonth = 'month';
+  static const String colYear = 'year';
+  static const String colTotalAmount = 'total_amount';
+  static const String colDueDate = 'due_date';
+  static const String colItems = 'items'; // jsonb column
+  static const String colInvoiceId = 'invoice_id';
+  static const String colAmount = 'amount';
+  static const String colPaidAt = 'paid_at';
+
+  // --- Invoice Status ---
+  static const String invoiceStatusUnpaid = 'UNPAID';
+  static const String invoiceStatusPaid = 'PAID';
+  static const String invoiceStatusOverdue = 'OVERDUE';
 }

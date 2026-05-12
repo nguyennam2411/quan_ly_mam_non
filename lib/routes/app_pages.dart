@@ -24,6 +24,7 @@ import '../modules/teacher/attendance/views/attendance_main_view.dart';
 import '../modules/teacher/attendance/views/attendance_list_view.dart';
 import '../modules/teacher/attendance/views/attendance_history_view.dart';
 import '../modules/teacher/attendance/views/attendance_statistic_view.dart';
+import '../modules/teacher/attendance/views/qr_scanner_view.dart';
 import '../modules/teacher/leave_request/bindings/teacher_leave_request_binding.dart';
 import '../modules/teacher/leave_request/views/teacher_leave_request_view.dart';
 import '../modules/teacher/activity_log/bindings/teacher_activity_log_binding.dart';
@@ -115,6 +116,11 @@ class AppPages {
     GetPage(
       name: Routes.ATTENDANCE_STATISTIC,
       page: () => const AttendanceStatisticView(),
+      binding: AttendanceBinding(),
+    ),
+    GetPage(
+      name: Routes.ATTENDANCE_QR,
+      page: () => const QrScannerView(),
       binding: AttendanceBinding(),
     ),
 

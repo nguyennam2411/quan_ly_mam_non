@@ -11,6 +11,7 @@ import '../../../../global_widgets/state/app_empty_state.dart';
 import '../controllers/attendance_controller.dart';
 import '../widgets/attendance_item_card.dart';
 import '../widgets/attendance_summary_card.dart';
+import '../../../../routes/app_routes.dart';
 
 class AttendanceListView extends GetView<AttendanceController> {
   const AttendanceListView({super.key});
@@ -127,16 +128,52 @@ class AttendanceListView extends GetView<AttendanceController> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05), 
-            blurRadius: 15, 
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 15,
             offset: const Offset(0, -5),
           ),
         ],
       ),
-      child: PrimaryButton(
-        text: AppStrings.attendanceSubmit,
-        trailingIcon: Icons.check_circle_outline,
-        onPressed: () => controller.submitAttendance(),
+      child: Row(
+        children: [
+          // Nút xác nhận điểm danh - chiếm phần lớn chiều rộng
+          Expanded(
+            child: PrimaryButton(
+              text: AppStrings.attendanceSubmit,
+              trailingIcon: Icons.check_circle_outline,
+              onPressed: () => controller.submitAttendance(),
+            ),
+          ),
+
+          // Nút quét QR - chỉ hiện khi điểm danh hôm nay
+          if (controller.isToday) ...[
+            const SizedBox(width: AppConstants.paddingM),
+            SizedBox(
+              height: AppConstants.buttonHeight,
+              width: AppConstants.buttonHeight,
+              child: OutlinedButton(
+                onPressed: () async {
+                  final result = await Get.toNamed(Routes.ATTENDANCE_QR);
+                  if (result == true) {
+                    controller.fetchAttendanceList();
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.primary, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppConstants.radiusM),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                child: const Icon(
+                  Icons.qr_code_scanner_rounded,
+                  color: AppColors.primary,
+                  size: 26,
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

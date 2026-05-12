@@ -57,14 +57,55 @@ class AttendanceItemCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 if (item.attendance?.checkinTime != null)
-                  Row(
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8, // Khoảng cách giữa giờ và tag QR
+                    runSpacing: 4, // Khoảng cách nếu bị xuống dòng
                     children: [
-                      const Icon(Icons.access_time, size: 12, color: AppColors.outline),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${AppStrings.attendanceCheckinAt}: ${item.attendance!.checkinTime}',
-                        style: Theme.of(context).textTheme.bodySmall,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.access_time, size: 12, color: AppColors.outline),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${AppStrings.attendanceCheckinAt}: ${item.attendance!.checkinTime}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
                       ),
+                      
+                      // Hiển thị nhãn QR nếu điểm danh bằng mã
+                      if (item.attendance?.method == AppDatabase.methodQr)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: AppColors.primary.withOpacity(0.2),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.qr_code_scanner_rounded,
+                                size: 10,
+                                color: AppColors.primary,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                'QR',
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      color: AppColors.primary,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   )
                 else

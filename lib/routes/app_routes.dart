@@ -17,6 +17,7 @@ abstract class Routes {
   static const ATTENDANCE_LIST = '/teacher/attendance/list';
   static const ATTENDANCE_HISTORY = '/teacher/attendance/history';
   static const ATTENDANCE_STATISTIC = '/teacher/attendance/statistic';
+  static const ATTENDANCE_QR = '/teacher/attendance/qr-scanner';
   
   // Chức năng Phụ huynh
   static const PARENT_LEAVE_REQUEST = '/parent/leave-request';

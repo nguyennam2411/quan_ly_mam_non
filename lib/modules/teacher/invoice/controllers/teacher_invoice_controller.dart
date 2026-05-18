@@ -16,6 +16,22 @@ class TeacherInvoiceController extends GetxController {
   // Mặc định lấy tháng và năm hiện tại
   var currentMonth = DateTime.now().month.obs;
   var currentYear = DateTime.now().year.obs;
+  
+  // Lọc: ALL, PAID, UNPAID, DEBT
+  var selectedFilter = 'ALL'.obs;
+
+  List<InvoiceModel> get filteredInvoices {
+    if (selectedFilter.value == 'PAID') {
+      return allInvoices.where((i) => i.status == AppDatabase.invoiceStatusPaid).toList();
+    }
+    if (selectedFilter.value == 'UNPAID') {
+      return allInvoices.where((i) => i.status == AppDatabase.invoiceStatusUnpaid || i.status == AppDatabase.pending).toList();
+    }
+    if (selectedFilter.value == 'DEBT') {
+      return allInvoices.where((i) => i.status == AppDatabase.invoiceStatusOverdue).toList();
+    }
+    return allInvoices;
+  }
 
   @override
   void onInit() {
@@ -109,33 +125,70 @@ class TeacherInvoiceController extends GetxController {
         double total = 0.0;
         List<InvoiceItemModel> items = [];
 
-        // Nhóm A: Phí cố định
-        items.add(InvoiceItemModel(group: 'A', type: 'fixed', name: 'Học phí chính khoá', amount: AppConstants.baseFixedFee));
-        total += AppConstants.baseFixedFee;
-        items.add(InvoiceItemModel(group: 'A', type: 'fixed', name: 'Phí vệ sinh & Nước uống', amount: AppConstants.baseSanitationFee));
-        total += AppConstants.baseSanitationFee;
+        // Nhóm A: Phí cố định và các môn học
+        final fixedFees = [
+          {'name': 'Học phí', 'amount': 1020000.0},
+          {'name': 'K.phí XH hóa P.vụ bữa ăn', 'amount': 700000.0},
+          {'name': 'Điện nước', 'amount': 65000.0},
+          {'name': 'Vệ sinh phí', 'amount': 38000.0},
+          {'name': 'Anh văn', 'amount': 100000.0},
+          {'name': 'Vẽ', 'amount': 90000.0},
+          {'name': 'Bóng đá', 'amount': 90000.0},
+        ];
 
-        // Nhóm B: Tiền ăn tháng mới
-        final mealFee = AppConstants.baseDailyMealFee * AppConstants.expectedSchoolDays;
+        for (var fee in fixedFees) {
+          items.add(InvoiceItemModel(group: 'A', type: 'fixed', name: fee['name'] as String, amount: fee['amount'] as double));
+          total += fee['amount'] as double;
+        }
+
+        // Nhóm B: Tiền ăn tháng mới (Tính số ngày đi học thực tế trong tháng)
+        final mealDays = _calculateSchoolDays(currentYear.value, currentMonth.value);
+        final mealNormal = 38000.0;
+        final mealBreakfast = 18000.0;
+        
         items.add(InvoiceItemModel(
           group: 'B', type: 'meal', 
-          name: 'Tiền ăn tháng ${currentMonth.value} (${AppConstants.expectedSchoolDays} ngày)', 
-          amount: mealFee, 
-          days: AppConstants.expectedSchoolDays, 
-          unitPrice: AppConstants.baseDailyMealFee
+          name: 'Tiền ăn BT (${mealNormal.toInt()}đ x $mealDays)', 
+          amount: mealNormal * mealDays, 
         ));
-        total += mealFee;
+        total += mealNormal * mealDays;
+
+        items.add(InvoiceItemModel(
+          group: 'B', type: 'meal', 
+          name: 'Tiền ăn sáng (${mealBreakfast.toInt()}đ x $mealDays)', 
+          amount: mealBreakfast * mealDays, 
+        ));
+        total += mealBreakfast * mealDays;
 
         // Nhóm D: Bù trừ tiền ăn do nghỉ có phép tháng trước
         if (absentDays > 0) {
-          final refund = absentDays * AppConstants.baseDailyMealFee;
+          final refund = absentDays * (mealNormal + mealBreakfast); // Trả lại cả tiền ăn trưa và ăn sáng
           items.add(InvoiceItemModel(
             group: 'D', type: 'refund', 
-            name: 'Hoàn tiền ăn vắng có phép tháng $previousMonth', 
+            name: 'Tiền thừa T.$previousMonth (Vắng $absentDays ngày)', 
             amount: -refund.toDouble(), // Số âm
             absentDays: absentDays
           ));
           total -= refund;
+        }
+
+        // Nhóm E: Nợ cũ chuyển sang (OVERDUE)
+        final unpaidInvoices = await repository.getUnpaidInvoicesByStudent(studentId as String);
+        for (var oldInvoice in unpaidInvoices) {
+          // Bỏ qua hoá đơn của chính tháng đang phát hành (nếu có lỗi trùng lặp)
+          if (oldInvoice.month == currentMonth.value && oldInvoice.year == currentYear.value) continue;
+          
+          items.add(InvoiceItemModel(
+            group: 'E', type: 'debt', 
+            name: 'Nợ học phí T.${oldInvoice.month}/${oldInvoice.year}', 
+            amount: oldInvoice.totalAmount, 
+          ));
+          total += oldInvoice.totalAmount;
+          
+          // Chuyển hoá đơn cũ sang trạng thái QUÁ HẠN
+          if (oldInvoice.id != null) {
+            await repository.updateInvoiceStatus(oldInvoice.id!, AppDatabase.invoiceStatusOverdue);
+          }
         }
 
         // Tạo Model hoá đơn
@@ -164,5 +217,17 @@ class TeacherInvoiceController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+  // Hàm đếm số ngày đi học (Thứ 2 - Thứ 6) trong tháng
+  int _calculateSchoolDays(int year, int month) {
+    int daysInMonth = DateTime(year, month + 1, 0).day;
+    int schoolDays = 0;
+    for (int i = 1; i <= daysInMonth; i++) {
+      DateTime date = DateTime(year, month, i);
+      if (date.weekday != DateTime.saturday && date.weekday != DateTime.sunday) {
+        schoolDays++;
+      }
+    }
+    return schoolDays;
   }
 }

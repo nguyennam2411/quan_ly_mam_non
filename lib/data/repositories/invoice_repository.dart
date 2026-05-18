@@ -22,6 +22,11 @@ class InvoiceRepository {
     return results.map((json) => InvoiceModel.fromJson(json)).toList();
   }
 
+  Future<List<InvoiceModel>> getUnpaidInvoicesByStudent(String studentId) async {
+    final List<dynamic> results = await provider.getUnpaidInvoicesByStudent(studentId);
+    return results.map((json) => InvoiceModel.fromJson(json)).toList();
+  }
+
   Future<void> updateInvoiceStatus(String invoiceId, String status) async {
     await provider.updateInvoiceStatus(invoiceId, status);
   }

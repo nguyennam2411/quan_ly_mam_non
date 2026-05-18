@@ -102,6 +102,7 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
           final invoice = invoices[index];
           final isPaid = invoice.status == AppDatabase.invoiceStatusPaid;
           final isPending = invoice.status == AppDatabase.pending;
+          final isOverdue = invoice.status == AppDatabase.invoiceStatusOverdue;
           final formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
 
           return GestureDetector(
@@ -138,8 +139,8 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       StatusBadge(
-                        text: isPaid ? 'ĐÃ ĐÓNG' : isPending ? 'CHỜ XÁC NHẬN' : 'CHƯA ĐÓNG',
-                        color: isPaid ? AppColors.success : isPending ? AppColors.warning : AppColors.error,
+                        text: isPaid ? 'ĐÃ ĐÓNG' : isPending ? 'CHỜ XÁC NHẬN' : isOverdue ? 'CÒN NỢ' : 'CHƯA ĐÓNG',
+                        color: isPaid ? AppColors.success : isPending ? AppColors.warning : isOverdue ? const Color(0xFFB3261E) : AppColors.error,
                       ),
                     ],
                   ),
@@ -157,7 +158,35 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
+                  const Text('Chi tiết các khoản thu:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.outline)),
+                  const SizedBox(height: 4),
+                  ...invoice.items.map((item) {
+                    final isRefund = item.amount < 0;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '- ${item.name}',
+                              style: TextStyle(fontSize: 13, color: isRefund ? AppColors.error : AppColors.onSurfaceVariant),
+                            ),
+                          ),
+                          Text(
+                            formatCurrency.format(item.amount),
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: isRefund ? AppColors.error : AppColors.onSurface),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Divider(height: 1, color: AppColors.outlineVariant),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -172,7 +201,7 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
                       ),
                     ],
                   ),
-                  if (!isPaid && !isPending) ...[
+                  if (!isPaid && !isPending && !isOverdue) ...[
                     const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
@@ -186,6 +215,21 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         child: const Text('Thanh toán ngay', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
+                    )
+                  ] else if (isOverdue) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9DEDC),
+                        borderRadius: BorderRadius.circular(AppConstants.radiusS),
+                      ),
+                      child: const Text(
+                        'Vui lòng thanh toán gộp trong hoá đơn tháng mới nhất.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Color(0xFFB3261E), fontSize: 13, fontWeight: FontWeight.bold),
                       ),
                     )
                   ]

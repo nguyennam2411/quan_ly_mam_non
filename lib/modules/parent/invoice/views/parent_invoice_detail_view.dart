@@ -63,7 +63,7 @@ class ParentInvoiceDetailView extends GetView<ParentInvoiceController> {
 
             // Nhóm A: Phí cố định
             if (groupA.isNotEmpty) ...[
-              _buildSectionTitle('Phí cố định hàng tháng'),
+              _buildSectionTitle('Các khoản nộp trong tháng'),
               ...groupA.map((item) => _buildFeeRow(item.name, item.amount, formatCurrency)),
               const Divider(height: 32),
             ],
@@ -77,7 +77,7 @@ class ParentInvoiceDetailView extends GetView<ParentInvoiceController> {
 
             // Nhóm D: Hoàn trả (Giảm trừ)
             if (groupD.isNotEmpty) ...[
-              _buildSectionTitle('Giảm trừ (do nghỉ học)'),
+              _buildSectionTitle('Giảm trừ (Tiền thừa / Nghỉ học)'),
               ...groupD.map((item) => _buildFeeRow(item.name, item.amount, formatCurrency, isDeduction: true)),
               const Divider(height: 32),
             ],
@@ -96,23 +96,40 @@ class ParentInvoiceDetailView extends GetView<ParentInvoiceController> {
           ],
         ),
       ),
-      bottomNavigationBar: (invoice.status != AppDatabase.invoiceStatusPaid && invoice.status != AppDatabase.pending)
-          ? Padding(
+      bottomNavigationBar: invoice.status == AppDatabase.invoiceStatusOverdue
+          ? Container(
+              color: AppColors.surface,
               padding: const EdgeInsets.all(AppConstants.paddingL),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => controller.simulatePayment(invoice),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.radiusM)),
-                  ),
-                  child: const Text('THANH TOÁN NGAY', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9DEDC),
+                  borderRadius: BorderRadius.circular(AppConstants.radiusS),
+                ),
+                child: const Text(
+                  'Hoá đơn đã quá hạn. Vui lòng thanh toán gộp trong hoá đơn tháng mới nhất.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Color(0xFFB3261E), fontSize: 13, fontWeight: FontWeight.bold),
                 ),
               ),
             )
-          : null,
+          : (invoice.status != AppDatabase.invoiceStatusPaid && invoice.status != AppDatabase.pending)
+              ? Padding(
+                  padding: const EdgeInsets.all(AppConstants.paddingL),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => controller.simulatePayment(invoice),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.radiusM)),
+                      ),
+                      child: const Text('THANH TOÁN NGAY', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    ),
+                  ),
+                )
+              : null,
     );
   }
 

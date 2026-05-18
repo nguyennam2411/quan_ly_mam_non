@@ -30,7 +30,9 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
       body: Column(
         children: [
           _buildMonthSelector(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+          _buildFilterChips(),
+          const SizedBox(height: 12),
           Expanded(child: _buildStudentList()),
         ],
       ),
@@ -89,10 +91,10 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
         return const Center(child: CircularProgressIndicator());
       }
 
-      if (controller.allInvoices.isEmpty) {
+      if (controller.filteredInvoices.isEmpty) {
         return const AppEmptyState(
           title: 'Chưa có dữ liệu',
-          description: 'Tháng này chưa phát hành hoá đơn học phí.',
+          description: 'Không có hoá đơn nào phù hợp với bộ lọc hiện tại.',
         );
       }
 
@@ -100,9 +102,9 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
 
       return ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingL),
-        itemCount: controller.allInvoices.length,
+        itemCount: controller.filteredInvoices.length,
         itemBuilder: (context, index) {
-          final invoice = controller.allInvoices[index];
+          final invoice = controller.filteredInvoices[index];
           final student = invoice.student;
           final isPaid = invoice.status == AppDatabase.invoiceStatusPaid;
 
@@ -148,13 +150,39 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
                         style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                       ),
                       StatusBadge(
-                        text: isPaid ? 'ĐÃ ĐÓNG' : invoice.status == AppDatabase.pending ? 'CHỜ XÁC NHẬN' : 'CHƯA ĐÓNG',
-                        color: isPaid ? AppColors.success : invoice.status == AppDatabase.pending ? AppColors.warning : AppColors.error,
+                        text: isPaid ? 'ĐÃ ĐÓNG' : invoice.status == AppDatabase.pending ? 'CHỜ XÁC NHẬN' : invoice.status == AppDatabase.invoiceStatusOverdue ? 'CÒN NỢ' : 'CHƯA ĐÓNG',
+                        color: isPaid ? AppColors.success : invoice.status == AppDatabase.pending ? AppColors.warning : invoice.status == AppDatabase.invoiceStatusOverdue ? const Color(0xFFB3261E) : AppColors.error,
                       ),
                     ],
                   ),
                 ),
                 children: [
+                  const Divider(height: 1),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Chi tiết các khoản thu:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.outline)),
+                        const SizedBox(height: 8),
+                        ...invoice.items.map((item) {
+                          final isRefund = item.amount < 0;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text('- ${item.name}', style: TextStyle(fontSize: 13, color: isRefund ? AppColors.error : AppColors.onSurfaceVariant)),
+                                ),
+                                Text(formatCurrency.format(item.amount), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: isRefund ? AppColors.error : AppColors.onSurface)),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
                   const Divider(height: 1),
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -170,7 +198,7 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
                             label: const Text('Xem phiếu'),
                           ),
                         ),
-                        if (!isPaid) ...[
+                        if (!isPaid && invoice.status != AppDatabase.invoiceStatusOverdue) ...[
                           const SizedBox(width: 12),
                           Expanded(
                             child: ElevatedButton.icon(
@@ -182,6 +210,22 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
                               label: Text(
                                 invoice.status == AppDatabase.pending ? 'Xác nhận thu' : 'Thu tiền mặt',
                                 style: const TextStyle(color: Colors.white, fontSize: 13),
+                              ),
+                            ),
+                          ),
+                        ] else if (invoice.status == AppDatabase.invoiceStatusOverdue) ...[
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF9DEDC),
+                                borderRadius: BorderRadius.circular(AppConstants.radiusS),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'Thu gộp ở HĐ mới',
+                                style: TextStyle(color: Color(0xFFB3261E), fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
@@ -244,6 +288,48 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
             child: const Text('Tiến hành', style: TextStyle(color: Colors.white)),
           ),
         ],
+      ),
+    );
+  }
+  Widget _buildFilterChips() {
+    return Obx(() {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingL),
+        child: Row(
+          children: [
+            _buildFilterChip('ALL', 'Tất cả'),
+            const SizedBox(width: 8),
+            _buildFilterChip('PAID', 'Đã đóng'),
+            const SizedBox(width: 8),
+            _buildFilterChip('UNPAID', 'Chưa đóng'),
+            const SizedBox(width: 8),
+            _buildFilterChip('DEBT', 'Còn nợ'),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildFilterChip(String value, String label) {
+    final isSelected = controller.selectedFilter.value == value;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (selected) {
+        if (selected) controller.selectedFilter.value = value;
+      },
+      selectedColor: AppColors.primaryContainer,
+      backgroundColor: AppColors.surfaceContainerLowest,
+      labelStyle: TextStyle(
+        color: isSelected ? AppColors.primary : AppColors.onSurfaceVariant,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+      side: BorderSide(
+        color: isSelected ? AppColors.primary : AppColors.outlineVariant,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppConstants.radiusL),
       ),
     );
   }

@@ -40,6 +40,15 @@ class InvoiceProvider {
         .order(AppDatabase.colCreatedAt, ascending: false);
   }
 
+  // Lấy danh sách hoá đơn chưa đóng của một học sinh
+  Future<List<dynamic>> getUnpaidInvoicesByStudent(String studentId) async {
+    return await _client
+        .from(AppDatabase.tableInvoices)
+        .select()
+        .eq(AppDatabase.colStudentId, studentId)
+        .eq(AppDatabase.colStatus, AppDatabase.invoiceStatusUnpaid);
+  }
+
   // Giáo viên/Kế toán: Cập nhật trạng thái hoá đơn
   Future<void> updateInvoiceStatus(String invoiceId, String status) async {
     await _client

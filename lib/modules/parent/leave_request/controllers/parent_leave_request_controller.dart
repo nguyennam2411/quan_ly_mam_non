@@ -66,6 +66,24 @@ class ParentLeaveRequestController extends GetxController {
     return list;
   }
 
+  Map<String, int> get statusCounts {
+    final currentStudent = ParentStudentService.to.selectedStudent.value;
+    final studentRequests = leaveRequests.where((r) {
+      if (currentStudent != null && r.studentId != currentStudent.id) {
+        return false;
+      }
+      return true;
+    }).toList();
+
+    return {
+      AppStrings.leaveStatusAll: studentRequests.length,
+      AppStrings.leaveStatusPending: studentRequests.where((r) => r.status == AppDatabase.pending).length,
+      AppStrings.leaveStatusApproved: studentRequests.where((r) => r.status == AppDatabase.approved).length,
+      AppStrings.leaveStatusRejected: studentRequests.where((r) => r.status == AppDatabase.rejected).length,
+      AppStrings.leaveStatusCancelled: studentRequests.where((r) => r.status == AppDatabase.cancelled).length,
+    };
+  }
+
   String _mapLabelToStatus(String label) {
     switch (label) {
       case AppStrings.leaveStatusPending:

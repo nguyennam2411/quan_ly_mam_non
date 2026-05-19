@@ -140,7 +140,7 @@ class AppStrings {
   // Leave Request
   static const String leaveRequestTitle = 'Đơn xin nghỉ';
   static const String leaveRequestSubtitle = 'Theo dõi và quản lý các đơn xin nghỉ học của bé';
-  static const String leaveRequestSearchHint = 'Tìm kiếm tên bé...';
+  static const String leaveRequestSearchHint = 'Tìm kiếm tên học sinh...';
   static const String leaveRequestSort = 'Sắp xếp';
   static const String leaveRequestCancel = 'Huỷ yêu cầu';
   static const String leaveRequestDetail = 'Chi tiết';

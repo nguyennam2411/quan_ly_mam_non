@@ -30,7 +30,9 @@ class ParentLeaveRequestView extends GetView<ParentLeaveRequestController> {
             subtitle: AppStrings.leaveRequestSubtitle,
           ),
           _buildFilterAndSort(context),
-          AppConstants.spacingM,
+          const SizedBox(height: 16),
+          _buildSeparatorSection(context),
+          const SizedBox(height: 12),
           Expanded(child: _buildRequestList(context)),
         ],
       ),
@@ -45,33 +47,47 @@ class ParentLeaveRequestView extends GetView<ParentLeaveRequestController> {
   }
   
   Widget _buildFilterAndSort(BuildContext context) {
+    return Obx(() => LeaveRequestFilterTabs(
+      selectedStatus: controller.selectedStatus.value,
+      onStatusChanged: (status) => controller.selectedStatus.value = status,
+      statusCounts: controller.statusCounts,
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
+    ));
+  }
+
+  Widget _buildSeparatorSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
-      child: IntrinsicHeight(
-        child: Row(
-          children: [
-            // Bộ lọc trạng thái
-            Expanded(
-              child: Obx(() => LeaveRequestFilterTabs(
-                selectedStatus: controller.selectedStatus.value,
-                onStatusChanged: (status) => controller.selectedStatus.value = status,
-              )),
-            ),
-            
-            // Đường kẻ ngăn cách tinh tế
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-              child: VerticalDivider(
-                width: 1,
-                thickness: 1,
-                color: AppColors.outlineVariant.withValues(alpha: 0.3),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Bên trái: Tiêu đề Danh sách đơn nghỉ 
+          Row(
+            children: [
+              Container(
+                width: 4.5,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(2.5),
+                ),
               ),
-            ),
-
-            // Nút sắp xếp tinh gọn
-            _buildSortButton(),
-          ],
-        ),
+              const SizedBox(width: 10),
+              Text(
+                'Danh sách đơn nghỉ',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.onBackground.withValues(alpha: 0.9),
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
+          ),
+          
+          // Bên phải: Nút sắp xếp 
+          _buildSortButton(),
+        ],
       ),
     );
   }

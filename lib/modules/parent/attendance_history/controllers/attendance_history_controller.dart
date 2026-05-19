@@ -3,12 +3,15 @@ import '../../../../core/services/parent_student_service.dart';
 import '../../../../data/models/attendance_model.dart';
 import '../../../../data/repositories/attendance_repository.dart';
 
+enum AttendanceHistoryFilter { all, excused, unexcused }
+
 class AttendanceHistoryController extends GetxController {
   final AttendanceRepository _repository = Get.find<AttendanceRepository>();
   final _studentService = ParentStudentService.to;
 
   final RxList<AttendanceModel> absentList = <AttendanceModel>[].obs;
   final RxBool isLoading = false.obs;
+  final Rx<AttendanceHistoryFilter> selectedFilter = AttendanceHistoryFilter.all.obs;
 
   // Stats
   final RxInt totalExcused = 0.obs;
@@ -22,6 +25,18 @@ class AttendanceHistoryController extends GetxController {
     
     // Theo dõi thay đổi học sinh để tải lại data
     ever(_studentService.selectedStudent, (_) => fetchHistory());
+  }
+
+  List<AttendanceModel> get filteredAbsentList {
+    switch (selectedFilter.value) {
+      case AttendanceHistoryFilter.excused:
+        return absentList.where((item) => item.status == 'ABSENT_EXCUSED').toList();
+      case AttendanceHistoryFilter.unexcused:
+        return absentList.where((item) => item.status == 'ABSENT_UNEXCUSED').toList();
+      case AttendanceHistoryFilter.all:
+      default:
+        return absentList;
+    }
   }
 
   Future<void> fetchHistory() async {

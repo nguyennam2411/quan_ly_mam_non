@@ -62,8 +62,18 @@ class HealthController extends GetxController {
   final RxBool isSaving = false.obs;
   final Rx<DateTime> selectedMonth = DateTime.now().obs;
   final RxList<HealthInputRow> rows = <HealthInputRow>[].obs;
+  final RxString searchQuery = ''.obs;
 
+  // Lọc danh sách học sinh theo tìm kiếm
+  List<HealthInputRow> get filteredRows {
+    if (searchQuery.value.trim().isEmpty) return rows;
+    final lowerQuery = searchQuery.value.trim().toLowerCase();
+    return rows.where((row) => row.studentName.toLowerCase().contains(lowerQuery)).toList();
+  }
+  
+  // Lấy mã lớp từ AuthService
   String get classroomId => AuthService.to.classroomId.value;
+  // Lấy mã giáo viên từ AuthService
   String get teacherId => AuthService.to.currentUser.value?.id ?? '';
 
   @override

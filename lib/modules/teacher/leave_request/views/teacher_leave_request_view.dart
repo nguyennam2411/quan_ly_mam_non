@@ -30,7 +30,9 @@ class TeacherLeaveRequestView extends GetView<TeacherLeaveRequestController> {
             subtitle: AppStrings.leaveRequestTeacherSubtitle,
           ),
           _buildSearchAndFilter(context),
-          AppConstants.spacingM,
+          const SizedBox(height: 16),
+          _buildSeparatorSection(context),
+          const SizedBox(height: 12),
           Expanded(child: _buildRequestList(context)),
         ],
       ),
@@ -39,41 +41,66 @@ class TeacherLeaveRequestView extends GetView<TeacherLeaveRequestController> {
 
 
   Widget _buildSearchAndFilter(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
-      child: Column(
-        children: [
-          // 1. Thanh tìm kiếm
-          AppSearchBar(
+    return Column(
+      children: [
+        // 1. Thanh tìm kiếm chiếm toàn bộ chiều rộng ngang
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
+          child: AppSearchBar(
             hintText: AppStrings.leaveRequestSearchHint,
             onChanged: (value) => controller.searchQuery.value = value,
+            height: 46,
+            borderRadius: BorderRadius.circular(23),
+            backgroundColor: AppColors.surfaceContainerHigh.withValues(alpha: 0.5),
+            boxShadow: const [],
+            iconSize: 22,
           ),
-          AppConstants.spacingM,
-          
-          // 2. Bộ lọc và Sắp xếp ngang hàng
-          IntrinsicHeight(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Obx(() => LeaveRequestFilterTabs(
-                    selectedStatus: controller.selectedStatus.value,
-                    onStatusChanged: (status) => controller.selectedStatus.value = status,
-                  )),
-                ),
-                
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                  child: VerticalDivider(
-                    width: 1,
-                    thickness: 1,
-                    color: AppColors.outlineVariant.withValues(alpha: 0.3),
-                  ),
-                ),
+        ),
+        AppConstants.spacingM,
+        
+        // 2. Bộ lọc trạng thái 
+        Obx(() => LeaveRequestFilterTabs(
+          selectedStatus: controller.selectedStatus.value,
+          onStatusChanged: (status) => controller.selectedStatus.value = status,
+          statusCounts: controller.statusCounts,
+          padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
+        )),
+      ],
+    );
+  }
 
-                _buildSortButton(),
-              ],
-            ),
+  Widget _buildSeparatorSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Bên trái: Tiêu đề Danh sách đơn nghỉ
+          Row(
+            children: [
+              Container(
+                width: 4.5,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(2.5),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Danh sách đơn nghỉ',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.onBackground.withValues(alpha: 0.9),
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
           ),
+          
+          // Bên phải: Nút sắp xếp 
+          _buildSortButton(),
         ],
       ),
     );

@@ -30,9 +30,6 @@ class AttendanceStatisticView extends GetView<AttendanceStatisticController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSummaryCards(),
-                AppConstants.spacingXL,
-                
                 _buildSectionHeader(AppStrings.statsMonthlyRatio),
                 _buildTimeSelector(
                   DateFormat('MM/yyyy').format(controller.selectedMonth.value),
@@ -77,69 +74,6 @@ class AttendanceStatisticView extends GetView<AttendanceStatisticController> {
       }),
     );
   }
-
-  Widget _buildSummaryCards() {
-    return Row(
-      children: [
-        Expanded(
-          child: _summaryItem(
-            AppStrings.statsSchoolDays, 
-            '${controller.totalAttendanceDays.value}', 
-            Icons.event_available, 
-            AppColors.primary
-          ),
-        ),
-        AppConstants.spacingM,
-        Expanded(
-          child: _summaryItem(
-            AppStrings.statsAttendanceRate, 
-            '${controller.presentPercentage.value.toStringAsFixed(1)}%', 
-            Icons.trending_up, 
-            AppColors.primary
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _summaryItem(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.paddingL),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppConstants.radiusL),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 12),
-          Text(
-            value, 
-            style: Theme.of(Get.context!).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.onSurface,
-                ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label, 
-            style: Theme.of(Get.context!).textTheme.labelSmall?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSectionHeader(String title) {
     return Text(
       title, 

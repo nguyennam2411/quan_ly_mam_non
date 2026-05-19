@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import '../../../core/values/app_database.dart';
+import '../../../core/utils/date_helper.dart';
 import 'student_model.dart';
 
 part 'leave_request_model.g.dart';
@@ -30,10 +31,10 @@ class LeaveRequestModel {
   @JsonKey(name: AppDatabase.colEndDate)
   final String endDate; 
 
-  @JsonKey(name: AppDatabase.colCreatedAt)
+  @JsonKey(name: AppDatabase.colCreatedAt, fromJson: DateHelper.parseUtcNullable)
   final DateTime? createdAt;
 
-  @JsonKey(name: AppDatabase.colApprovedAt)
+  @JsonKey(name: AppDatabase.colApprovedAt, fromJson: DateHelper.parseUtcNullable)
   final DateTime? approvedAt;
   
   // Trường bổ sung để hiển thị thông tin học sinh (không lưu xuống DB)
@@ -43,8 +44,16 @@ class LeaveRequestModel {
   @JsonKey(name: AppDatabase.colCancelReason)
   final String? cancelReason;
 
-  @JsonKey(name: AppDatabase.colEvidenceUrl)
-  final String? evidenceUrl;
+  @JsonKey(name: AppDatabase.colImages, fromJson: _imagesFromJson)
+  final List<String> images;
+
+  static List<String> _imagesFromJson(dynamic json) {
+    if (json == null) return [];
+    if (json is List) {
+      return json.where((e) => e != null).map((e) => e.toString()).toList();
+    }
+    return [];
+  }
 
   LeaveRequestModel({
     this.id,
@@ -59,7 +68,7 @@ class LeaveRequestModel {
     this.approvedAt,
     this.student,
     this.cancelReason,
-    this.evidenceUrl,
+    this.images = const [],
   });
 
   // Chuyển từ JSON (Supabase) sang Model

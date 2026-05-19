@@ -13,9 +13,7 @@ ActivityLogModel _$ActivityLogModelFromJson(Map<String, dynamic> json) =>
       teacherId: json['teacher_id'] as String,
       studentId: json['student_id'] as String?,
       content: json['content'] as String,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
+      createdAt: DateHelper.parseUtcNullable(json['created_at']),
       images: (json['activity_images'] as List<dynamic>?)
           ?.map((e) => ActivityImageModel.fromJson(e as Map<String, dynamic>))
           .toList(),

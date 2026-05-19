@@ -10,6 +10,13 @@ import 'package:quan_ly_mam_non/core/values/app_database.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 import 'package:quan_ly_mam_non/core/utils/dialog.dart';
 
+enum AttendanceFilter {
+  all,
+  notTaken,
+  present,
+  absent,
+}
+
 class AttendanceController extends GetxController {
   final AttendanceRepository repository;
   AttendanceController({required this.repository});
@@ -24,6 +31,7 @@ class AttendanceController extends GetxController {
   var isEditMode = false.obs;
   var searchQuery = ''.obs;
   var hasChanges = false.obs;
+  var selectedFilter = AttendanceFilter.all.obs;
   
   // Controller cho phần Lịch (SfDateRangePicker)
   final DateRangePickerController calendarController = DateRangePickerController();
@@ -47,12 +55,40 @@ class AttendanceController extends GetxController {
   int get absentCount => studentsWithAttendance.where((e) => 
       e.attendance?.status == AppDatabase.statusAbsentUnexcused || e.attendance?.status == AppDatabase.statusAbsentExcused).length;
 
-  // Danh sách đã lọc theo tìm kiếm
+  // Đếm số lượng bộ lọc
+  int get allFilterCount => studentsWithAttendance.length;
+  int get notTakenFilterCount => studentsWithAttendance.where((e) => e.attendance == null).length;
+  int get presentFilterCount => studentsWithAttendance.where((e) => e.attendance?.status == AppDatabase.statusPresent).length;
+  int get absentFilterCount => studentsWithAttendance.where((e) => 
+      e.attendance?.status == AppDatabase.statusAbsentExcused || e.attendance?.status == AppDatabase.statusAbsentUnexcused).length;
+
+  // Danh sách đã lọc theo bộ lọc trạng thái và tìm kiếm
   List<StudentWithAttendance> get filteredStudents {
-    if (searchQuery.value.isEmpty) return studentsWithAttendance;
-    return studentsWithAttendance
-        .where((s) => s.student.name.toLowerCase().contains(searchQuery.value.toLowerCase()))
-        .toList();
+    List<StudentWithAttendance> list = studentsWithAttendance;
+    
+    // 1. Lọc theo trạng thái điểm danh
+    switch (selectedFilter.value) {
+      case AttendanceFilter.notTaken:
+        list = list.where((e) => e.attendance == null).toList();
+        break;
+      case AttendanceFilter.present:
+        list = list.where((e) => e.attendance?.status == AppDatabase.statusPresent).toList();
+        break;
+      case AttendanceFilter.absent:
+        list = list.where((e) => 
+            e.attendance?.status == AppDatabase.statusAbsentExcused || 
+            e.attendance?.status == AppDatabase.statusAbsentUnexcused).toList();
+        break;
+      case AttendanceFilter.all:
+        break;
+    }
+    
+    // 2. Lọc theo tên tìm kiếm
+    if (searchQuery.value.isNotEmpty) {
+      list = list.where((s) => s.student.name.toLowerCase().contains(searchQuery.value.toLowerCase())).toList();
+    }
+    
+    return list;
   }
 
   @override

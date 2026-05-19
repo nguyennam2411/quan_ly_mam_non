@@ -101,7 +101,7 @@ class TeacherActivityLogView extends GetView<TeacherActivityLogController> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        timeago.format(log.createdAt ?? DateTime.now(), locale: 'vi'),
+                        timeago.format((log.createdAt ?? DateTime.now()).toLocal(), locale: 'vi'),
                         style: TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
                       ),
                     ],

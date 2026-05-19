@@ -7,6 +7,8 @@ import '../../../../data/repositories/student_repository.dart';
 import '../../../../data/providers/notification_provider.dart';
 import '../../../../data/repositories/notification_repository.dart';
 import '../../notifications/controllers/notification_controller.dart';
+import '../../../teacher/teacher_home/controllers/teacher_home_controller.dart';
+import '../../../../data/repositories/attendance_repository.dart';
 import '../controllers/main_controller.dart';
 
 class MainBinding extends Bindings {
@@ -30,5 +32,13 @@ class MainBinding extends Bindings {
     Get.lazyPut(() => NotificationProvider());
     Get.lazyPut(() => NotificationRepository());
     Get.put(NotificationController());
+
+    // Nếu người dùng là giáo viên, khởi tạo TeacherHomeController
+    if (UserRole.isTeacher(AuthService.to.userRole.value)) {
+      Get.lazyPut<TeacherHomeController>(() => TeacherHomeController(
+        StudentRepository(StudentProvider()),
+        AttendanceRepository(),
+      ));
+    }
   }
 }

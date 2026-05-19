@@ -85,7 +85,7 @@ class ParentActivityLogView extends GetView<ParentActivityLogController> {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             subtitle: Text(
-              timeago.format(log.createdAt ?? DateTime.now(), locale: 'vi'),
+              timeago.format((log.createdAt ?? DateTime.now()).toLocal(), locale: 'vi'),
               style: const TextStyle(fontSize: 12),
             ),
           ),

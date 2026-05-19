@@ -24,6 +24,7 @@ import '../modules/teacher/attendance/views/attendance_main_view.dart';
 import '../modules/teacher/attendance/views/attendance_list_view.dart';
 import '../modules/teacher/attendance/views/attendance_history_view.dart';
 import '../modules/teacher/attendance/views/attendance_statistic_view.dart';
+import '../modules/teacher/attendance/views/qr_scanner_view.dart';
 
 import '../modules/teacher/leave_request/bindings/teacher_leave_request_binding.dart';
 import '../modules/teacher/leave_request/views/teacher_leave_request_view.dart';
@@ -40,6 +41,11 @@ import '../modules/teacher/health/views/health_input_view.dart';
 
 import '../modules/teacher/invoice/bindings/teacher_invoice_binding.dart';
 import '../modules/teacher/invoice/views/teacher_invoice_view.dart';
+
+// Schedules & Lessons
+import '../modules/teacher/schedule_management/bindings/schedule_mgmt_binding.dart';
+import '../modules/teacher/schedule_management/views/schedule_mgmt_view.dart';
+import '../modules/teacher/schedule_management/views/lesson_editor_view.dart';
 
 // --- Parent ---
 import '../modules/parent/attendance_history/bindings/attendance_history_binding.dart';
@@ -62,6 +68,12 @@ import '../modules/parent/activity_log/views/parent_activity_log_view.dart';
 import '../modules/parent/health/bindings/parent_health_binding.dart';
 import '../modules/parent/health/views/parent_health_view.dart';
 
+import '../modules/parent/student_schedule/bindings/student_schedule_binding.dart';
+import '../modules/parent/student_schedule/views/student_schedule_view.dart';
+
+// Student QR
+import '../modules/parent/student_qr/bindings/student_qr_binding.dart';
+import '../modules/parent/student_qr/views/student_qr_view.dart';
 
 class AppPages {
   // Màn hình khởi đầu khi mở App
@@ -125,6 +137,11 @@ class AppPages {
       page: () => const AttendanceStatisticView(),
       binding: AttendanceBinding(),
     ),
+    GetPage(
+      name: Routes.ATTENDANCE_QR,
+      page: () => const QrScannerView(),
+      binding: AttendanceBinding(),
+    ),
 
     // 5. Teacher Leave Request
     GetPage(
@@ -136,7 +153,7 @@ class AppPages {
     // 6. Teacher Medication Request
     GetPage(
       name: Routes.TEACHER_MEDICATION_REQUEST,
-      page: () => const TeacherMedicationRequestView(),
+      page: () => const TeacherLeaveRequestView(),
       binding: TeacherMedicationRequestBinding(),
     ),
 
@@ -223,6 +240,32 @@ class AppPages {
       name: Routes.MEAL_PLAN,
       page: () => const MealPlanView(),
       binding: MealPlanBinding(),
+    ),
+
+    // 15. Teacher Schedule Management
+    GetPage(
+      name: Routes.TEACHER_SCHEDULE,
+      page: () => const ScheduleMgmtView(),
+      binding: ScheduleMgmtBinding(),
+    ),
+    GetPage(
+      name: Routes.TEACHER_LESSON_EDITOR,
+      page: () => const LessonEditorView(),
+      binding: ScheduleMgmtBinding(),
+    ),
+
+    // 16. Parent Student Schedule
+    GetPage(
+      name: Routes.PARENT_STUDENT_SCHEDULE,
+      page: () => const StudentScheduleView(),
+      binding: StudentScheduleBinding(),
+    ),
+
+    // 17. Parent Student QR
+    GetPage(
+      name: Routes.PARENT_STUDENT_QR,
+      page: () => const StudentQrView(),
+      binding: StudentQrBinding(),
     ),
   ];
 }

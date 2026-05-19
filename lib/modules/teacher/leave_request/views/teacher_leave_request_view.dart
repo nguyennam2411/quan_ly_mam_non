@@ -5,7 +5,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/headers/page_header.dart';
 import '../../../../global_widgets/inputs/app_search_bar.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/leave_request/leave_request_filter_tabs.dart';
@@ -20,97 +21,86 @@ class TeacherLeaveRequestView extends GetView<TeacherLeaveRequestController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: Text(
-          AppStrings.leaveRequestTeacherHeader,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-          ),
-        ),
-      ),
+      appBar: const MainAppBar(title: AppStrings.leaveRequestTeacherHeader),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(context),
+          const PageHeader(
+            title: AppStrings.leaveRequestTeacherHeader,
+            subtitle: AppStrings.leaveRequestTeacherSubtitle,
+          ),
           _buildSearchAndFilter(context),
-          AppConstants.spacingM,
+          const SizedBox(height: 16),
+          _buildSeparatorSection(context),
+          const SizedBox(height: 12),
           Expanded(child: _buildRequestList(context)),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppConstants.horizontalPadding,
-        AppConstants.paddingL, // Thêm padding trên
-        AppConstants.horizontalPadding,
-        0,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.leaveRequestTeacherHeader,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: AppColors.onBackground,
-            ),
+
+  Widget _buildSearchAndFilter(BuildContext context) {
+    return Column(
+      children: [
+        // 1. Thanh tìm kiếm chiếm toàn bộ chiều rộng ngang
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
+          child: AppSearchBar(
+            hintText: AppStrings.leaveRequestSearchHint,
+            onChanged: (value) => controller.searchQuery.value = value,
+            height: 46,
+            borderRadius: BorderRadius.circular(23),
+            backgroundColor: AppColors.surfaceContainerHigh.withValues(alpha: 0.5),
+            boxShadow: const [],
+            iconSize: 22,
           ),
-          AppConstants.spacingXS,
-          Text(
-            AppStrings.leaveRequestTeacherSubtitle,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
-          ),
-          AppConstants.spacingL,
-        ],
-      ),
+        ),
+        AppConstants.spacingM,
+        
+        // 2. Bộ lọc trạng thái 
+        Obx(() => LeaveRequestFilterTabs(
+          selectedStatus: controller.selectedStatus.value,
+          onStatusChanged: (status) => controller.selectedStatus.value = status,
+          statusCounts: controller.statusCounts,
+          padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
+        )),
+      ],
     );
   }
 
-  Widget _buildSearchAndFilter(BuildContext context) {
+  Widget _buildSeparatorSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // 1. Thanh tìm kiếm
-          AppSearchBar(
-            hintText: AppStrings.leaveRequestSearchHint,
-            onChanged: (value) => controller.searchQuery.value = value,
+          // Bên trái: Tiêu đề Danh sách đơn nghỉ
+          Row(
+            children: [
+              Container(
+                width: 4.5,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(2.5),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Danh sách đơn nghỉ',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.onBackground.withValues(alpha: 0.9),
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
           ),
-          AppConstants.spacingM,
           
-          // 2. Bộ lọc và Sắp xếp ngang hàng
-          IntrinsicHeight(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Obx(() => LeaveRequestFilterTabs(
-                    selectedStatus: controller.selectedStatus.value,
-                    onStatusChanged: (status) => controller.selectedStatus.value = status,
-                  )),
-                ),
-                
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                  child: VerticalDivider(
-                    width: 1,
-                    thickness: 1,
-                    color: AppColors.outlineVariant.withValues(alpha: 0.3),
-                  ),
-                ),
-
-                _buildSortButton(),
-              ],
-            ),
-          ),
+          // Bên phải: Nút sắp xếp 
+          _buildSortButton(),
         ],
       ),
     );

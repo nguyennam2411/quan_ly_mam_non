@@ -43,7 +43,7 @@ class LeaveRequestRepository {
     final data = {
       AppDatabase.colStatus: status,
       AppDatabase.colApprovedBy: teacherId,
-      AppDatabase.colApprovedAt: DateTime.now().toIso8601String(),
+      AppDatabase.colApprovedAt: DateTime.now().toUtc().toIso8601String(),
       if (reason != null) AppDatabase.colCancelReason: reason,
     };
     await _provider.updateStatus(requestId, data);
@@ -53,41 +53,43 @@ class LeaveRequestRepository {
     }
   }
 
-  Future<void> submitLeaveRequestWithImage(LeaveRequestModel request, File? imageFile) async {
-  String? imageUrl;
+  Future<void> submitLeaveRequestWithImages(LeaveRequestModel request, List<File> imageFiles) async {
+    List<String> imageUrls = [];
 
-  // 1. Nếu có ảnh, nén ảnh và upload để lấy URL
-  if (imageFile != null) {
-    // Sử dụng Helper dùng chung để nén ảnh
-    final compressedFile = await ImageHelper.compressImage(imageFile);
-    
-    // Upload file đã nén
-    imageUrl = await _provider.uploadEvidence(compressedFile);
-    
-    if (imageUrl == null) {
-      throw Exception('Upload ảnh minh chứng thất bại');
+    // 1. Nếu có ảnh, nén ảnh và upload để lấy URL
+    if (imageFiles.isNotEmpty) {
+      for (var imageFile in imageFiles) {
+        // Sử dụng Helper dùng chung để nén ảnh
+        final compressedFile = await ImageHelper.compressImage(imageFile);
+        
+        // Upload file đã nén
+        final imageUrl = await _provider.uploadEvidence(compressedFile);
+        
+        if (imageUrl != null) {
+          imageUrls.add(imageUrl);
+        }
+        
+        // Nếu là file tạm (khác file gốc), hãy xóa đi để tiết kiệm bộ nhớ máy
+        if (compressedFile.path != imageFile.path) {
+          await ImageHelper.deleteTempFile(compressedFile);
+        }
+      }
     }
-    
-    // Nếu là file tạm (khác file gốc), hãy xóa đi để tiết kiệm bộ nhớ máy
-    if (compressedFile.path != imageFile.path) {
-      await ImageHelper.deleteTempFile(compressedFile);
-    }
+
+    // 2. Tạo bản copy của model có kèm URL ảnh
+    final finalRequest = LeaveRequestModel(
+      studentId: request.studentId,
+      parentId: request.parentId,
+      reason: request.reason,
+      status: AppDatabase.pending,
+      startDate: request.startDate,
+      endDate: request.endDate,
+      images: imageUrls, // Gán mảng URL vào đây
+    );
+
+    // 3. Lưu toàn bộ đơn vào Database
+    await _provider.insertRequest(finalRequest.toJson());
   }
-
-  // 2. Tạo bản copy của model có kèm URL ảnh
-  final finalRequest = LeaveRequestModel(
-    studentId: request.studentId,
-    parentId: request.parentId,
-    reason: request.reason,
-    status: AppDatabase.pending,
-    startDate: request.startDate,
-    endDate: request.endDate,
-    evidenceUrl: imageUrl, // Gán URL vào đây
-  );
-
-  // 3. Lưu toàn bộ đơn vào Database
-  await _provider.insertRequest(finalRequest.toJson());
-}
 
   Future<LeaveRequestModel> _getRequestById(String requestId) async {
     final response = await _provider.getRequestById(requestId);

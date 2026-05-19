@@ -11,7 +11,7 @@ ActivityLikeModel _$ActivityLikeModelFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       activityLogId: json['activity_log_id'] as String,
       userId: json['user_id'] as String,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: DateHelper.parseUtc(json['created_at']),
     );
 
 Map<String, dynamic> _$ActivityLikeModelToJson(ActivityLikeModel instance) =>

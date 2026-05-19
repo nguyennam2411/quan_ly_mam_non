@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../core/values/app_strings.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/headers/page_header.dart';
 import '../controllers/meal_plan_controller.dart';
 
 class MealPlanView extends GetView<MealPlanController> {
@@ -12,21 +14,14 @@ class MealPlanView extends GetView<MealPlanController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        centerTitle: true,
-        title: Obx(() => Text(
-              controller.gradeName.value,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.onBackground,
-                  ),
-            )),
-      ),
+      appBar: const MainAppBar(title: AppStrings.mealPlanTitle),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Obx(() => PageHeader(
+                title: '${AppStrings.mealPlanTitle} - ${controller.gradeName.value}',
+                subtitle: AppStrings.mealPlanSubtitle,
+              )),
           _buildDaySelector(),
           Expanded(
             child: Obx(() {
@@ -85,6 +80,7 @@ class MealPlanView extends GetView<MealPlanController> {
       ),
     );
   }
+
 
   Widget _buildDaySelector() {
     final days = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6'];

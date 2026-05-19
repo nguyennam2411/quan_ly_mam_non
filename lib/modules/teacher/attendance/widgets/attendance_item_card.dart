@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_database.dart';
@@ -55,16 +56,73 @@ class AttendanceItemCard extends StatelessWidget {
                     color: AppColors.onBackground,
                   ),
                 ),
-                const SizedBox(height: 4),
-                if (item.attendance?.checkinTime != null)
+                if (item.student.birthday != null) ...[
+                  const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(Icons.access_time, size: 12, color: AppColors.outline),
+                      const Icon(Icons.cake_outlined, size: 12, color: AppColors.outline),
                       const SizedBox(width: 4),
                       Text(
-                        '${AppStrings.attendanceCheckinAt}: ${item.attendance!.checkinTime}',
-                        style: Theme.of(context).textTheme.bodySmall,
+                        DateFormat('dd/MM/yyyy').format(item.student.birthday!),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.outline,
+                              fontSize: 11,
+                            ),
                       ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 4),
+                if (item.attendance?.checkinTime != null)
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8, // Khoảng cách giữa giờ và tag QR
+                    runSpacing: 4, // Khoảng cách nếu bị xuống dòng
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.access_time, size: 12, color: AppColors.outline),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${AppStrings.attendanceCheckinAt}: ${item.attendance!.checkinTime}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                      
+                      // Hiển thị nhãn QR nếu điểm danh bằng mã
+                      if (item.attendance?.method == AppDatabase.methodQr)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: AppColors.primary.withOpacity(0.2),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.qr_code_scanner_rounded,
+                                size: 10,
+                                color: AppColors.primary,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                'QR',
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      color: AppColors.primary,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   )
                 else
@@ -147,23 +205,23 @@ class AttendanceItemCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _statusAction(
-          icon: Icons.check_circle_rounded,
+          icon: Icons.check_rounded,
           color: AppColors.success,
           isActive: currentStatus == AppDatabase.statusPresent,
           onTap: () => onStatusChanged?.call(AppDatabase.statusPresent),
           tooltip: AppStrings.attendancePresent,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         _statusAction(
-          icon: Icons.assignment_late_rounded,
+          icon: Icons.priority_high_rounded,
           color: AppColors.tertiary,
           isActive: currentStatus == AppDatabase.statusAbsentExcused,
           onTap: () => onStatusChanged?.call(AppDatabase.statusAbsentExcused),
           tooltip: AppStrings.attendanceExcused,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         _statusAction(
-          icon: Icons.cancel_rounded,
+          icon: Icons.close_rounded,
           color: AppColors.error,
           isActive: currentStatus == AppDatabase.statusAbsentUnexcused,
           onTap: () => onStatusChanged?.call(AppDatabase.statusAbsentUnexcused),
@@ -185,19 +243,19 @@ class AttendanceItemCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(100),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: isActive ? color : Colors.transparent,
           shape: BoxShape.circle,
           border: Border.all(
-            color: isActive ? color : AppColors.outlineVariant.withValues(alpha: 0.5),
+            color: isActive ? color : AppColors.outlineVariant.withValues(alpha: 0.4),
             width: 1.5,
           ),
         ),
         child: Icon(
           icon, 
-          color: isActive ? Colors.white : AppColors.outlineVariant, 
-          size: 20,
+          color: isActive ? Colors.white : AppColors.outlineVariant.withValues(alpha: 0.8), 
+          size: 18,
         ),
       ),
     );

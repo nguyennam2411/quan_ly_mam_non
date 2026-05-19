@@ -66,6 +66,24 @@ class ParentLeaveRequestController extends GetxController {
     return list;
   }
 
+  Map<String, int> get statusCounts {
+    final currentStudent = ParentStudentService.to.selectedStudent.value;
+    final studentRequests = leaveRequests.where((r) {
+      if (currentStudent != null && r.studentId != currentStudent.id) {
+        return false;
+      }
+      return true;
+    }).toList();
+
+    return {
+      AppStrings.leaveStatusAll: studentRequests.length,
+      AppStrings.leaveStatusPending: studentRequests.where((r) => r.status == AppDatabase.pending).length,
+      AppStrings.leaveStatusApproved: studentRequests.where((r) => r.status == AppDatabase.approved).length,
+      AppStrings.leaveStatusRejected: studentRequests.where((r) => r.status == AppDatabase.rejected).length,
+      AppStrings.leaveStatusCancelled: studentRequests.where((r) => r.status == AppDatabase.cancelled).length,
+    };
+  }
+
   String _mapLabelToStatus(String label) {
     switch (label) {
       case AppStrings.leaveStatusPending:
@@ -85,7 +103,7 @@ class ParentLeaveRequestController extends GetxController {
   var startDate = Rxn<DateTime>();
   var endDate = Rxn<DateTime>();
   final reasonController = TextEditingController();
-  var selectedImage = Rxn<File>();
+  var selectedImages = <File>[].obs;
   var hasChanges = false.obs;
 
   @override
@@ -108,14 +126,14 @@ class ParentLeaveRequestController extends GetxController {
     // Theo dõi các trường Rx khác
     ever(startDate, (_) => hasChanges.value = true);
     ever(endDate, (_) => hasChanges.value = true);
-    ever(selectedImage, (_) => hasChanges.value = true);
+    ever(selectedImages, (_) => hasChanges.value = true);
   }
 
   void resetForm() {
     startDate.value = null;
     endDate.value = null;
     reasonController.clear();
-    selectedImage.value = null;
+    selectedImages.clear();
     hasChanges.value = false;
   }
 
@@ -139,7 +157,13 @@ class ParentLeaveRequestController extends GetxController {
   Future<void> pickImage() async {
     final file = await ImageHelper.pickImage(ImageSource.gallery, crop: true);
     if (file != null) {
-      selectedImage.value = file;
+      selectedImages.add(file);
+    }
+  }
+
+  void removeImage(int index) {
+    if (index >= 0 && index < selectedImages.length) {
+      selectedImages.removeAt(index);
     }
   }
 
@@ -175,7 +199,7 @@ class ParentLeaveRequestController extends GetxController {
         endDate: endDate.value!.toIso8601String().split('T')[0],
       );
 
-      await repository.submitLeaveRequestWithImage(request, selectedImage.value);
+      await repository.submitLeaveRequestWithImages(request, selectedImages.toList());
       
       Get.back();
       Get.snackbar('Thành công', 'Đơn xin nghỉ đã được gửi và đang chờ duyệt',

@@ -151,7 +151,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                       Padding(
                                         padding: const EdgeInsets.only(left: 4, top: 4),
                                         child: Text(
-                                          timeago.format(comment.createdAt, locale: 'vi'),
+                                          timeago.format(comment.createdAt.toLocal(), locale: 'vi'),
                                           style: TextStyle(
                                             fontSize: 11,
                                             color: Colors.grey[500],

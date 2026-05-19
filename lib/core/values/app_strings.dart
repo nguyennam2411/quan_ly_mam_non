@@ -78,6 +78,7 @@ class AppStrings {
   static const String attendanceFutureWarning = 'Không thể điểm danh cho ngày trong tương lai';
 
   static const String attendanceHistoryTitle = 'Lịch sử điểm danh';
+  static const String attendanceHistorySubtitle = 'Xem lại tình hình đi học và chuyên cần của bé';
   static const String attendanceLockEdit = 'Khóa chỉnh sửa';
   static const String attendanceEnableEdit = 'Bật chỉnh sửa';
   static const String attendanceEmptyHistory = 'Trống dữ liệu';
@@ -114,6 +115,19 @@ class AppStrings {
   static const String statsWeeklyNoData = 'Không có dữ liệu tuần này';
   static const String statsChange = 'Thay đổi';
 
+  // Student Schedule
+  static const String scheduleTitle = 'Lịch sinh hoạt';
+  static const String scheduleSubtitle = 'Theo dõi các hoạt động học tập và vui chơi hàng ngày của bé';
+
+  // Meal Plan
+  static const String mealPlanTitle = 'Thực đơn';
+  static const String mealPlanSubtitle = 'Thực đơn dinh dưỡng và các món ăn trong tuần của bé';
+
+  // Health
+  static const String healthTitle = 'Sức khỏe & Phát triển';
+  static const String healthSubtitle = 'Theo dõi các chỉ số phát triển chiều cao, cân nặng của bé';
+  static const String healthTeacherSubtitle = 'Cập nhật và theo dõi chỉ số phát triển của học sinh trong lớp';
+
   // Dialogs
   static const String dialogConfirmTitle = 'Xác nhận';
   static const String dialogWarningTitle = 'Cảnh báo';
@@ -126,7 +140,7 @@ class AppStrings {
   // Leave Request
   static const String leaveRequestTitle = 'Đơn xin nghỉ';
   static const String leaveRequestSubtitle = 'Theo dõi và quản lý các đơn xin nghỉ học của bé';
-  static const String leaveRequestSearchHint = 'Tìm kiếm tên bé...';
+  static const String leaveRequestSearchHint = 'Tìm kiếm tên học sinh...';
   static const String leaveRequestSort = 'Sắp xếp';
   static const String leaveRequestCancel = 'Huỷ yêu cầu';
   static const String leaveRequestDetail = 'Chi tiết';

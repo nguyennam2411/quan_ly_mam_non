@@ -19,6 +19,36 @@ class AppDialogs {
     );
   }
 
+  // Snackbar Thông báo thành công
+  static void success({String? title, required String message}) {
+    Get.snackbar(
+      title ?? AppStrings.successTitle,
+      message,
+      backgroundColor: Colors.green.withOpacity(0.9),
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(AppConstants.paddingM),
+      borderRadius: AppConstants.radiusM,
+      icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  // Snackbar Thông báo lỗi
+  static void error({String? title, required String message}) {
+    Get.snackbar(
+      title ?? AppStrings.errorTitle,
+      message,
+      backgroundColor: Colors.redAccent.withOpacity(0.9),
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(AppConstants.paddingM),
+      borderRadius: AppConstants.radiusM,
+      icon: const Icon(Icons.error_outline, color: Colors.white),
+      duration: const Duration(seconds: 4),
+    );
+  }
+
   static void hideLoading() {
     if (Get.isDialogOpen ?? false) Get.back();
   }

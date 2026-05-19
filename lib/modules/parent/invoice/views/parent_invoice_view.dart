@@ -158,31 +158,6 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  const Text('Chi tiết các khoản thu:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.outline)),
-                  const SizedBox(height: 4),
-                  ...invoice.items.map((item) {
-                    final isRefund = item.amount < 0;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '- ${item.name}',
-                              style: TextStyle(fontSize: 13, color: isRefund ? AppColors.error : AppColors.onSurfaceVariant),
-                            ),
-                          ),
-                          Text(
-                            formatCurrency.format(item.amount),
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: isRefund ? AppColors.error : AppColors.onSurface),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
                     child: Divider(height: 1, color: AppColors.outlineVariant),

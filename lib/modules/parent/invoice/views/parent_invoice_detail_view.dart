@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_database.dart';
+import '../../../../core/values/user_role.dart';
+import '../../../../core/services/auth_service.dart';
 import '../../../../global_widgets/buttons/circle_back_button.dart';
 import '../../../../data/models/invoice_model.dart';
 import '../controllers/parent_invoice_controller.dart';
@@ -96,7 +98,9 @@ class ParentInvoiceDetailView extends GetView<ParentInvoiceController> {
           ],
         ),
       ),
-      bottomNavigationBar: invoice.status == AppDatabase.invoiceStatusOverdue
+      bottomNavigationBar: UserRole.isTeacher(AuthService.to.userRole.value) 
+          ? null 
+          : invoice.status == AppDatabase.invoiceStatusOverdue
           ? Container(
               color: AppColors.surface,
               padding: const EdgeInsets.all(AppConstants.paddingL),

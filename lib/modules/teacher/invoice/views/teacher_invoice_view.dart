@@ -198,18 +198,18 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
                             label: const Text('Xem phiếu'),
                           ),
                         ),
-                        if (!isPaid && invoice.status != AppDatabase.invoiceStatusOverdue) ...[
+                        if (invoice.status == AppDatabase.pending) ...[
                           const SizedBox(width: 12),
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () => _showConfirmDialog(context, invoice.id ?? '', student?.name ?? ''),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: invoice.status == AppDatabase.pending ? AppColors.warning : AppColors.primary,
+                                backgroundColor: AppColors.warning,
                               ),
                               icon: const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-                              label: Text(
-                                invoice.status == AppDatabase.pending ? 'Xác nhận thu' : 'Thu tiền mặt',
-                                style: const TextStyle(color: Colors.white, fontSize: 13),
+                              label: const Text(
+                                'Xác nhận thu',
+                                style: TextStyle(color: Colors.white, fontSize: 13),
                               ),
                             ),
                           ),

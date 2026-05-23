@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:uuid/uuid.dart';
 import '../../../core/utils/image_helper.dart';
 import '../models/leave_request_model.dart';
 import '../providers/leave_request_provider.dart';
 import '../../../core/values/app_database.dart';
+import '../../../core/values/app_media_folders.dart';
 
 class LeaveRequestRepository {
   final LeaveRequestProvider _provider = LeaveRequestProvider();
@@ -10,13 +12,13 @@ class LeaveRequestRepository {
   // GV: Lấy danh sách đơn cần duyệt
   Future<List<LeaveRequestModel>> getTeacherLeaveRequests(String classroomId) async {
     final response = await _provider.getRequestsByClassroom(classroomId);
-    return (response as List).map((e) => LeaveRequestModel.fromJson(e)).toList();
+    return response.map((e) => LeaveRequestModel.fromJson(e)).toList();
   }
 
   // PH: Lấy lịch sử đơn của mình
   Future<List<LeaveRequestModel>> getRequestsByParent(String parentId) async {
     final response = await _provider.getRequestsByParent(parentId);
-    return (response as List).map((e) => LeaveRequestModel.fromJson(e)).toList();
+    return response.map((e) => LeaveRequestModel.fromJson(e)).toList();
   }
 
   // PH: Gửi đơn xin nghỉ
@@ -55,15 +57,21 @@ class LeaveRequestRepository {
 
   Future<void> submitLeaveRequestWithImages(LeaveRequestModel request, List<File> imageFiles) async {
     List<String> imageUrls = [];
+    
+    // 1. Sinh UUID ngẫu nhiên cho requestId ở phía client trước
+    final generatedRequestId = const Uuid().v4();
 
-    // 1. Nếu có ảnh, nén ảnh và upload để lấy URL
+    // 2. Nếu có ảnh, nén ảnh và upload lên Cloudinary để lấy URL
     if (imageFiles.isNotEmpty) {
+      // Xác định thư mục lưu trữ động trên Cloudinary: mam-non/{env}/leave-requests/students/{studentId}/{requestId}
+      final uploadFolder = AppMediaFolders.leaveRequest(request.studentId, generatedRequestId);
+
       for (var imageFile in imageFiles) {
         // Sử dụng Helper dùng chung để nén ảnh
         final compressedFile = await ImageHelper.compressImage(imageFile);
         
-        // Upload file đã nén
-        final imageUrl = await _provider.uploadEvidence(compressedFile);
+        // Upload file đã nén lên Cloudinary vào đúng thư mục của đơn nghỉ phép
+        final imageUrl = await _provider.uploadEvidence(compressedFile, folder: uploadFolder);
         
         if (imageUrl != null) {
           imageUrls.add(imageUrl);
@@ -76,8 +84,9 @@ class LeaveRequestRepository {
       }
     }
 
-    // 2. Tạo bản copy của model có kèm URL ảnh
+    // 3. Tạo bản copy của model có kèm id đã sinh trước và URL ảnh
     final finalRequest = LeaveRequestModel(
+      id: generatedRequestId, // Gán id đã sinh sẵn
       studentId: request.studentId,
       parentId: request.parentId,
       reason: request.reason,
@@ -87,7 +96,7 @@ class LeaveRequestRepository {
       images: imageUrls, // Gán mảng URL vào đây
     );
 
-    // 3. Lưu toàn bộ đơn vào Database
+    // 4. Lưu toàn bộ đơn vào Database
     await _provider.insertRequest(finalRequest.toJson());
   }
 

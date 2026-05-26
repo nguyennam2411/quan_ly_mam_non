@@ -28,6 +28,10 @@ class AppMediaFolders {
     final folderName = scheduleId ?? '${DateFormat('yyyy-MM-dd').format(date)}-free';
     return '$root/lessons/classrooms/$classroomId/$year/$month/$folderName';
   }
+
+  // 4. Thư mục nhật ký hoạt động của trẻ
+  static String activity(String classroomId, String logId) =>
+      '$root/activities/classrooms/$classroomId/$logId';
 }
 
 

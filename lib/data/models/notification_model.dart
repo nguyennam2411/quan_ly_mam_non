@@ -1,6 +1,6 @@
-// lib/data/models/notification_model.dart
 import 'package:json_annotation/json_annotation.dart';
 import '../../../core/values/app_database.dart';
+import '../../../core/utils/date_helper.dart';
 
 part 'notification_model.g.dart';
 
@@ -21,7 +21,7 @@ class NotificationModel {
   @JsonKey(name: AppDatabase.colIsRead)
   bool isRead;
 
-  @JsonKey(name: AppDatabase.colCreatedAt)
+  @JsonKey(name: AppDatabase.colCreatedAt, fromJson: DateHelper.parseUtc)
   final DateTime createdAt;
 
   @JsonKey(name: AppDatabase.colType)

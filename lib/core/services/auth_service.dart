@@ -16,6 +16,8 @@ class AuthService extends GetxService {
   
   // Thông tin bổ sung cho Teacher/Parent
   final RxString classroomId = ''.obs; // Cực kỳ quan trọng cho Điểm danh
+  final RxString classroomName = ''.obs; // Hiển thị trên Dashboard
+  final RxString gradeId = ''.obs; // Dùng cho Thực đơn
   final RxMap userProfile = {}.obs;
 
   @override
@@ -73,13 +75,15 @@ class AuthService extends GetxService {
         print("DEBUG: Fetching classroom for teacher: $userId");
         final classData = await _supabase
             .from(AppDatabase.tableClassrooms)
-            .select(AppDatabase.colId)
+            .select('${AppDatabase.colId}, ${AppDatabase.colName}, ${AppDatabase.colGradeId}')
             .eq(AppDatabase.colTeacherId, userId)
             .maybeSingle();
         
         if (classData != null) {
           classroomId.value = classData[AppDatabase.colId];
-          print("DEBUG: Fetched classroomId: ${classroomId.value}");
+          classroomName.value = classData[AppDatabase.colName];
+          gradeId.value = classData[AppDatabase.colGradeId];
+          print("DEBUG: Fetched classroomId: ${classroomId.value}, gradeId: ${gradeId.value}");
         } else {
           print("DEBUG: No classroom found for teacher: $userId");
         }
@@ -120,6 +124,8 @@ class AuthService extends GetxService {
   void _clearUserData() {
     userRole.value = '';
     classroomId.value = '';
+    classroomName.value = '';
+    gradeId.value = '';
     userProfile.clear();
 
     // MỚI: Xóa thông tin con khi đăng xuất

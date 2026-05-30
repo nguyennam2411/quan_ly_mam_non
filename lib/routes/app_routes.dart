@@ -9,11 +9,15 @@ abstract class Routes {
 
   // Hệ thống chung (Main Dashboard)
   static const MAIN_DASHBOARD = '/dashboard';
+  static const MEAL_PLAN = '/meal-plan';
+  static const PARENT_ATTENDANCE_HISTORY = '/parent/attendance-history';
 
   // Chức năng Điểm danh (Teacher)
   static const ATTENDANCE_MAIN = '/teacher/attendance';
   static const ATTENDANCE_LIST = '/teacher/attendance/list';
   static const ATTENDANCE_HISTORY = '/teacher/attendance/history';
+  static const ATTENDANCE_STATISTIC = '/teacher/attendance/statistic';
+  static const ATTENDANCE_QR = '/teacher/attendance/qr-scanner';
   
   // Chức năng Phụ huynh
   static const PARENT_LEAVE_REQUEST = '/parent/leave-request';
@@ -21,9 +25,19 @@ abstract class Routes {
 
   // Chức năng Giáo viên (Tiếp tục)
   static const TEACHER_LEAVE_REQUEST = '/teacher/leave-request';
+  static const TEACHER_HEALTH = '/teacher/health';
   static const TEACHER_ACTIVITY_LOG = '/teacher/activity-log';
   static const TEACHER_ADD_ACTIVITY_LOG = '/teacher/activity-log/add';
 
   // Nhật ký (Parent)
   static const PARENT_ACTIVITY_LOG = '/parent/activity-log';
+  static const PARENT_HEALTH = '/parent/health';
+  static const PARENT_STUDENT_SCHEDULE = '/parent/student-schedule';
+
+  // Thời khóa biểu & Bài học
+  static const TEACHER_SCHEDULE = '/teacher/schedule';
+  static const TEACHER_LESSON_EDITOR = '/teacher/lesson-editor';
+  
+  // Student QR
+  static const PARENT_STUDENT_QR = '/parent/student-qr';
 }

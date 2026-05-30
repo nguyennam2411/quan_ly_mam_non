@@ -8,6 +8,11 @@ class AppSearchBar extends StatelessWidget {
   final TextEditingController? controller;
   final VoidCallback? onClear;
   final Widget? suffixIcon;
+  final double? height;
+  final BorderRadius? borderRadius;
+  final Color? backgroundColor;
+  final List<BoxShadow>? boxShadow;
+  final double? iconSize;
 
   const AppSearchBar({
     super.key,
@@ -16,16 +21,21 @@ class AppSearchBar extends StatelessWidget {
     this.controller,
     this.onClear,
     this.suffixIcon,
+    this.height,
+    this.borderRadius,
+    this.backgroundColor,
+    this.boxShadow,
+    this.iconSize,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 56,
+      height: height ?? 56,
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(AppConstants.radiusL),
-        boxShadow: [
+        color: backgroundColor ?? AppColors.surfaceContainerHigh,
+        borderRadius: borderRadius ?? BorderRadius.circular(AppConstants.radiusL),
+        boxShadow: boxShadow ?? [
           BoxShadow(
             color: Colors.black.withOpacity(0.03),
             blurRadius: 10,
@@ -49,10 +59,10 @@ class AppSearchBar extends StatelessWidget {
             fontSize: 15,
             fontWeight: FontWeight.w400,
           ),
-          prefixIcon: const Icon(
+          prefixIcon: Icon(
             Icons.search_rounded,
             color: AppColors.primary,
-            size: 24,
+            size: iconSize ?? 24,
           ),
           suffixIcon: suffixIcon ?? (controller?.text.isNotEmpty == true || onClear != null
               ? IconButton(

@@ -22,6 +22,18 @@ class StudentModel {
   @JsonKey(includeToJson: false)
   final String? classroomName;
 
+  @JsonKey(includeToJson: false)
+  final String? gradeId;
+
+  @JsonKey(includeToJson: false)
+  final String? gradeName;
+  
+  @JsonKey(name: AppDatabase.colBirthday)
+  final DateTime? birthday;
+
+  @JsonKey(name: AppDatabase.colGender)
+  final String? gender; 
+
   StudentModel({
     required this.id, 
     required this.name, 
@@ -29,13 +41,24 @@ class StudentModel {
     this.parentId, 
     this.avatarUrl,
     this.classroomName,
+    this.gradeId,
+    this.gradeName,
+    this.birthday,
+    this.gender,
   });
 
   factory StudentModel.fromJson(Map<String, dynamic> json) {
-    // Xử lý lấy tên lớp từ join query
+    // Xử lý lấy tên lớp và thông tin khối học từ join query
     String? cName;
+    String? gId;
+    String? gName;
+    
     if (json[AppDatabase.tableClassrooms] != null) {
       cName = json[AppDatabase.tableClassrooms][AppDatabase.colName];
+      gId = json[AppDatabase.tableClassrooms][AppDatabase.colGradeId];
+      if (json[AppDatabase.tableClassrooms][AppDatabase.tableGrades] != null) {
+        gName = json[AppDatabase.tableClassrooms][AppDatabase.tableGrades][AppDatabase.colName];
+      }
     }
     
     return StudentModel(
@@ -45,6 +68,12 @@ class StudentModel {
       parentId: json[AppDatabase.colParentId] as String?,
       avatarUrl: json[AppDatabase.colAvatarUrl] as String?,
       classroomName: cName,
+      gradeId: gId,
+      gradeName: gName,
+      birthday: json[AppDatabase.colBirthday] != null 
+          ? DateTime.parse(json[AppDatabase.colBirthday]) 
+          : null,
+      gender: json[AppDatabase.colGender] as String?,
     );
   }
   Map<String, dynamic> toJson() => _$StudentModelToJson(this);

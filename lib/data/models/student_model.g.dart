@@ -13,6 +13,10 @@ StudentModel _$StudentModelFromJson(Map<String, dynamic> json) => StudentModel(
   parentId: json['parent_id'] as String?,
   avatarUrl: json['avatar_url'] as String?,
   classroomName: json['classroomName'] as String?,
+  gradeId: json['gradeId'] as String?,
+  gradeName: json['gradeName'] as String?,
+  birthday: json['dob'] == null ? null : DateTime.parse(json['dob'] as String),
+  gender: json['gender'] as String?,
 );
 
 Map<String, dynamic> _$StudentModelToJson(StudentModel instance) =>
@@ -22,4 +26,6 @@ Map<String, dynamic> _$StudentModelToJson(StudentModel instance) =>
       'classroom_id': instance.classroomId,
       'parent_id': instance.parentId,
       'avatar_url': instance.avatarUrl,
+      'dob': instance.birthday?.toIso8601String(),
+      'gender': instance.gender,
     };

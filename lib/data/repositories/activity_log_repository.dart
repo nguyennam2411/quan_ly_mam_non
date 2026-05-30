@@ -2,6 +2,8 @@ import 'dart:io';
 import '../models/activity_comment_model.dart';
 import '../models/activity_log_model.dart';
 import '../providers/activity_log_provider.dart';
+import '../../../core/utils/image_helper.dart';
+import '../../../core/values/app_media_folders.dart';
 
 class ActivityLogRepository {
   final ActivityLogProvider provider;
@@ -51,16 +53,23 @@ class ActivityLogRepository {
     // 2. Upload ảnh và tạo bản ghi Image
     if (images.isNotEmpty) {
       final List<Map<String, dynamic>> imagesToInsert = [];
+      final uploadFolder = AppMediaFolders.activity(classroomId, logId);
       
       for (var image in images) {
-        final fileName = '${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}';
-        final path = 'activities/$logId/$fileName';
-        final imageUrl = await provider.uploadFile(image, path);
+        // Nén ảnh trước khi tải lên
+        final compressedFile = await ImageHelper.compressImage(image);
+        
+        final imageUrl = await provider.uploadFile(compressedFile, uploadFolder);
         
         imagesToInsert.add({
           'activity_id': logId,
           'image_url': imageUrl,
         });
+
+        // Xóa file tạm thời sau khi tải lên để giải phóng bộ nhớ
+        if (compressedFile.path != image.path) {
+          await ImageHelper.deleteTempFile(compressedFile);
+        }
       }
 
       await provider.insertImages(imagesToInsert);

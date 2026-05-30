@@ -9,6 +9,7 @@ import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/buttons/circle_back_button.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
+import '../../../../global_widgets/images/image_picker_grid.dart';
 import '../controllers/parent_leave_request_controller.dart';
 
 class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
@@ -204,71 +205,12 @@ class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
   }
 
   Widget _buildEvidencePicker() {
-    return Obx(() {
-      final image = controller.selectedImage.value;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (image != null) ...[
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(AppConstants.radiusM),
-                  child: Image.file(
-                    image,
-                    width: double.infinity,
-                    height: 180,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: () => controller.selectedImage.value = null,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.black54,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.close, color: Colors.white, size: 20),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            AppConstants.spacingM,
-          ],
-          InkWell(
-            onTap: () => controller.pickImage(),
-            borderRadius: BorderRadius.circular(AppConstants.radiusM),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: AppConstants.paddingM),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(AppConstants.radiusM),
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.3),
-                  style: BorderStyle.solid,
-                ),
-              ),
-              child: const Column(
-                children: [
-                  Icon(Icons.add_a_photo_outlined, color: AppColors.primary),
-                  AppConstants.spacingXS,
-                  Text(
-                    AppStrings.leaveRequestPickImage,
-                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      );
-    });
+    return Obx(() => ImagePickerGrid(
+          images: controller.selectedImages.toList(),
+          onImageAdded: (file) => controller.selectedImages.add(file),
+          onImageRemoved: (index) => controller.selectedImages.removeAt(index),
+          maxImages: 5,
+        ));
   }
 
   void _showDateRangePicker(BuildContext context) {

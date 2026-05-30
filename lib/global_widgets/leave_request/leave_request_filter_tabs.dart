@@ -6,11 +6,15 @@ import '../../core/values/app_strings.dart';
 class LeaveRequestFilterTabs extends StatelessWidget {
   final String selectedStatus;
   final Function(String) onStatusChanged;
+  final Map<String, int>? statusCounts; // Optional mapping of status label -> count
+  final EdgeInsetsGeometry? padding;
 
   const LeaveRequestFilterTabs({
     super.key,
     required this.selectedStatus,
     required this.onStatusChanged,
+    this.statusCounts,
+    this.padding,
   });
 
   @override
@@ -23,38 +27,73 @@ class LeaveRequestFilterTabs extends StatelessWidget {
       AppStrings.leaveStatusCancelled,
     ];
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: statuses.map((status) {
+    return SizedBox(
+      height: 36,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: padding,
+        itemCount: statuses.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final status = statuses[index];
           final isSelected = selectedStatus == status;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: ChoiceChip(
-              label: Text(
-                status,
-                style: TextStyle(
-                  color: isSelected ? AppColors.onPrimary : AppColors.onSurfaceVariant,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          final count = statusCounts?[status];
+          final activeColor = AppColors.primary;
+
+          return InkWell(
+            onTap: () => onStatusChanged(status),
+            borderRadius: BorderRadius.circular(18),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary.withValues(alpha: 0.08) : Colors.transparent,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isSelected ? activeColor : AppColors.outlineVariant.withValues(alpha: 0.4),
+                  width: 1.2,
                 ),
               ),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) onStatusChanged(status);
-              },
-              selectedColor: AppColors.primary,
-              backgroundColor: AppColors.onSurface.withValues(alpha: 0.05),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppConstants.radiusM),
-                side: BorderSide.none,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    status,
+                    style: TextStyle(
+                      color: isSelected ? activeColor : AppColors.onBackground.withValues(alpha: 0.7),
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      fontSize: 13,
+                    ),
+                  ),
+                  if (count != null) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.all(2),
+                      constraints: const BoxConstraints(
+                        minWidth: 18,
+                        minHeight: 18,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected ? activeColor : AppColors.outlineVariant.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$count',
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : AppColors.outline,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              showCheckmark: false,
-              padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingS, vertical: 0),
-              labelPadding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingXS, vertical: 0),
-              visualDensity: VisualDensity.compact,
             ),
           );
-        }).toList(),
+        },
       ),
     );
   }

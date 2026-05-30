@@ -13,7 +13,7 @@ NotificationModel _$NotificationModelFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String,
       content: json['content'] as String,
       isRead: json['is_read'] as bool? ?? false,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: DateHelper.parseUtc(json['created_at']),
       type: json['type'] as String?,
       referenceId: json['reference_id'] as String?,
     );

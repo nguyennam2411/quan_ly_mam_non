@@ -87,7 +87,7 @@ class AppLeaveRequestCard extends StatelessWidget {
               ),
               AppConstants.spacingXXS,
               Text(
-                '${AppStrings.leaveRequestSentAt} ${DateFormat('HH:mm - dd/MM/yyyy').format(createdAt)}',
+                '${AppStrings.leaveRequestSentAt} ${DateFormat('HH:mm - dd/MM/yyyy').format(createdAt.toLocal())}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.outline,
                 ),

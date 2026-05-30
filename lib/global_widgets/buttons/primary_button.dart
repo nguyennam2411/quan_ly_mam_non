@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/values/app_constants.dart';
 import '../dialogs/app_loading.dart';
 
@@ -24,6 +25,9 @@ class PrimaryButton extends StatelessWidget {
       height: AppConstants.buttonHeight,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+        ),
         child: isLoading
             ? const AppLoading(
                 size: AppConstants.buttonIconSize,
@@ -34,9 +38,10 @@ class PrimaryButton extends StatelessWidget {
                 children: [
                   Text(
                     text,
-                    style: const TextStyle(
+                    style: GoogleFonts.beVietnamPro(
                       fontSize: AppConstants.buttonFontSize,
                       fontWeight: FontWeight.bold,
+                      height: 1.2, // standard line height for perfect diacritic marks positioning
                     ),
                   ),
                   if (trailingIcon != null) ...[

@@ -21,4 +21,17 @@ class AttendanceProvider {
       onConflict: '${AppDatabase.colStudentId},${AppDatabase.colDate}'
     );
   }
+
+  // Lấy lịch sử vắng mặt (có phép & không phép) của 1 học sinh
+  Future<List<dynamic>> getAbsentRecordsByStudent(String studentId) async {
+    return await _client
+        .from(AppDatabase.tableAttendance)
+        .select('*')
+        .eq(AppDatabase.colStudentId, studentId)
+        .inFilter(AppDatabase.colStatus, [
+          AppDatabase.statusAbsentExcused,
+          AppDatabase.statusAbsentUnexcused,
+        ])
+        .order(AppDatabase.colDate, ascending: false);
+  }
 }

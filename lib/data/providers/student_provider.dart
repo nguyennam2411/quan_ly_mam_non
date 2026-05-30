@@ -7,7 +7,7 @@ class StudentProvider {
   Future<List<Map<String, dynamic>>> getStudentsByParent(String parentId) async {
     final response = await _client
         .from(AppDatabase.tableStudents)
-        .select('*, ${AppDatabase.tableClassrooms}(${AppDatabase.colName})')
+        .select('*, ${AppDatabase.tableClassrooms}(${AppDatabase.colName}, ${AppDatabase.colGradeId}, ${AppDatabase.tableGrades}(${AppDatabase.colName}))')
         .eq(AppDatabase.colParentId, parentId)
         .order(AppDatabase.colName);
     
@@ -17,7 +17,7 @@ class StudentProvider {
   Future<Map<String, dynamic>> getStudentById(String studentId) async {
     final response = await _client
         .from(AppDatabase.tableStudents)
-        .select('*, ${AppDatabase.tableClassrooms}(${AppDatabase.colName})')
+        .select('*, ${AppDatabase.tableClassrooms}(${AppDatabase.colName}, ${AppDatabase.colGradeId}, ${AppDatabase.tableGrades}(${AppDatabase.colName}))')
         .eq(AppDatabase.colId, studentId)
         .single();
     

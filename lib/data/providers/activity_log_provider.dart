@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/values/app_database.dart';
+import '../../../core/services/cloudinary_service.dart';
 
 class ActivityLogProvider {
   final client = Supabase.instance.client;
@@ -13,15 +14,14 @@ class ActivityLogProvider {
           *, 
           ${AppDatabase.tableActivityImages}(*), 
           students(*),
-          activity_likes!left(count), 
-          activity_comments!left(count),
-          isLiked:activity_likes!left(user_id)
+          like_count:activity_likes(count),
+          comment_count:activity_comments(count),
+          my_like:activity_likes(id)
         ''')
         .eq(AppDatabase.colClassroomId, classroomId)
-        .eq('activity_likes.user_id', userId ?? '')
         .order(AppDatabase.colCreatedAt, ascending: false);
     
-    return _processResponse(response);
+    return _processResponse(response, userId);
   }
 
   Future<List<Map<String, dynamic>>> getLogsByStudent(String studentId, String classroomId) async {
@@ -127,8 +127,11 @@ class ActivityLogProvider {
     await client.from(AppDatabase.tableActivityImages).insert(imagesData);
   }
 
-  Future<String> uploadFile(File file, String path) async {
-    await client.storage.from('activities').upload(path, file);
-    return client.storage.from('activities').getPublicUrl(path);
+  Future<String> uploadFile(File file, String folder) async {
+    final imageUrl = await CloudinaryService.to.uploadImage(file, folder: folder);
+    if (imageUrl == null) {
+      throw Exception('Upload hình ảnh nhật ký hoạt động lên Cloudinary thất bại');
+    }
+    return imageUrl;
   }
 }

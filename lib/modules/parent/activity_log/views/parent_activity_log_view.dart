@@ -4,7 +4,7 @@ import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import 'package:quan_ly_mam_non/data/models/activity_log_model.dart';
 import '../controllers/parent_activity_log_controller.dart';
-import 'widgets/comment_bottom_sheet.dart';
+import 'package:quan_ly_mam_non/global_widgets/comment_bottom_sheet.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ParentActivityLogView extends GetView<ParentActivityLogController> {
@@ -85,7 +85,7 @@ class ParentActivityLogView extends GetView<ParentActivityLogController> {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             subtitle: Text(
-              timeago.format(log.createdAt ?? DateTime.now(), locale: 'vi'),
+              timeago.format((log.createdAt ?? DateTime.now()).toLocal(), locale: 'vi'),
               style: const TextStyle(fontSize: 12),
             ),
           ),
@@ -136,7 +136,11 @@ class ParentActivityLogView extends GetView<ParentActivityLogController> {
 
   void _showCommentBottomSheet(BuildContext context, ActivityLogModel log) {
     Get.bottomSheet(
-      CommentBottomSheet(log: log),
+      CommentBottomSheet(
+        activityLog: log,
+        onSend: (content) => controller.addComment(log, content),
+        getComments: () => controller.getComments(log.id!),
+      ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );

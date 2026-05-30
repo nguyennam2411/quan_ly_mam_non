@@ -56,6 +56,16 @@ class TeacherLeaveRequestController extends GetxController {
     return list;
   }
 
+  Map<String, int> get statusCounts {
+    return {
+      AppStrings.leaveStatusAll: allRequests.length,
+      AppStrings.leaveStatusPending: allRequests.where((r) => r.status == AppDatabase.pending).length,
+      AppStrings.leaveStatusApproved: allRequests.where((r) => r.status == AppDatabase.approved).length,
+      AppStrings.leaveStatusRejected: allRequests.where((r) => r.status == AppDatabase.rejected).length,
+      AppStrings.leaveStatusCancelled: allRequests.where((r) => r.status == AppDatabase.cancelled).length,
+    };
+  }
+
   String _mapLabelToStatus(String label) {
     switch (label) {
       case AppStrings.leaveStatusPending:

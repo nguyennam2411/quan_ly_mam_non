@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import '../../../core/utils/date_helper.dart';
 
 part 'activity_comment_model.g.dart';
 
@@ -10,7 +11,7 @@ class ActivityCommentModel {
   @JsonKey(name: 'user_id')
   final String userId;
   final String content;
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: DateHelper.parseUtc)
   final DateTime createdAt;
   
   // These might be joined from the users table
@@ -46,7 +47,7 @@ class ActivityCommentModel {
       activityLogId: json['activity_log_id'],
       userId: json['user_id'],
       content: json['content'],
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: DateHelper.parseUtc(json['created_at']),
       userName: name,
       userRole: role,
     );

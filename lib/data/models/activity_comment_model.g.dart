@@ -13,7 +13,7 @@ ActivityCommentModel _$ActivityCommentModelFromJson(
   activityLogId: json['activity_log_id'] as String,
   userId: json['user_id'] as String,
   content: json['content'] as String,
-  createdAt: DateTime.parse(json['created_at'] as String),
+  createdAt: DateHelper.parseUtc(json['created_at']),
   userName: json['userName'] as String?,
   userRole: json['userRole'] as String?,
 );

@@ -1,15 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:path/path.dart' as p;
 import '../../../../core/services/auth_service.dart';
+import '../../../../core/services/cloudinary_service.dart';
 import '../../../../core/values/app_database.dart';
+import '../../../../core/values/app_media_folders.dart';
 import '../../../../data/repositories/lesson_repository.dart';
 import '../../../../data/models/lesson_model.dart';
 import '../../../../data/models/schedule_model.dart';
 import '../../../../data/providers/schedule_provider.dart';
-import 'package:intl/intl.dart';
 
 class LessonEditorController extends GetxController {
   final LessonRepository _repository;
@@ -77,7 +76,7 @@ class LessonEditorController extends GetxController {
         }
       }
     } catch (e) {
-      print('Error fetching schedules: $e');
+      debugPrint('Error fetching schedules: $e');
     }
   }
 
@@ -153,22 +152,25 @@ class LessonEditorController extends GetxController {
     }
   }
 
-  // Logic upload ảnh lên Supabase Storage
+  // Logic upload ảnh lên Cloudinary
   Future<List<String>> _uploadImages(String classroomId, DateTime date) async {
     final List<String> finalUrls = [];
-    final dateStr = DateFormat('yyyy-MM-dd').format(date);
-    final storage = Supabase.instance.client.storage.from('lessons');
+    
+    // Thư mục lưu trữ trên Cloudinary tương ứng với bài học
+    final uploadFolder = AppMediaFolders.lesson(
+      classroomId: classroomId,
+      date: date,
+      scheduleId: selectedSchedule.value?.id,
+    );
 
     for (var item in selectedImages) {
       if (item is String) {
         finalUrls.add(item);
       } else if (item is File) {
-        final fileName = '${DateTime.now().millisecondsSinceEpoch}${p.extension(item.path)}';
-        final path = '$classroomId/$dateStr/$fileName';
-        
-        await storage.upload(path, item);
-        final publicUrl = storage.getPublicUrl(path);
-        finalUrls.add(publicUrl);
+        final imageUrl = await CloudinaryService.to.uploadImage(item, folder: uploadFolder);
+        if (imageUrl != null) {
+          finalUrls.add(imageUrl);
+        }
       }
     }
     return finalUrls;

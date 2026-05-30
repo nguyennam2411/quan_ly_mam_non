@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/values/app_database.dart';
 
+import '../../../core/services/cloudinary_service.dart';
+
 class LeaveRequestProvider {
   final _client = Supabase.instance.client;
 
@@ -36,21 +38,14 @@ class LeaveRequestProvider {
     await _client.from(AppDatabase.tableLeaveRequests).insert(data);
   }
 
-  // Upload file đính kèm
-  Future<String?> uploadEvidence(File imageFile) async {
-  try {
-    final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-    final path = 'proofs/$fileName';
-    
-    // Upload vào bucket 'leave_proofs'
-    await _client.storage.from('leave_proofs').upload(path, imageFile);
-    
-    // Lấy link công khai
-    return _client.storage.from('leave_proofs').getPublicUrl(path);
-  } catch (e) {
-    rethrow;
+  // Upload file đính kèm bằng Cloudinary
+  Future<String?> uploadEvidence(File imageFile, {required String folder}) async {
+    try {
+      return await CloudinaryService.to.uploadImage(imageFile, folder: folder);
+    } catch (e) {
+      rethrow;
+    }
   }
-}
 
   // Cập nhật trạng thái (Duyệt/Từ chối)
   Future<void> updateStatus(String id, Map<String, dynamic> data) async {

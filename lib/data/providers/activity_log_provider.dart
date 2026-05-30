@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/values/app_database.dart';
+import '../../../core/services/cloudinary_service.dart';
 
 class ActivityLogProvider {
   final client = Supabase.instance.client;
@@ -126,8 +127,11 @@ class ActivityLogProvider {
     await client.from(AppDatabase.tableActivityImages).insert(imagesData);
   }
 
-  Future<String> uploadFile(File file, String path) async {
-    await client.storage.from('activities').upload(path, file);
-    return client.storage.from('activities').getPublicUrl(path);
+  Future<String> uploadFile(File file, String folder) async {
+    final imageUrl = await CloudinaryService.to.uploadImage(file, folder: folder);
+    if (imageUrl == null) {
+      throw Exception('Upload hình ảnh nhật ký hoạt động lên Cloudinary thất bại');
+    }
+    return imageUrl;
   }
 }

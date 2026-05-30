@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
 import 'app_routes.dart';
 
 // --- Common & Shared ---
@@ -153,7 +152,7 @@ class AppPages {
     // 6. Teacher Medication Request
     GetPage(
       name: Routes.TEACHER_MEDICATION_REQUEST,
-      page: () => const TeacherLeaveRequestView(),
+      page: () => const TeacherMedicationRequestView(),
       binding: TeacherMedicationRequestBinding(),
     ),
 

@@ -47,4 +47,8 @@ abstract class Routes {
   
   // Student QR
   static const PARENT_STUDENT_QR = '/parent/student-qr';
+
+  // --- Bổ sung chức năng Năng khiếu bị thiếu ở đây ---
+  static const PARENT_TALENT = '/parent/talent';
+  static const TEACHER_TALENT = '/teacher/talent';
 }

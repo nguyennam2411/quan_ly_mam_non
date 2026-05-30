@@ -57,22 +57,22 @@ class ParentMedicationRequestController extends GetxController {
   }
 
   String _mapLabelToStatus(String label) {
-    switch (label) {
-      case AppStrings.leaveStatusPending: return AppDatabase.pending;
-      case AppStrings.leaveStatusApproved: return AppDatabase.approved;
-      case AppStrings.leaveStatusRejected: return AppDatabase.rejected;
-      case AppStrings.leaveStatusCancelled: return AppDatabase.cancelled;
-      default: return '';
-    }
+    if (label == AppStrings.medicationStatusPending) return AppDatabase.pending;
+    if (label == AppStrings.medicationStatusCompleted) return AppDatabase.completed;
+    if (label == AppStrings.medicationStatusMedical) return AppDatabase.rejected;
+    return '';
   }
 
   var applyDate = Rxn<DateTime>();
   final medicineNameController = TextEditingController();
   final dosageController = TextEditingController();
-  final timeController = TextEditingController();
+  var selectedTimes = <String>[].obs;
+  final symptomsController = TextEditingController();
   final noteController = TextEditingController();
   var selectedImage = Rxn<File>();
   var hasChanges = false.obs;
+  var isAgreedToMedicalPolicy = false.obs;
+  var showFeverWarning = false.obs;
 
   @override
   void onInit() {
@@ -84,22 +84,45 @@ class ParentMedicationRequestController extends GetxController {
     });
 
     void checkChanges() => hasChanges.value = true;
+    void checkFever() {
+      final text = symptomsController.text.toLowerCase();
+      showFeverWarning.value = text.contains('sốt') || 
+                               text.contains('nóng') || 
+                               text.contains('38') || 
+                               text.contains('39') || 
+                               text.contains('40');
+    }
     medicineNameController.addListener(checkChanges);
     dosageController.addListener(checkChanges);
-    timeController.addListener(checkChanges);
+    symptomsController.addListener(() {
+      checkChanges();
+      checkFever();
+    });
     noteController.addListener(checkChanges);
+    selectedTimes.listen((_) => checkChanges());
     ever(applyDate, (_) => checkChanges());
     ever(selectedImage, (_) => checkChanges());
+  }
+
+  void toggleTimeSelection(String time) {
+    if (selectedTimes.contains(time)) {
+      selectedTimes.remove(time);
+    } else {
+      selectedTimes.add(time);
+    }
   }
 
   void resetForm() {
     applyDate.value = null;
     medicineNameController.clear();
     dosageController.clear();
-    timeController.clear();
+    selectedTimes.clear();
+    symptomsController.clear();
     noteController.clear();
     selectedImage.value = null;
     hasChanges.value = false;
+    isAgreedToMedicalPolicy.value = false;
+    showFeverWarning.value = false;
   }
 
   Future<void> fetchMyMedicationRequests() async {
@@ -131,8 +154,13 @@ class ParentMedicationRequestController extends GetxController {
       return;
     }
 
-    if (applyDate.value == null || medicineNameController.text.isEmpty || dosageController.text.isEmpty || timeController.text.isEmpty) {
+    if (applyDate.value == null || medicineNameController.text.isEmpty || dosageController.text.isEmpty || selectedTimes.isEmpty) {
       Get.snackbar('Thông báo', 'Vui lòng điền đủ các thông tin bắt buộc');
+      return;
+    }
+
+    if (!isAgreedToMedicalPolicy.value) {
+      Get.snackbar('Thông báo', 'Vui lòng đồng ý với chính sách y tế của nhà trường');
       return;
     }
 
@@ -145,13 +173,21 @@ class ParentMedicationRequestController extends GetxController {
 
     isLoading.value = true;
     try {
+      String finalNote = '';
+      if (symptomsController.text.trim().isNotEmpty) {
+        finalNote += 'Triệu chứng: ${symptomsController.text.trim()}\n';
+      }
+      if (noteController.text.trim().isNotEmpty) {
+        finalNote += 'Ghi chú: ${noteController.text.trim()}';
+      }
+
       final request = MedicationRequestModel(
         studentId: currentStudent.id,
         parentId: AuthService.to.currentUser.value!.id,
-        medicineName: medicineNameController.text,
-        dosage: dosageController.text,
-        time: timeController.text,
-        note: noteController.text.isEmpty ? null : noteController.text,
+        medicineName: medicineNameController.text.trim(),
+        dosage: dosageController.text.trim(),
+        time: selectedTimes.join(', '),
+        note: finalNote.isEmpty ? null : finalNote.trim(),
         date: applyDate.value!.toIso8601String().split('T')[0],
         status: AppDatabase.pending,
       );

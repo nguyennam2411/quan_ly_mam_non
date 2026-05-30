@@ -169,6 +169,7 @@ class AppStrings {
   // Medication Request
   static const String medicationStatusPending = 'Chưa cho uống';
   static const String medicationStatusCompleted = 'Đã cho uống';
+  static const String medicationStatusMedical = 'Chuyển Y Tế';
 
   static const String leaveRequestTeacherHeader = 'Đơn xin nghỉ';
   static const String leaveRequestTeacherSubtitle = 'Theo dõi và phê duyệt lịch nghỉ của học sinh';

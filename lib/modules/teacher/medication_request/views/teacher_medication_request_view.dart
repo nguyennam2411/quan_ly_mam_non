@@ -36,7 +36,7 @@ class TeacherMedicationRequestView extends GetView<TeacherMedicationRequestContr
               return ListView.separated(
                 padding: const EdgeInsets.all(AppConstants.paddingL),
                 itemCount: controller.filteredRequests.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
+                separatorBuilder: (_, _) => const SizedBox(height: 16),
                 itemBuilder: (context, index) {
                   final request = controller.filteredRequests[index];
                   return _buildRequestCard(context, request);
@@ -81,6 +81,8 @@ class TeacherMedicationRequestView extends GetView<TeacherMedicationRequestContr
                 _buildStatusChip(AppStrings.medicationStatusPending),
                 const SizedBox(width: 8),
                 _buildStatusChip(AppStrings.medicationStatusCompleted),
+                const SizedBox(width: 8),
+                _buildStatusChip(AppStrings.medicationStatusMedical),
               ],
             ),
           )),
@@ -113,6 +115,10 @@ class TeacherMedicationRequestView extends GetView<TeacherMedicationRequestContr
 
   Widget _buildRequestCard(BuildContext context, dynamic request) {
     final isPending = request.status == AppDatabase.pending;
+    final isMedical = request.status == AppDatabase.rejected;
+
+    Color badgeColor = isPending ? Colors.orange : (isMedical ? Colors.red : Colors.green);
+    String badgeText = isPending ? AppStrings.medicationStatusPending : (isMedical ? AppStrings.medicationStatusMedical : AppStrings.medicationStatusCompleted);
 
     return Container(
       decoration: BoxDecoration(
@@ -141,13 +147,13 @@ class TeacherMedicationRequestView extends GetView<TeacherMedicationRequestContr
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isPending ? Colors.orange.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
+                  color: badgeColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  isPending ? AppStrings.medicationStatusPending : AppStrings.medicationStatusCompleted,
+                  badgeText,
                   style: TextStyle(
-                    color: isPending ? Colors.orange : Colors.green,
+                    color: badgeColor,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -190,20 +196,34 @@ class TeacherMedicationRequestView extends GetView<TeacherMedicationRequestContr
           // Nút thao tác nếu chưa uống
           if (isPending) ...[
             const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  controller.markAsCompleted(request.id!);
-                },
-                icon: const Icon(Icons.check_circle_outline, color: Colors.white),
-                label: const Text('Đã Cho Uống', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.radiusM)),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => controller.transferToMedical(request.id!),
+                    icon: const Icon(Icons.local_hospital_rounded, color: Colors.white, size: 18),
+                    label: const Text('Chuyển Y tế', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade400,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.radiusM)),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => controller.markAsCompleted(request.id!),
+                    icon: const Icon(Icons.check_circle_outline, color: Colors.white, size: 18),
+                    label: const Text('Đã Cho Uống', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.radiusM)),
+                    ),
+                  ),
+                ),
+              ],
             )
           ],
         ],

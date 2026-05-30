@@ -9,7 +9,6 @@ import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
 import 'package:quan_ly_mam_non/global_widgets/images/image_picker_grid.dart';
 import 'package:quan_ly_mam_non/global_widgets/buttons/primary_button.dart';
 import 'package:quan_ly_mam_non/modules/teacher/schedule_management/controllers/lesson_editor_controller.dart';
-import 'package:quan_ly_mam_non/data/models/schedule_model.dart';
 
 
 class LessonEditorView extends GetView<LessonEditorController> {

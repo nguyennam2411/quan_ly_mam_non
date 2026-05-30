@@ -16,6 +16,7 @@ class ParentInvoiceController extends GetxController {
   var isLoading = false.obs;
   var allInvoices = <InvoiceModel>[].obs;
   var selectedStatus = 'ALL'.obs;
+  var isDescending = true.obs;
 
   @override
   void onInit() {
@@ -31,7 +32,7 @@ class ParentInvoiceController extends GetxController {
   List<InvoiceModel> get filteredInvoices {
     final currentStudent = ParentStudentService.to.selectedStudent.value;
     
-    return allInvoices.where((invoice) {
+    final list = allInvoices.where((invoice) {
       // 1. Lọc theo học sinh đang được chọn
       if (currentStudent != null && invoice.studentId != currentStudent.id) {
         return false;
@@ -44,6 +45,21 @@ class ParentInvoiceController extends GetxController {
       
       return true;
     }).toList();
+
+    // 3. Sắp xếp tùy chỉnh: Mới nhất hoặc Cũ nhất
+    list.sort((a, b) {
+      final yearA = a.year ?? 0;
+      final yearB = b.year ?? 0;
+      final monthA = a.month ?? 0;
+      final monthB = b.month ?? 0;
+
+      if (yearA != yearB) {
+        return isDescending.value ? yearB.compareTo(yearA) : yearA.compareTo(yearB);
+      }
+      return isDescending.value ? monthB.compareTo(monthA) : monthA.compareTo(monthB);
+    });
+
+    return list;
   }
 
   Future<void> fetchInvoices() async {

@@ -76,10 +76,13 @@ class AppLeaveRequestCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                   Text(
-                    student?.name ?? AppStrings.unknownLabel,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      student?.name ?? AppStrings.unknownLabel,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   _buildStatusBadge(),
@@ -169,7 +172,7 @@ class AppLeaveRequestCard extends StatelessWidget {
   Widget _buildActionsRow(BuildContext context) {
     return Row(
       children: [
-        if (actions != null) actions!,
+        ?actions,
         
         const Spacer(),
         

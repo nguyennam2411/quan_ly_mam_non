@@ -13,8 +13,8 @@ class InvoiceProvider {
         .from(AppDatabase.tableInvoices)
         .select('*, ${AppDatabase.tableStudents}!inner(*, ${AppDatabase.tableClassrooms}(${AppDatabase.colName}))')
         .eq('${AppDatabase.tableStudents}.${AppDatabase.colParentId}', parentId)
-        .order(AppDatabase.colMonth, ascending: false)
-        .order(AppDatabase.colYear, ascending: false);
+        .order(AppDatabase.colYear, ascending: false)
+        .order(AppDatabase.colMonth, ascending: false);
   }
 
   // Lấy chi tiết 1 hoá đơn (Kèm thông tin thanh toán nếu có)
@@ -68,6 +68,19 @@ class InvoiceProvider {
         .lte(AppDatabase.colDate, endDate);
     
     return (response as List).length;
+  }
+
+  // Lấy danh sách các ngày điểm danh của 1 bé trong khoảng thời gian để tính thời gian học thực tế
+  Future<List<String>> getAttendanceDates(String studentId, String startDate, String endDate) async {
+    final response = await _client
+        .from(AppDatabase.tableAttendance)
+        .select(AppDatabase.colDate)
+        .eq(AppDatabase.colStudentId, studentId)
+        .gte(AppDatabase.colDate, startDate)
+        .lte(AppDatabase.colDate, endDate)
+        .order(AppDatabase.colDate, ascending: true);
+    
+    return (response as List).map((item) => item[AppDatabase.colDate].toString()).toList();
   }
 
   // Phụ huynh: Ghi nhận thanh toán

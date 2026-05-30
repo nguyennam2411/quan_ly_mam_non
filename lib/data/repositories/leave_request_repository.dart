@@ -46,7 +46,7 @@ class LeaveRequestRepository {
       AppDatabase.colStatus: status,
       AppDatabase.colApprovedBy: teacherId,
       AppDatabase.colApprovedAt: DateTime.now().toUtc().toIso8601String(),
-      if (reason != null) AppDatabase.colCancelReason: reason,
+      AppDatabase.colCancelReason: ?reason,
     };
     await _provider.updateStatus(requestId, data);
 

@@ -46,7 +46,7 @@ class TeacherHomeView extends GetView<TeacherHomeController> {
                 crossAxisCount: 4,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 0.85,
+                childAspectRatio: 0.75,
                 children: [
                   QuickFeatureCard(
                     icon: Icons.assignment_turned_in_rounded,

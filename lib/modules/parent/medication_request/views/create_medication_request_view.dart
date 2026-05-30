@@ -55,46 +55,88 @@ class CreateMedicationRequestView extends GetView<ParentMedicationRequestControl
               // 3. Tên thuốc
               _buildSectionLabel('Tên thuốc'),
               AppConstants.spacingS,
-              _buildTextField(controller.medicineNameController, 'VD: Siro ho Prospan', 1),
+              _buildTextField(controller.medicineNameController, 'VD: Siro ho Prospan', 1, maxLength: 100),
               AppConstants.spacingL,
 
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionLabel('Liều lượng'),
-                        AppConstants.spacingS,
-                        _buildTextField(controller.dosageController, 'VD: 5ml', 1),
-                      ],
-                    ),
-                  ),
-                  AppConstants.spacingM,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionLabel('Giờ đổi'),
-                        AppConstants.spacingS,
-                        _buildTextField(controller.timeController, 'VD: Sau Bữa Sáng', 1),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              _buildSectionLabel('Liều lượng'),
+              AppConstants.spacingS,
+              _buildTextField(controller.dosageController, 'VD: 5ml', 1, maxLength: 50),
+              AppConstants.spacingL,
+
+              _buildSectionLabel('Giờ uống thuốc (Chọn một hoặc nhiều)'),
+              AppConstants.spacingS,
+              _buildTimeSelector(),
               AppConstants.spacingL,
   
-              // 4. Lời dặn thêm
+              // 4. Triệu chứng
+              _buildSectionLabel('Tình trạng/Triệu chứng hiện tại (Tuỳ chọn)'),
+              AppConstants.spacingS,
+              _buildTextField(controller.symptomsController, 'VD: Sốt 38 độ, sổ mũi...', 2, maxLength: 200),
+              
+              // Cảnh báo sốt
+              Obx(() {
+                if (controller.showFeverWarning.value) {
+                  return Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppConstants.radiusS),
+                      border: Border.all(color: Colors.orange.withValues(alpha: 0.5)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: const Text(
+                            'Bé có dấu hiệu sốt/mệt. Nhà trường khuyến nghị nên cho bé nghỉ ngơi tại nhà. Nếu gửi bé, nhà trường có thể sẽ chuyển bé xuống phòng Y tế theo dõi.',
+                            style: TextStyle(color: Colors.orange, fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+              AppConstants.spacingL,
+
+              // 5. Lời dặn thêm
               _buildSectionLabel('Ghi chú thêm (Nếu có)'),
               AppConstants.spacingS,
-              _buildTextField(controller.noteController, 'Nhập lời dặn thêm cho giáo viên...', 3),
+              _buildTextField(controller.noteController, 'Nhập lời dặn thêm cho giáo viên...', 3, maxLength: 500),
               AppConstants.spacingL,
   
               // 5. Minh chứng ảnh
               _buildSectionLabel('Ảnh minh chứng (nếu có)'),
               AppConstants.spacingS,
               _buildEvidencePicker(),
+              AppConstants.spacingL,
+
+              // 6. Chính sách y tế
+              Obx(() => Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.errorContainer.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(AppConstants.radiusM),
+                      border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
+                    ),
+                    padding: const EdgeInsets.all(AppConstants.paddingS),
+                    child: CheckboxListTile(
+                      value: controller.isAgreedToMedicalPolicy.value,
+                      onChanged: (val) => controller.isAgreedToMedicalPolicy.value = val ?? false,
+                      title: const Text(
+                        'Tôi đồng ý: Nếu bé có biểu hiện sốt cao hoặc mệt mỏi bất thường, nhà trường sẽ chủ động đưa bé xuống phòng Y tế để theo dõi và xử lý.',
+                        style: TextStyle(fontSize: 13, color: AppColors.error, fontWeight: FontWeight.w600),
+                      ),
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.zero,
+                      activeColor: AppColors.error,
+                      checkColor: Colors.white,
+                      dense: true,
+                    ),
+                  )),
               AppConstants.spacingXXL,
   
               // 6. Nút gửi
@@ -207,10 +249,11 @@ class CreateMedicationRequestView extends GetView<ParentMedicationRequestControl
     });
   }
 
-  Widget _buildTextField(TextEditingController textController, String hintText, int maxLines) {
+  Widget _buildTextField(TextEditingController textController, String hintText, int maxLines, {int? maxLength}) {
     return TextField(
       controller: textController,
       maxLines: maxLines,
+      maxLength: maxLength,
       decoration: InputDecoration(
         hintText: hintText,
         filled: true,
@@ -230,6 +273,44 @@ class CreateMedicationRequestView extends GetView<ParentMedicationRequestControl
         contentPadding: const EdgeInsets.all(AppConstants.paddingM),
       ),
     );
+  }
+
+  Widget _buildTimeSelector() {
+    final options = [
+      'Trước khi ăn sáng',
+      'Sau khi ăn sáng',
+      'Trước khi ăn trưa',
+      'Sau khi ăn trưa',
+    ];
+
+    return Obx(() => Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: options.map((String value) {
+        final isSelected = controller.selectedTimes.contains(value);
+        return FilterChip(
+          label: Text(value),
+          selected: isSelected,
+          onSelected: (_) => controller.toggleTimeSelection(value),
+          selectedColor: AppColors.primary.withValues(alpha: 0.15),
+          checkmarkColor: AppColors.primary,
+          backgroundColor: AppColors.surface,
+          labelStyle: TextStyle(
+            color: isSelected ? AppColors.primary : AppColors.onSurfaceVariant,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 13,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusM),
+            side: BorderSide(
+              color: isSelected ? AppColors.primary : AppColors.outline.withValues(alpha: 0.5),
+              width: isSelected ? 1.5 : 1,
+            ),
+          ),
+          showCheckmark: true,
+        );
+      }).toList(),
+    ));
   }
 
   Widget _buildEvidencePicker() {

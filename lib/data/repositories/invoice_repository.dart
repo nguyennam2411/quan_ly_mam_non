@@ -39,6 +39,10 @@ class InvoiceRepository {
     return await provider.countExcusedAbsences(studentId, startDate, endDate);
   }
 
+  Future<List<String>> getAttendanceDates(String studentId, String startDate, String endDate) async {
+    return await provider.getAttendanceDates(studentId, startDate, endDate);
+  }
+
   Future<void> insertInvoices(List<InvoiceModel> invoices) async {
     // Chuyển List<InvoiceModel> thành List<Map> để đẩy lên Supabase
     final data = invoices.map((inv) => inv.toJson()).toList();

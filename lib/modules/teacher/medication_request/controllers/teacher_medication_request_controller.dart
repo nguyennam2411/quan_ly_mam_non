@@ -61,6 +61,7 @@ class TeacherMedicationRequestController extends GetxController {
   String _mapLabelToStatus(String label) {
     if (label == AppStrings.medicationStatusPending) return AppDatabase.pending;
     if (label == AppStrings.medicationStatusCompleted) return AppDatabase.completed;
+    if (label == AppStrings.medicationStatusMedical) return AppDatabase.rejected;
     return '';
   }
 
@@ -82,6 +83,29 @@ class TeacherMedicationRequestController extends GetxController {
       allRequests.assignAll(result);
     } catch (e) {
       Get.snackbar('Lỗi', 'Không thể tải danh sách dặn thuốc: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Chuyển xuống Y tế (Dùng trạng thái REJECTED)
+  Future<void> transferToMedical(String requestId) async {
+    isLoading.value = true;
+    try {
+      final teacherId = AuthService.to.currentUser.value!.id;
+      
+      await repository.updateRequestStatus(requestId, AppDatabase.rejected, teacherId);
+      
+      Get.snackbar(
+        'Đã Chuyển Y Tế', 
+        'Đã ngưng đơn thuốc và chuyển bé xuống phòng Y tế.', 
+        backgroundColor: Colors.red, 
+        colorText: Colors.white,
+        duration: const Duration(seconds: 4),
+      );
+      await fetchRequests();
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể cập nhật trạng thái: $e');
     } finally {
       isLoading.value = false;
     }

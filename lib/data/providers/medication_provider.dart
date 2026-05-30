@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/values/app_database.dart';
+import '../../../core/services/cloudinary_service.dart';
 
 class MedicationProvider {
   final _client = Supabase.instance.client;
@@ -37,15 +38,9 @@ class MedicationProvider {
   }
 
   // Upload file đính kèm (Ảnh đơn thuốc)
-  Future<String?> uploadPrescriptionImage(File imageFile) async {
+  Future<String?> uploadPrescriptionImage(File imageFile, {required String folder}) async {
     try {
-      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final path = 'prescriptions/$fileName';
-      
-      // Chú ý: Cần đảm bảo bucket 'medications' đã được tạo trên Supabase Storage và set Public
-      await _client.storage.from('medications').upload(path, imageFile);
-      
-      return _client.storage.from('medications').getPublicUrl(path);
+      return await CloudinaryService.to.uploadImage(imageFile, folder: folder);
     } catch (e) {
       rethrow;
     }

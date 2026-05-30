@@ -18,7 +18,7 @@ class ParentPaymentGatewayView extends GetView<ParentInvoiceController> {
     final formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
     
     // Tự sinh nội dung chuyển khoản: HocPhi_<TenBe>_T<Thang>
-    final studentName = invoice.student?.name?.split(' ').last ?? 'Be';
+    final studentName = invoice.student?.name.split(' ').last ?? 'Be';
     final transferContent = 'HocPhi_${studentName}_T${invoice.month}';
 
     return Scaffold(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
-import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 import 'package:quan_ly_mam_non/global_widgets/state/app_empty_state.dart';
 import '../controllers/notification_controller.dart';

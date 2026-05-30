@@ -9,7 +9,6 @@ import '../../../../core/values/app_strings.dart';
 import '../../../../core/utils/dialog.dart';
 import '../../../../global_widgets/buttons/circle_back_button.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
-import '../../../../global_widgets/leave_request/leave_request_filter_tabs.dart';
 import '../../../../global_widgets/chips/status_badge.dart';
 import '../controllers/parent_medication_request_controller.dart';
 import '../../../../data/models/medication_request_model.dart';
@@ -90,21 +89,60 @@ class ParentMedicationRequestView extends GetView<ParentMedicationRequestControl
         child: Row(
           children: [
             Expanded(
-              child: Obx(() => LeaveRequestFilterTabs(
-                selectedStatus: controller.selectedStatus.value,
-                onStatusChanged: (status) => controller.selectedStatus.value = status,
+              child: Obx(() => SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: [
+                    _buildStatusChip(AppStrings.leaveStatusAll),
+                    const SizedBox(width: 8),
+                    _buildStatusChip(AppStrings.medicationStatusPending),
+                    const SizedBox(width: 8),
+                    _buildStatusChip(AppStrings.medicationStatusCompleted),
+                    const SizedBox(width: 8),
+                    _buildStatusChip(AppStrings.medicationStatusMedical),
+                  ],
+                ),
               )),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
               child: VerticalDivider(
-                width: 1,
+                color: AppColors.outlineVariant.withValues(alpha: 0.5),
                 thickness: 1,
-                color: AppColors.outlineVariant.withValues(alpha: 0.3),
               ),
             ),
             _buildSortButton(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusChip(String label) {
+    final isSelected = controller.selectedStatus.value == label;
+    final activeColor = AppColors.primary;
+
+    return InkWell(
+      onTap: () => controller.selectedStatus.value = label,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.08) : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isSelected ? activeColor : AppColors.outlineVariant.withValues(alpha: 0.4),
+            width: 1.2,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? activeColor : AppColors.onBackground.withValues(alpha: 0.7),
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            fontSize: 13,
+          ),
         ),
       ),
     );
@@ -329,7 +367,7 @@ class ParentMedicationRequestView extends GetView<ParentMedicationRequestControl
         break;
       case AppDatabase.rejected:
         color = AppColors.error;
-        text = AppStrings.leaveStatusRejected;
+        text = AppStrings.medicationStatusMedical;
         break;
       case AppDatabase.cancelled:
         color = AppColors.outline;

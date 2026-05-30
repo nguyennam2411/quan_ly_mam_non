@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import '../../../../data/providers/meal_plan_provider.dart';
 import '../../../../data/repositories/meal_plan_repository.dart';
 import '../controllers/meal_plan_controller.dart';
 

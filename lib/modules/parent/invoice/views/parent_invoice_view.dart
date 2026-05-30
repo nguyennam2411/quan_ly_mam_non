@@ -34,7 +34,9 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildFilterTabs(),
-          const SizedBox(height: AppConstants.paddingM),
+          const SizedBox(height: 8),
+          _buildSortToggle(),
+          const SizedBox(height: 8),
           Expanded(child: _buildInvoiceList()),
         ],
       ),
@@ -55,6 +57,39 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
           _buildTab(AppDatabase.invoiceStatusPaid, 'Đã đóng'),
         ],
       )),
+    );
+  }
+
+  Widget _buildSortToggle() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingL + 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          GestureDetector(
+            onTap: () => controller.isDescending.toggle(),
+            child: Obx(() => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  controller.isDescending.value ? Icons.south_rounded : Icons.north_rounded,
+                  size: 14,
+                  color: AppColors.onSurfaceVariant,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  controller.isDescending.value ? 'Mới nhất trước' : 'Cũ nhất trước',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            )),
+          ),
+        ],
+      ),
     );
   }
 

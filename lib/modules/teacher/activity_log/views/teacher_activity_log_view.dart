@@ -112,10 +112,10 @@ class TeacherActivityLogView extends GetView<TeacherActivityLogController> {
           ),
 
           // Content
-          if (log.content != null && log.content!.isNotEmpty)
+          if (log.content.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingM),
-              child: Text(log.content!),
+              child: Text(log.content),
             ),
 
           const SizedBox(height: 12),

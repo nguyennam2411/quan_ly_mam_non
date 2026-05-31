@@ -17,7 +17,6 @@ class ParentHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = AuthService.to.currentUser.value;
     final studentService = ParentStudentService.to;
 
     return Scaffold(
@@ -326,7 +325,7 @@ class ParentHomeView extends StatelessWidget {
           crossAxisCount: 4,
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
-          childAspectRatio: 0.85,
+          childAspectRatio: 0.75,
           children: [
             QuickFeatureCard(
               icon: Icons.schedule_rounded,
@@ -361,7 +360,7 @@ class ParentHomeView extends StatelessWidget {
             QuickFeatureCard(
               icon: Icons.payment_rounded,
               label: 'Học phí',
-              onTap: () {},
+              onTap: () => Get.toNamed(Routes.PARENT_INVOICE),
             ),
             QuickFeatureCard(
               icon: Icons.timeline_rounded,
@@ -372,6 +371,11 @@ class ParentHomeView extends StatelessWidget {
               icon: Icons.health_and_safety_rounded,
               label: 'Sức khỏe',
               onTap: () => Get.toNamed(Routes.PARENT_HEALTH),
+            ),
+            QuickFeatureCard(
+              icon: Icons.medication_rounded,
+              label: 'Dặn thuốc',
+              onTap: () => Get.toNamed(Routes.PARENT_MEDICATION_REQUEST),
             ),
           ],
         ),

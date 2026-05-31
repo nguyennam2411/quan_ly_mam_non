@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/utils/date_helper.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../routes/app_routes.dart';
@@ -17,8 +16,6 @@ class TeacherHomeView extends GetView<TeacherHomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final user = AuthService.to.currentUser.value;
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -42,13 +39,14 @@ class TeacherHomeView extends GetView<TeacherHomeController> {
               // Utilities Section
               const HomeSectionHeader(title: 'Tiện ích hệ thống'),
               const SizedBox(height: 16),
+              
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 4,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 0.85,
+                childAspectRatio: 0.75,
                 children: [
                   QuickFeatureCard(
                     icon: Icons.assignment_turned_in_rounded,
@@ -64,6 +62,11 @@ class TeacherHomeView extends GetView<TeacherHomeController> {
                     onTap: () => Get.toNamed(Routes.TEACHER_LEAVE_REQUEST),
                   ),
                   QuickFeatureCard(
+                    icon: Icons.medication_rounded,
+                    label: 'Dặn thuốc',
+                    onTap: () => Get.toNamed(Routes.TEACHER_MEDICATION_REQUEST),
+                  ),
+                  QuickFeatureCard(
                     icon: Icons.history_edu_rounded,
                     label: 'Nhật ký',
                     onTap: () => Get.toNamed(Routes.TEACHER_ACTIVITY_LOG),
@@ -74,14 +77,22 @@ class TeacherHomeView extends GetView<TeacherHomeController> {
                     onTap: () => Get.toNamed(Routes.TEACHER_SCHEDULE),
                   ),
                   QuickFeatureCard(
+                    icon: Icons.restaurant_menu_rounded,
+                    label: 'Thực đơn',
+                    onTap: () => Get.toNamed(Routes.MEAL_PLAN, arguments: {
+                      'gradeId': AuthService.to.gradeId.value,
+                      'title': 'Thực đơn của lớp',
+                    }),
+                  ),
+                  QuickFeatureCard(
+                    icon: Icons.payment_rounded,
+                    label: 'Học phí',
+                    onTap: () => Get.toNamed(Routes.TEACHER_INVOICE),
+                  ),
+                  QuickFeatureCard(
                     icon: Icons.monitor_heart_rounded,
                     label: 'Sức khỏe',
                     onTap: () => Get.toNamed(Routes.TEACHER_HEALTH),
-                  ),
-                  QuickFeatureCard(
-                    icon: Icons.restaurant_menu_rounded,
-                    label: 'Thực đơn',
-                    onTap: () => Get.toNamed(Routes.MEAL_PLAN),
                   ),
                 ],
               ),

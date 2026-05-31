@@ -15,6 +15,10 @@ class AppMediaFolders {
   static String leaveRequest(String studentId, String requestId) =>
       '$root/leave-requests/students/$studentId/$requestId';
 
+  // 2.5 Thư mục đơn dặn thuốc
+  static String medicationRequest(String studentId, String requestId) =>
+      '$root/medication-requests/students/$studentId/$requestId';
+
   // 3. Thư mục bài học/bài tập giảng dạy
   static String lesson({
     required String classroomId,

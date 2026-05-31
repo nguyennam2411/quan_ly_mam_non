@@ -166,6 +166,11 @@ class AppStrings {
   static const String leaveStatusRejected = 'Từ chối';
   static const String leaveStatusCancelled = 'Đã hủy';
 
+  // Medication Request
+  static const String medicationStatusPending = 'Chưa cho uống';
+  static const String medicationStatusCompleted = 'Đã cho uống';
+  static const String medicationStatusMedical = 'Chuyển Y Tế';
+
   static const String leaveRequestTeacherHeader = 'Đơn xin nghỉ';
   static const String leaveRequestTeacherSubtitle = 'Theo dõi và phê duyệt lịch nghỉ của học sinh';
   static const String leaveRequestApprove = 'Duyệt';

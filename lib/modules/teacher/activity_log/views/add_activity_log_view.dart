@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
@@ -115,7 +114,7 @@ class AddActivityLogView extends GetView<TeacherActivityLogController> {
             )),
         Obx(() => controller.isAllClass.value
             ? const SizedBox.shrink()
-            : Container(
+            : SizedBox(
                 height: 100,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,

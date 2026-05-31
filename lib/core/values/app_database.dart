@@ -6,6 +6,7 @@ class AppDatabase {
   static const String approved = 'APPROVED';
   static const String rejected = 'REJECTED';
   static const String cancelled = 'CANCELLED';
+  static const String completed = 'APPROVED';
 
   // --- Attendance Status ---
   static const String statusPresent = 'PRESENT';
@@ -48,7 +49,6 @@ class AppDatabase {
   static const String colTeacherId = 'teacher_id';      
   static const String colNote = 'note';
   static const String colScheduleId = 'schedule_id';
-
   static const String colCode = 'code';
 
   // --- Students Columns ---
@@ -71,7 +71,7 @@ class AppDatabase {
   static const String colApprovedAt = 'approved_at';
   static const String colImages = 'images';
 
-  // --- Notifications Columns ---
+  // Notifications Columns
   static const String colTitle = 'title';
   static const String colContent = 'content';
   static const String colIsRead = 'is_read';
@@ -107,6 +107,31 @@ class AppDatabase {
   static const String colBreakfastTime = 'breakfast_time';
   static const String colLunchTime = 'lunch_time';
   static const String colSnackTime = 'snack_time';
+
+  // --- Medication Requests (Đơn thuốc) ---
+  static const String tableMedicationRequests = 'medication_requests';
+  static const String colMedicineName = 'medicine_name'; 
+  static const String colDosage = 'dosage';            
+  static const String colTime = 'time';              
+  static const String colPrescriptionImage = 'prescription_image'; 
+
+  // --- Invoices & Payments (Học phí) ---
+  static const String tableInvoices = 'invoices';
+  static const String tablePayments = 'payments';
+  
+  static const String colMonth = 'month';
+  static const String colYear = 'year';
+  static const String colTotalAmount = 'total_amount';
+  static const String colDueDate = 'due_date';
+  static const String colItems = 'items'; // jsonb column
+  static const String colInvoiceId = 'invoice_id';
+  static const String colAmount = 'amount';
+  static const String colPaidAt = 'paid_at';
+
+  // --- Invoice Status ---
+  static const String invoiceStatusUnpaid = 'UNPAID';
+  static const String invoiceStatusPaid = 'PAID';
+  static const String invoiceStatusOverdue = 'OVERDUE';
 
   // --- Schedules Columns ---
   static const String colStartTime = 'start_time';

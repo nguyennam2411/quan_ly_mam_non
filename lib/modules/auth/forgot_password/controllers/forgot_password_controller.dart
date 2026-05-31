@@ -109,11 +109,8 @@ class ForgotPasswordController extends GetxController {
     resendCount.value = AppConstants.otpCountdownSeconds;
     _timer?.cancel();
     _timer = Timer.periodic(AppConstants.timerPeriodic, (timer) {
-      if (resendCount.value > 0) {
-        resendCount.value--;
-      } else {
-        _timer?.cancel();
-      }
+      if (resendCount.value > 0) resendCount.value--;
+      else _timer?.cancel();
     });
   }
 

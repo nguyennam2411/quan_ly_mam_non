@@ -8,7 +8,7 @@ class NotificationRepository {
   // Lấy danh sách thông báo và chuyển thành List Model
   Future<List<NotificationModel>> getNotifications(String userId) async {
     final response = await _provider.fetchNotifications(userId);
-    return (response)
+    return (response as List)
         .map((item) => NotificationModel.fromJson(item))
         .toList();
   }

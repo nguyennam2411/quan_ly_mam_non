@@ -77,11 +77,9 @@ class AppDialogs {
               color: iconColor ?? AppColors.primary,
             ),
             const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                title ?? AppStrings.dialogConfirmTitle,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+            Text(
+              title ?? AppStrings.dialogConfirmTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
         ),

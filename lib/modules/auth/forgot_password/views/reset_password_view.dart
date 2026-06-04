@@ -37,7 +37,8 @@ class ResetPasswordView extends GetView<ForgotPasswordController> {
               ),
 
               // --- Form ---
-              Form(
+              Obx(() => Form(
+                autovalidateMode: controller.resetAutovalidateMode.value,
                 key: controller.resetFormKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -95,7 +96,7 @@ class ResetPasswordView extends GetView<ForgotPasswordController> {
                     )),
                   ],
                 ),
-              ),
+              )),
               AppConstants.spacingL,
             ],
           ),

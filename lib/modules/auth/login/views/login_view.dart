@@ -24,8 +24,9 @@ class LoginView extends GetView<LoginController> {
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(AppConstants.horizontalPadding),
-              child: Form(
+              child: Obx(() => Form(
                 key: controller.formKey,
+                autovalidateMode: controller.autovalidateMode.value,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -129,7 +130,7 @@ class LoginView extends GetView<LoginController> {
                     AppConstants.spacingL,
                   ],
                 ),
-              ),
+              )),
             ),
           ),
         ),

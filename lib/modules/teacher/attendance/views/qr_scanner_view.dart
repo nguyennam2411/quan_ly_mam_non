@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../controllers/qr_scanner_controller.dart';
 
@@ -12,7 +13,7 @@ class QrScannerView extends GetView<QrScannerController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: const MainAppBar(title: 'Quét mã điểm danh'),
+      appBar: const MainAppBar(title: AppStrings.attendanceQrScannerTitle),
       body: Stack(
         children: [
           // 1. Camera feed (full screen)
@@ -152,7 +153,7 @@ class _ScanOverlayPainter extends CustomPainter {
     // --- Hướng dẫn bên dưới khung ---
     final tp = TextPainter(
       text: TextSpan(
-        text: 'Đưa mã QR của bé vào khung hình',
+        text: AppStrings.attendanceQrScannerHint,
         style: TextStyle(
           color: Colors.white.withOpacity(0.75),
           fontSize: 14,
@@ -220,7 +221,7 @@ class _ResultOverlay extends GetView<QrScannerController> {
 
               // Label trên
               Text(
-                _isSuccess ? 'Đã điểm danh' : 'Không thể điểm danh',
+                _isSuccess ? AppStrings.attendanceQrScannedSuccess : AppStrings.attendanceQrScannedError,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -276,7 +277,7 @@ class _ResultOverlay extends GetView<QrScannerController> {
                         ),
                       ),
                       child: Text(
-                        _isSuccess ? 'Xong' : 'Đóng',
+                        _isSuccess ? AppStrings.labelDone : AppStrings.labelClose,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.grey[700],
@@ -301,7 +302,7 @@ class _ResultOverlay extends GetView<QrScannerController> {
                         ),
                       ),
                       child: Text(
-                        _isSuccess ? 'Quét tiếp' : 'Thử lại',
+                        _isSuccess ? AppStrings.labelScanNext : AppStrings.labelRetry,
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                     ),

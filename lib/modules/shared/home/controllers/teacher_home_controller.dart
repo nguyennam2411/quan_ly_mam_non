@@ -3,6 +3,8 @@ import '../../../../core/services/auth_service.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../data/repositories/attendance_repository.dart';
 import '../../../../data/repositories/student_repository.dart';
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/utils/app_error_message.dart';
 
 class TeacherHomeController extends GetxController {
   final StudentRepository _studentRepository;
@@ -13,6 +15,7 @@ class TeacherHomeController extends GetxController {
   final RxInt totalStudents = 0.obs;
   final RxInt presentStudents = 0.obs;
   final RxBool isLoading = false.obs;
+  final List<Worker> _workers = [];
 
   String get classroomName => AuthService.to.classroomName.value;
   String get classroomId => AuthService.to.classroomId.value;
@@ -20,7 +23,14 @@ class TeacherHomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchClassroomStats();
+    if (classroomId.isNotEmpty) {
+      fetchClassroomStats();
+    }
+    _workers.add(ever(AuthService.to.classroomId, (classId) {
+      if (classId.isNotEmpty) {
+        fetchClassroomStats();
+      }
+    }));
   }
 
   Future<void> fetchClassroomStats() async {
@@ -38,7 +48,7 @@ class TeacherHomeController extends GetxController {
       presentStudents.value = attendanceList.where((e) => e.attendance?.status == AppDatabase.statusPresent).length;
       
     } catch (e) {
-      print('Error fetching classroom stats: $e');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }
@@ -47,5 +57,13 @@ class TeacherHomeController extends GetxController {
   double get attendancePercentage {
     if (totalStudents.value == 0) return 0;
     return (presentStudents.value / totalStudents.value);
+  }
+
+  @override
+  void onClose() {
+    for (var worker in _workers) {
+      worker.dispose();
+    }
+    super.onClose();
   }
 }

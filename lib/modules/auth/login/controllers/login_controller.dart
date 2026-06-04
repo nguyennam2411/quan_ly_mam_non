@@ -19,6 +19,7 @@ class LoginController extends GetxController {
 
   var emailError = RxnString();
   var passwordError = RxnString();
+  final autovalidateMode = AutovalidateMode.disabled.obs;
 
   Future<void> login() async {
     print("Login button pressed"); // Debug log
@@ -28,6 +29,7 @@ class LoginController extends GetxController {
 
     // 1. Kiểm tra Local (Syntax / Format) qua formKey
     if (formKey.currentState?.validate() != true) {
+      autovalidateMode.value = AutovalidateMode.onUserInteraction;
       print("Validation failed");
       return;
     }

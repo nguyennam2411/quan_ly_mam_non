@@ -36,6 +36,7 @@ class AppDatabase {
   static const String tableMealPlans = 'meal_plans';  
   static const String tableSchedules = 'schedules';
   static const String tableLessons = 'lessons';   
+  static const String tableStudentGuardians = 'student_guardians';
 
   // --- Common Columns ---
   static const String colId = 'id';
@@ -50,6 +51,8 @@ class AppDatabase {
   static const String colNote = 'note';
   static const String colScheduleId = 'schedule_id';
   static const String colCode = 'code';
+  static const String colRelationship = 'relationship';
+  static const String colPhone = 'phone';
 
   // --- Students Columns ---
   static const String colClassroomId = 'classroom_id';

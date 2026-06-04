@@ -3,12 +3,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
-import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../data/models/health_record_model.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/headers/page_header.dart';
+import '../../../../global_widgets/headers/section_header.dart';
 import '../../../../global_widgets/charts/app_line_chart.dart';
+import '../../../../global_widgets/dialogs/app_loading.dart';
 import '../controllers/parent_health_controller.dart';
 
 class ParentHealthView extends GetView<ParentHealthController> {
@@ -21,7 +22,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
       appBar: const MainAppBar(title: AppStrings.healthTitle),
       body: Obx(() { 
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const AppLoading();
         }
         return RefreshIndicator( 
           onRefresh: controller.fetchHistory,
@@ -65,7 +66,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
         padding: const EdgeInsets.all(AppConstants.paddingL),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.primary, AppColors.primary.withOpacity(0.75)],
+            colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.75)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -73,7 +74,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
         ),
         child: const Center(
           child: Text(
-            'Chưa có dữ liệu đo lường nào',
+            AppStrings.statsNoData,
             style: TextStyle(color: Colors.white70, fontSize: 14),
           ),
         ),
@@ -86,14 +87,14 @@ class ParentHealthView extends GetView<ParentHealthController> {
       padding: const EdgeInsets.all(AppConstants.paddingL),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primary.withOpacity(0.75)],
+          colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.75)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(AppConstants.radiusXL),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -107,7 +108,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
               const Icon(Icons.monitor_heart_rounded, color: Colors.white70, size: 16),
               const SizedBox(width: 6),
               Text(
-                'Lần đo gần nhất — ${DateFormat('dd/MM/yyyy').format(latest.date.toLocal())}',
+                '${AppStrings.healthLatestMeasurementPrefix}${DateFormat('dd/MM/yyyy').format(latest.date.toLocal())}',
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
@@ -116,10 +117,10 @@ class ParentHealthView extends GetView<ParentHealthController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildMetricItem('Chiều cao',
+              _buildMetricItem(AppStrings.labelHeight,
                   '${(latest.height * 100).toStringAsFixed(1)} cm', Icons.height_rounded),
               Container(width: 1, height: 48, color: Colors.white24),
-              _buildMetricItem('Cân nặng',
+              _buildMetricItem(AppStrings.labelWeight,
                   '${latest.weight.toStringAsFixed(1)} kg', Icons.monitor_weight_outlined),
               Container(width: 1, height: 48, color: Colors.white24),
               Column(
@@ -133,9 +134,9 @@ class ParentHealthView extends GetView<ParentHealthController> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: bmiColor.withOpacity(0.25),
+                      color: bmiColor.withValues(alpha: 0.25),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: bmiColor.withOpacity(0.6)),
+                      border: Border.all(color: bmiColor.withValues(alpha: 0.6)),
                     ),
                     child: Text(
                       latest.bmiCategoryLabel,
@@ -144,7 +145,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text('BMI', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                  const Text(AppStrings.labelBmi, style: TextStyle(color: Colors.white54, fontSize: 11)),
                 ],
               ),
             ],
@@ -174,18 +175,13 @@ class ParentHealthView extends GetView<ParentHealthController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Biểu đồ tăng trưởng',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
+        const SectionHeader(title: AppStrings.healthGrowthChart),
         AppConstants.spacingM,
         Row(
           children: [
-            _buildChartTab(context, 0, 'Chiều cao', Icons.height_rounded),
+            _buildChartTab(context, 0, AppStrings.labelHeight, Icons.height_rounded),
             const SizedBox(width: 8),
-            _buildChartTab(context, 1, 'Cân nặng', Icons.monitor_weight_outlined),
+            _buildChartTab(context, 1, AppStrings.labelWeight, Icons.monitor_weight_outlined),
           ],
         ),
         Obx(() => controller.isMissingInfo.value
@@ -193,9 +189,9 @@ class ParentHealthView extends GetView<ParentHealthController> {
                 margin: const EdgeInsets.only(top: AppConstants.paddingM),
                 padding: const EdgeInsets.all(AppConstants.paddingM),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withOpacity(0.1),
+                  color: AppColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppConstants.radiusM),
-                  border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+                  border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -203,7 +199,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Cần cập nhật Ngày sinh và Giới tính để đối chiếu chuẩn WHO.',
+                        AppStrings.healthMissingInfoWarning,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: AppColors.warning,
                               fontWeight: FontWeight.w600,
@@ -222,7 +218,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
             borderRadius: BorderRadius.circular(AppConstants.radiusL),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 10,
                   offset: const Offset(0, 4))
             ],
@@ -236,7 +232,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
               return const SizedBox(
                 height: 160,
                 child: Center(
-                  child: Text('Chưa có dữ liệu để vẽ biểu đồ',
+                  child: Text(AppStrings.healthNoChartData,
                       style: TextStyle(color: AppColors.onSurfaceVariant)),
                 ),
               );
@@ -244,10 +240,10 @@ class ParentHealthView extends GetView<ParentHealthController> {
 
             return AppLineChart(
               lines: lines,
-              xTitle: controller.isMissingInfo.value ? 'Lần đo' : 'Tháng tuổi',
+              xTitle: controller.isMissingInfo.value ? AppStrings.healthMeasurementIndex : AppStrings.healthAgeInMonths,
               yTitle: isHeight ? 'cm' : 'kg',
               legendItems: legend,
-              noDataText: 'Chưa có dữ liệu',
+              noDataText: AppStrings.healthNoChartData,
             );
           }),
         ),
@@ -296,12 +292,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Lịch sử đo lường',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
+        const SectionHeader(title: AppStrings.healthHistoryTitle),
         AppConstants.spacingM,
         ...history.reversed.take(6).map((record) =>
             _buildHistoryItem(context, record)),
@@ -318,14 +309,14 @@ class ParentHealthView extends GetView<ParentHealthController> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppConstants.radiusM),
-        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.5)),
+        border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.primaryContainer.withOpacity(0.3),
+              color: AppColors.primaryContainer.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.straighten_rounded, color: AppColors.primary, size: 20),
@@ -366,7 +357,7 @@ class ParentHealthView extends GetView<ParentHealthController> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: bmiColor.withOpacity(0.1),
+                  color: bmiColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -384,12 +375,12 @@ class ParentHealthView extends GetView<ParentHealthController> {
   // Lấy màu sắc cho BMI
   Color _bmiColor(String label) {
     switch (label) {
-      case 'Bình thường':
+      case AppStrings.healthBmiNormal:
         return AppColors.success;
-      case 'Thừa cân':
+      case AppStrings.healthBmiOverweight:
         return AppColors.warning;
-      case 'Suy dinh dưỡng':
-      case 'Béo phì':
+      case AppStrings.healthBmiUnderweight:
+      case AppStrings.healthBmiObese:
         return AppColors.error;
       default:
         return AppColors.onSurfaceVariant;

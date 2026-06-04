@@ -11,6 +11,6 @@ class ParentLeaveRequestBinding extends Bindings {
     Get.lazyPut(() => LeaveRequestRepository());
     
     // Khởi tạo Controller
-    Get.lazyPut(() => ParentLeaveRequestController());
+    Get.lazyPut(() => ParentLeaveRequestController(repository: Get.find()));
   }
 }

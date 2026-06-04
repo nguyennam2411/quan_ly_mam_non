@@ -1,5 +1,4 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/data/who_growth_data.dart';
 import '../../../../core/services/parent_student_service.dart';
@@ -7,6 +6,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../data/models/health_record_model.dart';
 import '../../../../data/repositories/health_record_repository.dart';
 import '../../../../global_widgets/charts/app_line_chart.dart';
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/utils/app_error_message.dart';
+import '../../../../core/values/app_strings.dart';
 
 class ParentHealthController extends GetxController {
   final HealthRecordRepository _repository;
@@ -18,12 +20,13 @@ class ParentHealthController extends GetxController {
   final RxList<HealthRecordModel> history = <HealthRecordModel>[].obs;
   final RxInt chartTab = 0.obs; // 0 = Chiều cao, 1 = Cân nặng
   final RxBool isMissingInfo = false.obs; // Cảnh báo thiếu ngày sinh/giới tính
+  final List<Worker> _workers = [];
 
   @override
   void onInit() {
     super.onInit();
     fetchHistory();
-    ever(_studentService.selectedStudent, (_) => fetchHistory());
+    _workers.add(ever(_studentService.selectedStudent, (_) => fetchHistory()));
   }
 
   Future<void> fetchHistory() async {
@@ -37,7 +40,7 @@ class ParentHealthController extends GetxController {
       // Cập nhật trạng thái thiếu thông tin ngay khi có dữ liệu học sinh
       isMissingInfo.value = student.birthday == null || student.gender == null;
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể tải dữ liệu sức khoẻ');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }
@@ -115,22 +118,22 @@ class ParentHealthController extends GetxController {
       lines.addAll([
         AppLineData(
           spots: medianSpots,
-          color: AppColors.onSurfaceVariant.withOpacity(0.5),
-          label: 'Chuẩn WHO',
+          color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
+          label: AppStrings.healthWhoStandard,
           isDashed: true,
           strokeWidth: 1.5,
         ),
         AppLineData(
           spots: plus2Spots,
-          color: AppColors.warning.withOpacity(0.6),
-          label: 'Ngưỡng cao',
+          color: AppColors.warning.withValues(alpha: 0.6),
+          label: AppStrings.healthHighThreshold,
           isDashed: true,
           strokeWidth: 1,
         ),
         AppLineData(
           spots: minus2Spots,
-          color: AppColors.error.withOpacity(0.6),
-          label: 'Ngưỡng thấp',
+          color: AppColors.error.withValues(alpha: 0.6),
+          label: AppStrings.healthLowThreshold,
           isDashed: true,
           strokeWidth: 1,
         ),
@@ -142,7 +145,7 @@ class ParentHealthController extends GetxController {
       AppLineData(
         spots: babySpots,
         color: AppColors.primary,
-        label: isHeight ? 'Chiều cao (cm)' : 'Cân nặng (kg)',
+        label: isHeight ? AppStrings.healthHeightCm : AppStrings.healthWeightKg,
         isDashed: false,
         strokeWidth: 3,
       ),
@@ -153,17 +156,24 @@ class ParentHealthController extends GetxController {
   // Xây dựng chú thích cho biểu đồ
   List<Map<String, dynamic>> buildLegend(bool isHeight) {
     final legend = [
-      {'label': _studentService.selectedStudent.value?.name ?? 'Của bé', 'color': AppColors.primary, 'isDashed': false},
+      {'label': _studentService.selectedStudent.value?.name ?? AppStrings.healthChildLabel, 'color': AppColors.primary, 'isDashed': false},
     ];
 
     if (!isMissingInfo.value) {
       legend.addAll([
-        {'label': 'Chuẩn WHO', 'color': AppColors.onSurfaceVariant.withOpacity(0.5), 'isDashed': true},
-        {'label': 'Ngưỡng cao', 'color': AppColors.warning, 'isDashed': true},
-        {'label': 'Ngưỡng thấp', 'color': AppColors.error, 'isDashed': true},
+        {'label': AppStrings.healthWhoStandard, 'color': AppColors.onSurfaceVariant.withValues(alpha: 0.5), 'isDashed': true},
+        {'label': AppStrings.healthHighThreshold, 'color': AppColors.warning, 'isDashed': true},
+        {'label': AppStrings.healthLowThreshold, 'color': AppColors.error, 'isDashed': true},
       ]);
     }
 
     return legend;
+  }
+  @override
+  void onClose() {
+    for (var worker in _workers) {
+      worker.dispose();
+    }
+    super.onClose();
   }
 }

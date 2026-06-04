@@ -7,7 +7,9 @@ import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/headers/page_header.dart';
+import '../../../../global_widgets/headers/section_header.dart';
 import '../../../../global_widgets/inputs/app_search_bar.dart';
+import '../../../../global_widgets/dialogs/app_loading.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/leave_request/leave_request_filter_tabs.dart';
 import '../../../../global_widgets/leave_request/leave_request_card.dart';
@@ -22,19 +24,22 @@ class TeacherLeaveRequestView extends GetView<TeacherLeaveRequestController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: const MainAppBar(title: AppStrings.leaveRequestTeacherHeader),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const PageHeader(
-            title: AppStrings.leaveRequestTeacherHeader,
-            subtitle: AppStrings.leaveRequestTeacherSubtitle,
-          ),
-          _buildSearchAndFilter(context),
-          const SizedBox(height: 16),
-          _buildSeparatorSection(context),
-          const SizedBox(height: 12),
-          Expanded(child: _buildRequestList(context)),
-        ],
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const PageHeader(
+              title: AppStrings.leaveRequestTeacherHeader,
+              subtitle: AppStrings.leaveRequestTeacherSubtitle,
+            ),
+            _buildSearchAndFilter(context),
+            const SizedBox(height: 16),
+            _buildSeparatorSection(context),
+            const SizedBox(height: 12),
+            _buildRequestList(context),
+          ],
+        ),
       ),
     );
   }
@@ -72,36 +77,9 @@ class TeacherLeaveRequestView extends GetView<TeacherLeaveRequestController> {
   Widget _buildSeparatorSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Bên trái: Tiêu đề Danh sách đơn nghỉ
-          Row(
-            children: [
-              Container(
-                width: 4.5,
-                height: 18,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(2.5),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'Danh sách đơn nghỉ',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.onBackground.withValues(alpha: 0.9),
-                  letterSpacing: -0.2,
-                ),
-              ),
-            ],
-          ),
-          
-          // Bên phải: Nút sắp xếp 
-          _buildSortButton(),
-        ],
+      child: SectionHeader(
+        title: AppStrings.leaveRequestListTitle,
+        trailing: _buildSortButton(),
       ),
     );
   }
@@ -143,22 +121,29 @@ class TeacherLeaveRequestView extends GetView<TeacherLeaveRequestController> {
   Widget _buildRequestList(BuildContext context) {
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 40.0),
+          child: AppLoading(),
+        );
       }
 
       final requests = controller.filteredRequests;
 
       if (requests.isEmpty) {
-        return const AppEmptyState(
-          title: AppStrings.leaveRequestNoData,
-          description: AppStrings.leaveRequestEmptyTeacher,
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 40.0),
+          child: AppEmptyState(
+            title: AppStrings.leaveRequestNoData,
+            description: AppStrings.leaveRequestEmptyTeacher,
+          ),
         );
       }
 
       return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
         itemCount: requests.length,
-        physics: const BouncingScrollPhysics(),
         itemBuilder: (context, index) {
           final request = requests[index];
           return AppLeaveRequestCard(

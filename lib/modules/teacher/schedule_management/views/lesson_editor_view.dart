@@ -9,8 +9,9 @@ import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
 import 'package:quan_ly_mam_non/global_widgets/images/image_picker_grid.dart';
 import 'package:quan_ly_mam_non/global_widgets/buttons/primary_button.dart';
 import 'package:quan_ly_mam_non/modules/teacher/schedule_management/controllers/lesson_editor_controller.dart';
-import 'package:quan_ly_mam_non/data/models/schedule_model.dart';
-
+import 'package:quan_ly_mam_non/global_widgets/dialogs/app_loading.dart';
+import 'package:quan_ly_mam_non/core/utils/validators.dart';
+import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 
 class LessonEditorView extends GetView<LessonEditorController> {
   const LessonEditorView({super.key});
@@ -19,32 +20,50 @@ class LessonEditorView extends GetView<LessonEditorController> {
   Widget build(BuildContext context) {
     final DateTime date = Get.arguments['date'];
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: MainAppBar(
-        title: 'Soạn bài học',
+    return Obx(() => PopScope(
+      canPop: !controller.hasChanges.value,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        
+        final shouldPop = await AppDialogs.showExitConfirm();
+        if (shouldPop) {
+          controller.hasChanges.value = false;
+          Get.back(result: result);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: MainAppBar(
+        title: AppStrings.lessonEditorTitle,
         actions: [
           Obx(() => controller.isSaving.value
               ? const SizedBox(
                   width: 56,
-                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  child: Center(child: AppLoading(size: 24)),
                 )
               : TextButton(
                   onPressed: () async {
+                    if (!(controller.formKey.currentState?.validate() ?? false)) {
+                      controller.autovalidateMode.value = AutovalidateMode.onUserInteraction;
+                      return;
+                    }
                     final confirm = await AppDialogs.showConfirm(
-                      title: 'Xác nhận lưu',
-                      message: 'Bạn có chắc chắn muốn lưu nội dung bài học này không?',
+                      title: AppStrings.lessonSaveConfirmTitle,
+                      message: AppStrings.lessonSaveConfirmMessage,
                     );
                     if (confirm) {
                       controller.saveLesson(date);
                     }
                   },
-                  child: const Text('LƯU', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+                  child: const Text(AppStrings.labelSave, style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
                 )),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppConstants.paddingL),
+      body: Form(
+        key: controller.formKey,
+        autovalidateMode: controller.autovalidateMode.value,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppConstants.paddingL),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -55,16 +74,17 @@ class LessonEditorView extends GetView<LessonEditorController> {
             // 1. Ô nhập liệu bài học
             _buildInputField(
               controller: controller.titleController,
-              label: 'Tiêu đề bài học',
-              hint: 'Ví dụ: Làm quen với chữ cái A, B, C',
+              label: AppStrings.lessonTitleLabel,
+              hint: AppStrings.lessonTitleHint,
               icon: Icons.title_rounded,
+              validator: AppValidators.titleRequired,
             ),
             const SizedBox(height: AppConstants.paddingM),
             
             _buildInputField(
               controller: controller.objectivesController,
-              label: 'Mục tiêu bài học',
-              hint: 'Trẻ nhận biết và phát âm đúng...',
+              label: AppStrings.lessonObjectivesLabel,
+              hint: AppStrings.lessonObjectivesHint,
               icon: Icons.track_changes_rounded,
               maxLines: 3,
             ),
@@ -72,8 +92,8 @@ class LessonEditorView extends GetView<LessonEditorController> {
             
             _buildInputField(
               controller: controller.contentController,
-              label: 'Nội dung chi tiết',
-              hint: 'Các bước thực hiện bài dạy...',
+              label: AppStrings.lessonContentLabel,
+              hint: AppStrings.lessonContentHint,
               icon: Icons.description_outlined,
               maxLines: 5,
             ),
@@ -83,15 +103,16 @@ class LessonEditorView extends GetView<LessonEditorController> {
             // 2. Tài liệu
             _buildInputField(
               controller: controller.youtubeController,
-              label: 'Link Video Youtube (Hướng dẫn)',
-              hint: 'Dán đường dẫn video tại đây...',
+              label: AppStrings.lessonYoutubeLabel,
+              hint: AppStrings.lessonYoutubeHint,
               icon: Icons.play_circle_filled_rounded,
               iconColor: Colors.red,
+              validator: AppValidators.youtubeUrlOptional,
             ),
             const SizedBox(height: AppConstants.paddingM),
             
             // Hình ảnh minh họa
-            _buildSectionLabel('Hình ảnh minh họa'),
+            _buildSectionLabel(AppStrings.lessonImagesLabel),
             const SizedBox(height: AppConstants.paddingS),
             Obx(() => ImagePickerGrid(
               images: controller.selectedImages.toList(),
@@ -102,7 +123,7 @@ class LessonEditorView extends GetView<LessonEditorController> {
             const SizedBox(height: AppConstants.paddingL),
             
             // Trạng thái công khai
-            _buildSectionLabel('Cài đặt hiển thị'),
+            _buildSectionLabel(AppStrings.lessonDisplaySettingsLabel),
             const SizedBox(height: AppConstants.paddingS),
             _buildStatusToggle(),
             
@@ -110,12 +131,16 @@ class LessonEditorView extends GetView<LessonEditorController> {
 
             // Nút Lưu dưới cùng
             Obx(() => PrimaryButton(
-              text: 'Lưu bài học',
+              text: AppStrings.lessonSaveButton,
               isLoading: controller.isSaving.value,
               onPressed: () async {
+                if (!(controller.formKey.currentState?.validate() ?? false)) {
+                  controller.autovalidateMode.value = AutovalidateMode.onUserInteraction;
+                  return;
+                }
                 final confirm = await AppDialogs.showConfirm(
-                  title: 'Xác nhận lưu',
-                  message: 'Bạn có chắc chắn muốn lưu nội dung bài học này không?',
+                  title: AppStrings.lessonSaveConfirmTitle,
+                  message: AppStrings.lessonSaveConfirmMessage,
                 );
                 if (confirm) {
                   controller.saveLesson(date);
@@ -127,6 +152,9 @@ class LessonEditorView extends GetView<LessonEditorController> {
           ],
         ),
       ),
+    ),
+    ),
+    ),
     );
   }
 
@@ -139,16 +167,16 @@ class LessonEditorView extends GetView<LessonEditorController> {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.05),
+          color: AppColors.primary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(Icons.event_note_rounded, color: AppColors.primary, size: 24),
@@ -169,8 +197,8 @@ class LessonEditorView extends GetView<LessonEditorController> {
                   const SizedBox(height: 4),
                   Text(
                     schedule != null 
-                      ? 'Khung giờ: ${schedule.startTime} - ${schedule.activityName}'
-                      : 'Bài giảng bổ sung (Tự do)',
+                      ? '${AppStrings.lessonTimeSlotPrefix} ${schedule.startTime} - ${schedule.activityName}'
+                      : AppStrings.lessonSupplementalLabel,
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -204,6 +232,7 @@ class LessonEditorView extends GetView<LessonEditorController> {
     required IconData icon,
     int maxLines = 1,
     Color? iconColor,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,10 +242,11 @@ class LessonEditorView extends GetView<LessonEditorController> {
         TextFormField(
           controller: controller,
           maxLines: maxLines,
+          validator: validator,
           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: AppColors.onSurfaceVariant.withOpacity(0.5), fontWeight: FontWeight.normal),
+            hintStyle: TextStyle(color: AppColors.onSurfaceVariant.withValues(alpha: 0.5), fontWeight: FontWeight.normal),
             prefixIcon: Icon(icon, color: iconColor ?? AppColors.primary, size: 20),
             filled: true,
             fillColor: AppColors.surface,
@@ -232,6 +262,14 @@ class LessonEditorView extends GetView<LessonEditorController> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppConstants.radiusM),
               borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppConstants.radiusM),
+              borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppConstants.radiusM),
+              borderSide: const BorderSide(color: AppColors.error, width: 1.5),
             ),
           ),
         ),
@@ -251,17 +289,17 @@ class LessonEditorView extends GetView<LessonEditorController> {
         children: [
           const Icon(Icons.public_rounded, color: AppColors.secondary, size: 20),
           const SizedBox(width: AppConstants.paddingM),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Công khai bài học',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  AppStrings.lessonStatusPublishLabel,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
                 Text(
-                  'Phụ huynh sẽ thấy bài học này',
-                  style: TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
+                  AppStrings.lessonStatusPublishDesc,
+                  style: const TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
                 ),
               ],
             ),

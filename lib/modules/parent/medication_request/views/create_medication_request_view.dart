@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../../../../core/utils/dialog.dart';
@@ -351,7 +352,14 @@ class CreateMedicationRequestView extends GetView<ParentMedicationRequestControl
             AppConstants.spacingM,
           ],
           InkWell(
-            onTap: () => controller.pickImage(),
+            onTap: () async {
+              final source = await AppDialogs.showImageSourcePicker(
+                title: 'Chọn nguồn ảnh đơn thuốc',
+              );
+              if (source != null) {
+                controller.pickImage(source);
+              }
+            },
             borderRadius: BorderRadius.circular(AppConstants.radiusM),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: AppConstants.paddingM),
@@ -369,7 +377,7 @@ class CreateMedicationRequestView extends GetView<ParentMedicationRequestControl
                   Icon(Icons.add_a_photo_outlined, color: AppColors.primary),
                   AppConstants.spacingXS,
                   Text(
-                    'Chọn ảnh từ thư viện',
+                    'Đính kèm ảnh đơn thuốc',
                     style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
                   ),
                 ],

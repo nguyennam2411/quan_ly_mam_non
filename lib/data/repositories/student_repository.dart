@@ -20,4 +20,8 @@ class StudentRepository {
     final response = await _provider.getStudentsByClassroom(classroomId);
     return response.map((json) => StudentModel.fromJson(json)).toList();
   }
+
+  Future<void> updateStudentAvatar(String studentId, String avatarUrl) async {
+    await _provider.updateStudentAvatar(studentId, avatarUrl);
+  }
 }

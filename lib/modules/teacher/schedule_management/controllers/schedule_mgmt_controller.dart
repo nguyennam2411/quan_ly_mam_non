@@ -2,6 +2,9 @@ import 'package:get/get.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../data/repositories/schedule_repository.dart';
 
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/utils/app_error_message.dart';
+
 class ScheduleMgmtController extends GetxController {
   final ScheduleRepository _repository;
   ScheduleMgmtController({required ScheduleRepository repository}) : _repository = repository;
@@ -29,7 +32,7 @@ class ScheduleMgmtController extends GetxController {
       final data = await _repository.getFullDailySchedule(classroomId, selectedDate.value);
       dailySchedule.assignAll(data);
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể tải thời khóa biểu');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }

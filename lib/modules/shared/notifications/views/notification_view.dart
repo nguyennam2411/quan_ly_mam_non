@@ -4,6 +4,7 @@ import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 import 'package:quan_ly_mam_non/global_widgets/state/app_empty_state.dart';
+import 'package:quan_ly_mam_non/global_widgets/dialogs/app_loading.dart';
 import '../controllers/notification_controller.dart';
 import '../widgets/notification_item.dart';
 
@@ -39,7 +40,7 @@ class NotificationView extends GetView<NotificationController> {
         color: AppColors.primary,
         child: Obx(() {
           if (controller.isLoading.value && controller.notifications.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+            return const AppLoading();
           }
 
           if (controller.notifications.isEmpty) {
@@ -56,7 +57,7 @@ class NotificationView extends GetView<NotificationController> {
             separatorBuilder: (context, index) => Divider(
               height: 1,
               thickness: 1,
-              color: AppColors.surfaceVariant.withOpacity(0.5),
+              color: AppColors.surfaceVariant.withValues(alpha: 0.5),
             ),
             itemBuilder: (context, index) {
               final item = controller.notifications[index];

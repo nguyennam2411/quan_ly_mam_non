@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
-import '../../../../global_widgets/headers/page_header.dart';
+import '../../../../global_widgets/headers/section_header.dart';
+import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_empty_state.dart';
+import '../../../../global_widgets/calendar/app_calendar_picker.dart';
 import '../controllers/meal_plan_controller.dart';
 
 class MealPlanView extends GetView<MealPlanController> {
@@ -14,19 +19,25 @@ class MealPlanView extends GetView<MealPlanController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const MainAppBar(title: AppStrings.mealPlanTitle),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Obx(() => MainAppBar(title: controller.gradeName.value)),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Obx(() => PageHeader(
-                title: '${AppStrings.mealPlanTitle} - ${controller.gradeName.value}',
-                subtitle: AppStrings.mealPlanSubtitle,
-              )),
-          _buildDaySelector(),
+          _buildCompactHeader(context),
+          
+          // Tiêu đề phụ
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+            child: const SectionHeader(title: AppStrings.mealPlanDetailTitle),
+          ),
+
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return const AppLoading();
               }
 
               if (controller.weeklyMenu.isEmpty) {
@@ -43,7 +54,7 @@ class MealPlanView extends GetView<MealPlanController> {
                 child: Column(
                   children: [
                     _buildMealCard(
-                      title: 'Bữa sáng',
+                      title: AppStrings.mealBreakfast,
                       time: menu.breakfastTime,
                       content: menu.breakfast,
                       images: menu.breakfastImg,
@@ -53,7 +64,7 @@ class MealPlanView extends GetView<MealPlanController> {
                     ),
                     AppConstants.spacingL,
                     _buildMealCard(
-                      title: 'Bữa trưa',
+                      title: AppStrings.mealLunch,
                       time: menu.lunchTime,
                       content: menu.lunch,
                       images: menu.lunchImg,
@@ -63,7 +74,7 @@ class MealPlanView extends GetView<MealPlanController> {
                     ),
                     AppConstants.spacingL,
                     _buildMealCard(
-                      title: 'Bữa xế',
+                      title: AppStrings.mealSnack,
                       time: menu.snackTime,
                       content: menu.snack,
                       images: menu.snackImg,
@@ -82,64 +93,147 @@ class MealPlanView extends GetView<MealPlanController> {
   }
 
 
-  Widget _buildDaySelector() {
-    final days = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6'];
+  Widget _buildCompactHeader(BuildContext context) {
     return Container(
-      height: 80,
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingL),
-        itemCount: days.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          return Obx(() {
-            bool isSelected = controller.selectedDayIndex.value == index;
-            return GestureDetector(
-              onTap: () => controller.changeDay(index),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: 70,
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : AppColors.surfaceVariant.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(AppConstants.radiusM),
-                  boxShadow: isSelected
-                      ? [
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 15,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Dòng trên: Tháng & Icon Lịch
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 16, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Obx(() => Text(
+                  DateFormat('MMMM yyyy', 'vi').format(controller.selectedDate.value),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black87,
+                  ),
+                )),
+                IconButton(
+                  onPressed: () => _showCalendarDialog(context),
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.calendar_month_rounded, color: AppColors.primary, size: 22),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Dòng dưới: Thanh chọn 7 ngày trong tuần
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+            child: Obx(() {
+              final selectedDate = controller.selectedDate.value;
+              // Tính ngày đầu tuần (Thứ 2)
+              final firstDayOfWeek = selectedDate.subtract(Duration(days: selectedDate.weekday - 1));
+              
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(7, (index) {
+                  final date = firstDayOfWeek.add(Duration(days: index));
+                  final isSelected = date.day == selectedDate.day && 
+                                   date.month == selectedDate.month &&
+                                   date.year == selectedDate.year;
+                  final dayName = _getShortDayName(date.weekday);
+
+                  return GestureDetector(
+                    onTap: () => controller.onDateChanged(date),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: (MediaQuery.of(context).size.width - 64) / 7,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.primary : Colors.transparent,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: isSelected ? [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           )
-                        ]
-                      : [],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      days[index].split(' ')[0],
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isSelected ? AppColors.onPrimary.withOpacity(0.8) : AppColors.onSurfaceVariant,
+                        ] : null,
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            dayName,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected ? Colors.white70 : Colors.grey.shade400,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            date.day.toString(),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isSelected ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      days[index].split(' ')[1],
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: isSelected ? AppColors.onPrimary : AppColors.onSurface,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          });
-        },
+                  );
+                }),
+              );
+            }),
+          ),
+        ],
       ),
     );
+  }
+
+  void _showCalendarDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.radiusL)),
+        child: SizedBox(
+          height: 450,
+          child: AppCalendarPicker(
+            controller: DateRangePickerController(),
+            initialDate: controller.selectedDate.value,
+            onSelectionChanged: (date) {
+              controller.onDateChanged(date);
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _getShortDayName(int weekday) {
+    switch (weekday) {
+      case 1: return 'T2';
+      case 2: return 'T3';
+      case 3: return 'T4';
+      case 4: return 'T5';
+      case 5: return 'T6';
+      case 6: return 'T7';
+      case 7: return 'CN';
+      default: return '';
+    }
   }
 
   Widget _buildMealCard({
@@ -159,7 +253,7 @@ class MealPlanView extends GetView<MealPlanController> {
         borderRadius: BorderRadius.circular(AppConstants.radiusXL),
         boxShadow: [
           BoxShadow(
-            color: AppColors.onSurface.withOpacity(0.05),
+            color: AppColors.onSurface.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -195,7 +289,7 @@ class MealPlanView extends GetView<MealPlanController> {
                     '($time)',
                     style: TextStyle(
                       fontSize: 12,
-                      color: onColor.withOpacity(0.8),
+                      color: onColor.withValues(alpha: 0.8),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -208,7 +302,7 @@ class MealPlanView extends GetView<MealPlanController> {
           Padding(
             padding: const EdgeInsets.fromLTRB(AppConstants.paddingM, AppConstants.paddingM, AppConstants.paddingM, 8),
             child: Text(
-              content.isEmpty ? 'Chưa cập nhật thực đơn' : content,
+              content.isEmpty ? AppStrings.mealNotUpdated : content,
               style: TextStyle(
                 fontSize: 16,
                 height: 1.5,
@@ -234,7 +328,7 @@ class MealPlanView extends GetView<MealPlanController> {
                     width: 220,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(AppConstants.radiusL),
-                      border: Border.all(color: AppColors.surfaceVariant.withOpacity(0.5)),
+                      border: Border.all(color: AppColors.surfaceVariant.withValues(alpha: 0.5)),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(AppConstants.radiusL - 1),
@@ -244,11 +338,8 @@ class MealPlanView extends GetView<MealPlanController> {
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                  : null,
-                              strokeWidth: 2,
+                            child: AppLoading(
+                              size: 20,
                             ),
                           );
                         },
@@ -271,27 +362,10 @@ class MealPlanView extends GetView<MealPlanController> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.restaurant_menu_rounded, size: 80, color: AppColors.outlineVariant),
-          AppConstants.spacingM,
-          Text(
-            'Chưa có thực đơn tuần nầy',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Vui lòng quay lại sau',
-            style: TextStyle(color: AppColors.outline),
-          ),
-        ],
-      ),
+    return const AppEmptyState(
+      title: AppStrings.mealEmptyTitle,
+      description: AppStrings.mealEmptyDesc,
+      icon: Icons.restaurant_menu_rounded,
     );
   }
 }

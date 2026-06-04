@@ -361,7 +361,6 @@ class ParentMedicationRequestView extends GetView<ParentMedicationRequestControl
         text = AppStrings.medicationStatusPending;
         break;
       case AppDatabase.approved:
-      case AppDatabase.completed:
         color = AppColors.success;
         text = AppStrings.medicationStatusCompleted;
         break;

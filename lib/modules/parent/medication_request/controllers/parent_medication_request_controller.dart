@@ -140,8 +140,8 @@ class ParentMedicationRequestController extends GetxController {
     }
   }
 
-  Future<void> pickImage() async {
-    final file = await ImageHelper.pickImage(ImageSource.gallery, crop: true);
+  Future<void> pickImage(ImageSource source) async {
+    final file = await ImageHelper.pickImage(source, crop: true);
     if (file != null) {
       selectedImage.value = file;
     }

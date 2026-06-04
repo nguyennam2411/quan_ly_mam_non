@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -49,20 +50,20 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDsWWM5VYBO7ofg6mM4aJyrDQWk-FBFnwM',
-    appId: '1:792466069004:android:5f034696782bcac91d0029',
-    messagingSenderId: '792466069004',
-    projectId: 'quan-ly-mam-non',
-    storageBucket: 'quan-ly-mam-non.firebasestorage.app',
-  );
+  static FirebaseOptions get android => FirebaseOptions(
+        apiKey: dotenv.env['FIREBASE_API_KEY_ANDROID'] ?? '',
+        appId: dotenv.env['FIREBASE_APP_ID_ANDROID'] ?? '',
+        messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID_ANDROID'] ?? '',
+        projectId: dotenv.env['FIREBASE_PROJECT_ID_ANDROID'] ?? '',
+        storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET_ANDROID'] ?? '',
+      );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDY6upXe4DzHWqa6u-RCri4tnUD1gWAebo',
-    appId: '1:792466069004:ios:3d48679b659fc7b21d0029',
-    messagingSenderId: '792466069004',
-    projectId: 'quan-ly-mam-non',
-    storageBucket: 'quan-ly-mam-non.firebasestorage.app',
-    iosBundleId: 'com.example.quanLyMamNon',
-  );
+  static FirebaseOptions get ios => FirebaseOptions(
+        apiKey: dotenv.env['FIREBASE_API_KEY_IOS'] ?? '',
+        appId: dotenv.env['FIREBASE_APP_ID_IOS'] ?? '',
+        messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID_IOS'] ?? '',
+        projectId: dotenv.env['FIREBASE_PROJECT_ID_IOS'] ?? '',
+        storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET_IOS'] ?? '',
+        iosBundleId: dotenv.env['FIREBASE_IOS_BUNDLE_ID'] ?? '',
+      );
 }

@@ -17,13 +17,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('vi', null);
 
-  // 2. Khởi tạo Firebase
+  // 2. Load biến môi trường từ .env
+  await dotenv.load(fileName: ".env");
+
+  // 3. Khởi tạo Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
-  // 3. Load biến môi trường từ .env
-  await dotenv.load(fileName: ".env");
 
   // 4. Khởi tạo Supabase Service bằng GetX
   await Get.putAsync(() => SupabaseService().init());

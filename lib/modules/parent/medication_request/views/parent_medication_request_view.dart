@@ -10,6 +10,7 @@ import '../../../../core/utils/dialog.dart';
 import '../../../../global_widgets/buttons/circle_back_button.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/chips/status_badge.dart';
+import '../../../../global_widgets/medication_request/medication_request_detail_modal.dart';
 import '../controllers/parent_medication_request_controller.dart';
 import '../../../../data/models/medication_request_model.dart';
 
@@ -210,143 +211,97 @@ class ParentMedicationRequestView extends GetView<ParentMedicationRequestControl
 
   Widget _buildMedicationCard(BuildContext context, MedicationRequestModel request) {
     final student = request.student;
-    final isPending = request.status == AppDatabase.pending;
     
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppConstants.paddingM),
-      padding: const EdgeInsets.all(AppConstants.paddingL),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(AppConstants.radiusXL),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.onSurface.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header: Avatar, Name, Status
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.primaryContainer.withValues(alpha: 0.2),
-                backgroundImage: student?.avatarUrl != null ? NetworkImage(student!.avatarUrl!) : null,
-                child: student?.avatarUrl == null ? Icon(Icons.person, color: AppColors.primary) : null,
-              ),
-              const SizedBox(width: AppConstants.paddingM),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            student?.name ?? 'Trẻ',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: () {
+        MedicationRequestDetailModal.show(
+          request: request,
+          isTeacher: false,
+          onCancel: () => _showCancelConfirm(context, request.id!),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppConstants.paddingM),
+        padding: const EdgeInsets.all(AppConstants.paddingL),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(AppConstants.radiusXL),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.onSurface.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header: Avatar, Name, Status
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: AppColors.primaryContainer.withValues(alpha: 0.2),
+                  backgroundImage: student?.avatarUrl != null ? NetworkImage(student!.avatarUrl!) : null,
+                  child: student?.avatarUrl == null ? Icon(Icons.person, color: AppColors.primary) : null,
+                ),
+                const SizedBox(width: AppConstants.paddingM),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              student?.name ?? 'Trẻ',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          ),
+                          _buildStatusBadge(request.status),
+                        ],
+                      ),
+                      AppConstants.spacingXXS,
+                      if (request.createdAt != null)
+                        Text(
+                          'Đã gửi lúc: ${DateFormat('HH:mm - dd/MM/yyyy').format(request.createdAt!.toLocal())}',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.outline,
                           ),
                         ),
-                        _buildStatusBadge(request.status),
-                      ],
-                    ),
-                    AppConstants.spacingXXS,
-                    if (request.createdAt != null)
-                      Text(
-                        'Đã gửi lúc: ${DateFormat('HH:mm - dd/MM/yyyy').format(request.createdAt!)}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.outline,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1, thickness: 1),
-          ),
-          
-          // Chi tiết đơn dặn thuốc
-          Row(
-            children: [
-              Icon(Icons.medical_information, size: 18, color: AppColors.primary),
-              const SizedBox(width: 8),
-              Text(
-                'Uống ngày: ${request.date}',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          
-          _buildDetailRow(Icons.medication_liquid_rounded, 'Tên thuốc:', request.medicineName),
-          const SizedBox(height: 8),
-          _buildDetailRow(Icons.scale, 'Liều lượng:', request.dosage),
-          const SizedBox(height: 8),
-          _buildDetailRow(Icons.access_time, 'Giờ uống:', request.time),
-          
-          if (request.note != null && request.note!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            _buildDetailRow(Icons.notes, 'Ghi chú:', request.note!),
-          ],
-          
-          if (request.prescriptionImage != null) ...[
-            const SizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppConstants.radiusM),
-              child: Image.network(
-                request.prescriptionImage!,
-                height: 100,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 100,
-                  width: double.infinity,
-                  color: AppColors.surfaceContainerHigh,
-                  child: const Icon(Icons.broken_image, color: AppColors.outline),
-                ),
-              ),
-            ),
-          ],
-          
-          // Action button (Huỷ đơn)
-          if (isPending) ...[
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () => _showCancelConfirm(context, request.id!),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryContainer.withValues(alpha: 0.8),
-                  foregroundColor: AppColors.onPrimaryContainer,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.radiusMax),
+                    ],
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingL, vertical: 0),
-                  minimumSize: const Size(0, AppConstants.inputMinHeight),
                 ),
-                child: const Text(
-                  AppStrings.leaveRequestCancel,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+              ],
+            ),
+            
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Divider(height: 1, thickness: 1),
+            ),
+            
+            // Summary
+            _buildDetailRow(Icons.medical_information, 'Ngày uống:', request.date),
+            const SizedBox(height: 8),
+            _buildDetailRow(Icons.medication_liquid_rounded, 'Tên thuốc:', request.medicineName),
+            const SizedBox(height: 8),
+            const Text(
+              'Nhấn để xem chi tiết đơn thuốc',
+              style: TextStyle(
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+                color: AppColors.primary,
               ),
             ),
           ],
-        ],
+        ),
       ),
     );
   }

@@ -9,6 +9,8 @@ import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../data/models/medication_request_model.dart';
 import '../../../../data/repositories/medication_repository.dart';
+import '../../../../data/repositories/notification_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ParentMedicationRequestController extends GetxController {
   final MedicationRepository repository = Get.find();
@@ -194,6 +196,29 @@ class ParentMedicationRequestController extends GetxController {
 
       await repository.submitRequestWithImage(request, selectedImage.value);
       
+      // Gửi thông báo cho giáo viên
+      try {
+        if (currentStudent.classroomId != null) {
+          final classResponse = await Supabase.instance.client
+              .from(AppDatabase.tableClassrooms)
+              .select(AppDatabase.colTeacherId)
+              .eq(AppDatabase.colId, currentStudent.classroomId!)
+              .single();
+          final teacherId = classResponse[AppDatabase.colTeacherId] as String?;
+          if (teacherId != null) {
+            final notifRepo = Get.find<NotificationRepository>();
+            await notifRepo.createNotification(
+              userId: teacherId,
+              title: 'Dặn thuốc mới',
+              content: 'Phụ huynh bé ${currentStudent.name} vừa gửi đơn dặn thuốc mới.',
+              type: 'MEDICATION_REQUEST',
+            );
+          }
+        }
+      } catch (e) {
+        debugPrint('Không thể gửi thông báo cho giáo viên: $e');
+      }
+
       Get.back();
       Get.snackbar('Thành công', 'Đơn dặn thuốc đã được gửi thành công', backgroundColor: Colors.green, colorText: Colors.white);
       

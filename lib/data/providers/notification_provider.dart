@@ -15,6 +15,11 @@ class NotificationProvider {
         .limit(limit);
   }
 
+  // Tạo thông báo mới
+  Future<void> createNotification(Map<String, dynamic> data) async {
+    await _client.from(AppDatabase.tableNotifications).insert(data);
+  }
+
   // Đếm số lượng chưa đọc trực tiếp từ DB
   Future<int> countUnreadNotifications(String userId) async {
     final response = await _client

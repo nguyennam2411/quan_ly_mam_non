@@ -5,6 +5,7 @@ import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../data/models/medication_request_model.dart';
 import '../../../../data/repositories/medication_repository.dart';
+import '../../../../data/repositories/notification_repository.dart';
 
 class TeacherMedicationRequestController extends GetxController {
   final MedicationRepository repository;
@@ -96,6 +97,22 @@ class TeacherMedicationRequestController extends GetxController {
       
       await repository.updateRequestStatus(requestId, AppDatabase.rejected, teacherId);
       
+      // Gửi thông báo cho phụ huynh
+      try {
+        final request = allRequests.firstWhereOrNull((r) => r.id == requestId);
+        if (request != null && request.parentId != null) {
+          final notifRepo = Get.find<NotificationRepository>();
+          await notifRepo.createNotification(
+            userId: request.parentId!,
+            title: 'Cập nhật Dặn Thuốc',
+            content: 'Bé ${request.student?.name ?? 'nhà bạn'} đã được chuyển xuống Phòng Y Tế thay vì uống thuốc trên lớp.',
+            type: 'MEDICATION_STATUS',
+          );
+        }
+      } catch (e) {
+        debugPrint('Lỗi gửi thông báo: $e');
+      }
+
       Get.snackbar(
         'Đã Chuyển Y Tế', 
         'Đã ngưng đơn thuốc và chuyển bé xuống phòng Y tế.', 
@@ -119,6 +136,22 @@ class TeacherMedicationRequestController extends GetxController {
       
       await repository.updateRequestStatus(requestId, AppDatabase.completed, teacherId);
       
+      // Gửi thông báo cho phụ huynh
+      try {
+        final request = allRequests.firstWhereOrNull((r) => r.id == requestId);
+        if (request != null && request.parentId != null) {
+          final notifRepo = Get.find<NotificationRepository>();
+          await notifRepo.createNotification(
+            userId: request.parentId!,
+            title: 'Cập nhật Dặn Thuốc',
+            content: 'Cô giáo đã cho bé ${request.student?.name ?? 'nhà bạn'} uống thuốc thành công.',
+            type: 'MEDICATION_STATUS',
+          );
+        }
+      } catch (e) {
+        debugPrint('Lỗi gửi thông báo: $e');
+      }
+
       Get.snackbar('Thành công', 'Đã ghi nhận Đã Cho Uống', backgroundColor: Colors.green, colorText: Colors.white);
       await fetchRequests();
     } catch (e) {

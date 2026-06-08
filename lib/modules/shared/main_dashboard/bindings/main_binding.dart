@@ -7,8 +7,11 @@ import '../../../../data/repositories/student_repository.dart';
 import '../../../../data/providers/notification_provider.dart';
 import '../../../../data/repositories/notification_repository.dart';
 import '../../notifications/controllers/notification_controller.dart';
-import '../../../teacher/teacher_home/controllers/teacher_home_controller.dart';
+import '../../home/controllers/teacher_home_controller.dart';
 import '../../../../data/repositories/attendance_repository.dart';
+import '../../../../data/providers/profile_provider.dart';
+import '../../../../data/repositories/profile_repository.dart';
+import '../../profile/controllers/profile_controller.dart';
 import '../controllers/main_controller.dart';
 
 class MainBinding extends Bindings {
@@ -16,6 +19,10 @@ class MainBinding extends Bindings {
   void dependencies() {
     // MainController giữ trạng thái chung của Dashboard
     Get.lazyPut<MainController>(() => MainController(), fenix: true);
+    Get.lazyPut<ProfileController>(
+      () => ProfileController(ProfileRepository(ProfileProvider())),
+      fenix: true,
+    );
 
     // Nếu người dùng là phụ huynh, khởi tạo ParentStudentService để quản lý học sinh
     if (UserRole.isParent(AuthService.to.userRole.value)) {

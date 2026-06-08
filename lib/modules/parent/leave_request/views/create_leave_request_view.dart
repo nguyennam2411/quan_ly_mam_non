@@ -11,6 +11,7 @@ import '../../../../global_widgets/buttons/circle_back_button.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
 import '../../../../global_widgets/images/image_picker_grid.dart';
 import '../controllers/parent_leave_request_controller.dart';
+import '../../../../core/utils/validators.dart';
 
 class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
   const CreateLeaveRequestView({super.key});
@@ -38,9 +39,12 @@ class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
           ),
           centerTitle: true,
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppConstants.paddingL),
-          child: Column(
+        body: Form(
+          key: controller.formKey,
+          autovalidateMode: controller.autovalidateMode.value,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppConstants.paddingL),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Thông tin học sinh
@@ -70,6 +74,16 @@ class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
                     text: AppStrings.leaveRequestFormSubmit,
                     isLoading: controller.isLoading.value,
                     onPressed: () async {
+                      if (!(controller.formKey.currentState?.validate() ?? false)) {
+                        controller.autovalidateMode.value = AutovalidateMode.onUserInteraction;
+                        return;
+                      }
+                      final now = DateTime.now();
+                      final today = DateTime(now.year, now.month, now.day);
+                      if (controller.startDate.value != null && controller.startDate.value!.isBefore(today)) {
+                        AppDialogs.warning(message: AppStrings.leaveRequestPastDateWarning);
+                        return;
+                      }
                       final confirm = await AppDialogs.showConfirm(
                         message: AppStrings.leaveRequestConfirmSubmit,
                         agreeText: AppStrings.leaveRequestFormSubmit,
@@ -84,7 +98,9 @@ class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
           ),
         ),
       ),
-    ));
+    ),
+    ),
+    );
   }
 
   Widget _buildStudentInfo() {
@@ -137,52 +153,80 @@ class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
   }
 
   Widget _buildDateSelector(BuildContext context) {
-    return Obx(() {
-      final hasDate = controller.startDate.value != null;
-      String dateText = AppStrings.leaveRequestSelectDate;
-      if (hasDate) {
-        if (controller.endDate.value != null && controller.startDate.value != controller.endDate.value) {
-          dateText = '${DateFormat('dd/MM/yyyy').format(controller.startDate.value!)} - ${DateFormat('dd/MM/yyyy').format(controller.endDate.value!)}';
-        } else {
-          dateText = DateFormat('EEEE, dd/MM/yyyy', 'vi_VN').format(controller.startDate.value!);
-        }
-      }
+    return FormField<DateTimeRange>(
+      validator: (_) {
+        return AppValidators.dateRange(controller.startDate.value, controller.endDate.value);
+      },
+      builder: (FormFieldState<DateTimeRange> state) {
+        return Obx(() {
+          final hasDate = controller.startDate.value != null;
+          String dateText = AppStrings.leaveRequestSelectDate;
+          if (hasDate) {
+            if (controller.endDate.value != null && controller.startDate.value != controller.endDate.value) {
+              dateText = '${DateFormat('dd/MM/yyyy').format(controller.startDate.value!)} - ${DateFormat('dd/MM/yyyy').format(controller.endDate.value!)}';
+            } else {
+              dateText = DateFormat('EEEE, dd/MM/yyyy', 'vi_VN').format(controller.startDate.value!);
+            }
+          }
 
-      return InkWell(
-        onTap: () => _showDateRangePicker(context),
-        borderRadius: BorderRadius.circular(AppConstants.radiusM),
-        child: Container(
-          padding: const EdgeInsets.all(AppConstants.paddingM),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppConstants.radiusM),
-            border: Border.all(color: AppColors.outline.withValues(alpha: 0.5)),
-          ),
-          child: Row(
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.calendar_month_outlined, color: AppColors.primary),
-              AppConstants.spacingM,
-              Expanded(
-                child: Text(
-                  dateText,
-                  style: TextStyle(
-                    color: hasDate ? AppColors.onSurface : AppColors.onSurfaceVariant,
-                    fontWeight: hasDate ? FontWeight.w600 : FontWeight.normal,
+              InkWell(
+                onTap: () => _showDateRangePicker(context, state),
+                borderRadius: BorderRadius.circular(AppConstants.radiusM),
+                child: Container(
+                  padding: const EdgeInsets.all(AppConstants.paddingM),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppConstants.radiusM),
+                    border: Border.all(
+                      color: state.hasError ? AppColors.error : AppColors.outline.withValues(alpha: 0.5),
+                      width: state.hasError ? 1.5 : 1.0,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.calendar_month_outlined, color: state.hasError ? AppColors.error : AppColors.primary),
+                      AppConstants.spacingM,
+                      Expanded(
+                        child: Text(
+                          dateText,
+                          style: TextStyle(
+                            color: state.hasError 
+                              ? AppColors.error 
+                              : (hasDate ? AppColors.onSurface : AppColors.onSurfaceVariant),
+                            fontWeight: hasDate ? FontWeight.w600 : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.outline),
+                    ],
                   ),
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.outline),
+              if (state.hasError) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Text(
+                    state.errorText!,
+                    style: const TextStyle(color: AppColors.error, fontSize: 12),
+                  ),
+                ),
+              ],
             ],
-          ),
-        ),
-      );
-    });
+          );
+        });
+      },
+    );
   }
 
   Widget _buildReasonInput() {
-    return TextField(
+    return TextFormField(
       controller: controller.reasonController,
       maxLines: 4,
+      validator: AppValidators.reasonRequired,
       decoration: InputDecoration(
         hintText: AppStrings.leaveRequestFormReasonHint,
         filled: true,
@@ -199,6 +243,14 @@ class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
           borderRadius: BorderRadius.circular(AppConstants.radiusM),
           borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusM),
+          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusM),
+          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+        ),
         contentPadding: const EdgeInsets.all(AppConstants.paddingM),
       ),
     );
@@ -213,7 +265,7 @@ class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
         ));
   }
 
-  void _showDateRangePicker(BuildContext context) {
+  void _showDateRangePicker(BuildContext context, FormFieldState<DateTimeRange> state) {
     Get.bottomSheet(
       Container(
         height: 450,
@@ -248,6 +300,12 @@ class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
                   if (args.value is PickerDateRange) {
                     controller.startDate.value = args.value.startDate;
                     controller.endDate.value = args.value.endDate ?? args.value.startDate;
+                    if (args.value.startDate != null) {
+                      state.didChange(DateTimeRange(
+                        start: args.value.startDate!,
+                        end: args.value.endDate ?? args.value.startDate!,
+                      ));
+                    }
                   }
                 },
                 selectionMode: DateRangePickerSelectionMode.range,

@@ -112,4 +112,8 @@ class LeaveRequestRepository {
       endDate: request.endDate,
     );
   }
+
+  Future<String?> getStudentClassroomId(String studentId) async {
+    return await _provider.getStudentClassroomId(studentId);
+  }
 }

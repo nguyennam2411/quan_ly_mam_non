@@ -6,6 +6,9 @@ import '../controllers/student_qr_controller.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_error_state.dart';
+import '../../../../core/values/app_strings.dart';
 
 class StudentQrView extends GetView<StudentQrController> {
   const StudentQrView({super.key});
@@ -14,29 +17,17 @@ class StudentQrView extends GetView<StudentQrController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const MainAppBar(title: 'Mã QR của bé'),
+      appBar: const MainAppBar(title: AppStrings.studentQrTitle),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const AppLoading(size: 32);
         }
 
         final token = controller.qrToken.value;
         if (token == null) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: AppColors.error),
-                const SizedBox(height: 16),
-                const Text('Không thể tải mã QR'),
-                TextButton(
-                  onPressed: controller.refreshQr,
-                  child: const Text('Thử lại'),
-                ),
-              ],
-            ),
+          return AppErrorState(
+            title: AppStrings.studentQrErrorLoad,
+            onRetry: controller.refreshQr,
           );
         }
 
@@ -54,7 +45,7 @@ class StudentQrView extends GetView<StudentQrController> {
                   borderRadius: BorderRadius.circular(AppConstants.radiusXL),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -63,7 +54,7 @@ class StudentQrView extends GetView<StudentQrController> {
                 child: Column(
                   children: [
                     const Text(
-                      'MÃ ĐIỂM DANH',
+                      AppStrings.studentQrCodeLabel,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -87,18 +78,18 @@ class StudentQrView extends GetView<StudentQrController> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.school_outlined, size: 16, color: AppColors.onSurfaceVariant.withOpacity(0.6)),
+                          Icon(Icons.school_outlined, size: 16, color: AppColors.onSurfaceVariant.withValues(alpha: 0.6)),
                           const SizedBox(width: 4),
                           Text(
-                            'Lớp: ${controller.student.value!.classroomName ?? "Chưa gán"}',
+                            '${AppStrings.classLabel} ${controller.student.value!.classroomName ?? AppStrings.noClassAssigned}',
                             style: TextStyle(
                               fontSize: 15,
-                              color: AppColors.onSurfaceVariant.withOpacity(0.8),
+                              color: AppColors.onSurfaceVariant.withValues(alpha: 0.8),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                           const SizedBox(width: 16),
-                          Icon(Icons.cake_outlined, size: 16, color: AppColors.onSurfaceVariant.withOpacity(0.6)),
+                          Icon(Icons.cake_outlined, size: 16, color: AppColors.onSurfaceVariant.withValues(alpha: 0.6)),
                           const SizedBox(width: 4),
                           Text(
                             controller.student.value!.birthday != null 
@@ -106,7 +97,7 @@ class StudentQrView extends GetView<StudentQrController> {
                                 : '---',
                             style: TextStyle(
                               fontSize: 15,
-                              color: AppColors.onSurfaceVariant.withOpacity(0.8),
+                              color: AppColors.onSurfaceVariant.withValues(alpha: 0.8),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -131,10 +122,10 @@ class StudentQrView extends GetView<StudentQrController> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Dùng mã này để điểm danh khi đến trường',
+                      AppStrings.studentQrHint,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: AppColors.onSurfaceVariant.withOpacity(0.7),
+                        color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                     ),

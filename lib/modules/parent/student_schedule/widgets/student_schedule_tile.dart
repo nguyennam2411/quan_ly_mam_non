@@ -3,6 +3,7 @@ import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/data/repositories/schedule_repository.dart';
 import 'package:quan_ly_mam_non/global_widgets/dialogs/app_image_viewer.dart';
 import 'package:quan_ly_mam_non/global_widgets/video/youtube_player_widget.dart';
+import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 
 class StudentScheduleTile extends StatelessWidget {
   final ScheduleItem item;
@@ -92,7 +93,7 @@ class StudentScheduleTile extends StatelessWidget {
                       child: Divider(height: 1, thickness: 0.5),
                     ),
                     Text(
-                      'Bài học: ${lesson.title}',
+                      '${AppStrings.scheduleLessonPrefix} ${lesson.title}',
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 14,
@@ -102,7 +103,7 @@ class StudentScheduleTile extends StatelessWidget {
                     if (lesson.objectives != null && lesson.objectives!.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
-                        'Mục tiêu: ${lesson.objectives}',
+                        '${AppStrings.scheduleObjectivesPrefix} ${lesson.objectives}',
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey.shade600,
@@ -112,7 +113,7 @@ class StudentScheduleTile extends StatelessWidget {
                     if (lesson.content != null && lesson.content!.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Text(
-                        'Nội dung: ${lesson.content}',
+                        '${AppStrings.scheduleContentPrefix} ${lesson.content}',
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black54,

@@ -29,13 +29,13 @@ class AppEmptyState extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppConstants.paddingXXL),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.05),
+                color: AppColors.primary.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
                 size: 80,
-                color: AppColors.primary.withOpacity(0.5),
+                color: AppColors.primary.withValues(alpha: 0.5),
               ),
             ),
             AppConstants.spacingL,
@@ -54,7 +54,7 @@ class AppEmptyState extends StatelessWidget {
                 description!,
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.onSurfaceVariant.withOpacity(0.8),
+                  color: AppColors.onSurfaceVariant.withValues(alpha: 0.8),
                 ),
                 textAlign: TextAlign.center,
               ),

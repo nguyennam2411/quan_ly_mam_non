@@ -7,6 +7,7 @@ import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/charts/app_bar_chart.dart';
 import '../../../../global_widgets/charts/app_pie_chart.dart';
+import '../../../../global_widgets/dialogs/app_loading.dart';
 import '../controllers/attendance_statistic_controller.dart';
 
 class AttendanceStatisticView extends GetView<AttendanceStatisticController> {
@@ -16,10 +17,10 @@ class AttendanceStatisticView extends GetView<AttendanceStatisticController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const MainAppBar(title: 'Thống kê chuyên cần'),
+      appBar: const MainAppBar(title: AppStrings.statsAttendanceTitle),
       body: Obx(() {
         if (controller.isLoading.value && controller.monthlyRawData.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const AppLoading();
         }
 
         return RefreshIndicator(
@@ -135,7 +136,7 @@ class AttendanceStatisticView extends GetView<AttendanceStatisticController> {
         borderRadius: BorderRadius.circular(AppConstants.radiusL),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -151,7 +152,7 @@ class AttendanceStatisticView extends GetView<AttendanceStatisticController> {
       initialDate: controller.selectedMonth.value,
       firstDate: DateTime(2024),
       lastDate: DateTime.now(),
-      helpText: 'CHỌN THÁNG THỐNG KÊ',
+      helpText: AppStrings.statsMonthPickerHelp,
     );
     if (picked != null) {
       controller.changeMonth(picked);
@@ -164,7 +165,7 @@ class AttendanceStatisticView extends GetView<AttendanceStatisticController> {
       initialDate: controller.selectedWeek.value,
       firstDate: DateTime(2024),
       lastDate: DateTime.now(),
-      helpText: 'CHỌN TUẦN THỐNG KÊ',
+      helpText: AppStrings.statsWeekPickerHelp,
     );
     if (picked != null) {
       controller.changeWeek(picked);

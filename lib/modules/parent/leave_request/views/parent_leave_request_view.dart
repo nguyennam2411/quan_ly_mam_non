@@ -8,6 +8,8 @@ import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/headers/page_header.dart';
+import '../../../../global_widgets/headers/section_header.dart';
+import '../../../../global_widgets/dialogs/app_loading.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/leave_request/leave_request_filter_tabs.dart';
 import '../../../../global_widgets/leave_request/leave_request_card.dart';
@@ -22,22 +24,26 @@ class ParentLeaveRequestView extends GetView<ParentLeaveRequestController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: const MainAppBar(title: AppStrings.leaveRequestTitle),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const PageHeader(
-            title: AppStrings.leaveRequestTitle,
-            subtitle: AppStrings.leaveRequestSubtitle,
-          ),
-          _buildFilterAndSort(context),
-          const SizedBox(height: 16),
-          _buildSeparatorSection(context),
-          const SizedBox(height: 12),
-          Expanded(child: _buildRequestList(context)),
-        ],
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const PageHeader(
+              title: AppStrings.leaveRequestTitle,
+              subtitle: AppStrings.leaveRequestSubtitle,
+            ),
+            _buildFilterAndSort(context),
+            const SizedBox(height: 16),
+            _buildSeparatorSection(context),
+            const SizedBox(height: 12),
+            _buildRequestList(context),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          controller.resetForm();
           Get.toNamed(Routes.PARENT_CREATE_LEAVE_REQUEST);
         },
         backgroundColor: AppColors.primary,
@@ -58,36 +64,9 @@ class ParentLeaveRequestView extends GetView<ParentLeaveRequestController> {
   Widget _buildSeparatorSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Bên trái: Tiêu đề Danh sách đơn nghỉ 
-          Row(
-            children: [
-              Container(
-                width: 4.5,
-                height: 18,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(2.5),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'Danh sách đơn nghỉ',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.onBackground.withValues(alpha: 0.9),
-                  letterSpacing: -0.2,
-                ),
-              ),
-            ],
-          ),
-          
-          // Bên phải: Nút sắp xếp 
-          _buildSortButton(),
-        ],
+      child: SectionHeader(
+        title: AppStrings.leaveRequestListTitle,
+        trailing: _buildSortButton(),
       ),
     );
   }
@@ -129,19 +108,27 @@ class ParentLeaveRequestView extends GetView<ParentLeaveRequestController> {
   Widget _buildRequestList(BuildContext context) {
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 40.0),
+          child: AppLoading(),
+        );
       }
 
       final requests = controller.filteredRequests;
 
       if (requests.isEmpty) {
-        return const AppEmptyState(
-          title: AppStrings.leaveRequestNoData,
-          description: AppStrings.leaveRequestEmptyParent,
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 40.0),
+          child: AppEmptyState(
+            title: AppStrings.leaveRequestNoData,
+            description: AppStrings.leaveRequestEmptyParent,
+          ),
         );
       }
 
       return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
         itemCount: requests.length,
         itemBuilder: (context, index) {

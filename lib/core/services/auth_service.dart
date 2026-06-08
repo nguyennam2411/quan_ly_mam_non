@@ -4,6 +4,7 @@ import '../../routes/app_routes.dart';
 import '../values/app_database.dart';
 import '../values/user_role.dart';
 import 'parent_student_service.dart';
+import 'notification_service.dart';
 
 class AuthService extends GetxService {
   static AuthService get to => Get.find();
@@ -95,7 +96,9 @@ class AuthService extends GetxService {
     // MỚI: Tự động tải danh sách con nếu là Phụ huynh
     if (userRole.value == UserRole.parent) {
       try {
-        ParentStudentService.to.fetchStudents();
+        if (Get.isRegistered<ParentStudentService>()) {
+          ParentStudentService.to.fetchStudents();
+        }
       } catch (e) {
         print("Error fetching students: $e");
       }
@@ -130,11 +133,23 @@ class AuthService extends GetxService {
 
     // MỚI: Xóa thông tin con khi đăng xuất
     try {
-      ParentStudentService.to.clear();
+      if (Get.isRegistered<ParentStudentService>()) {
+        ParentStudentService.to.clear();
+      }
     } catch (_) {}
   }
 
   Future<void> signOut() async {
+    // 1. Xóa FCM Token của thiết bị này trên DB trước khi hủy session (để tránh lỗi RLS)
+    try {
+      if (Get.isRegistered<NotificationService>()) {
+        await NotificationService.to.clearTokenOnLogout();
+      }
+    } catch (e) {
+      Get.log("Error clearing token on logout: $e", isError: true);
+    }
+
+    // 2. Tiến hành đăng xuất khỏi Supabase
     await _supabase.auth.signOut();
     _clearUserData();
     Get.offAllNamed(Routes.LOGIN);

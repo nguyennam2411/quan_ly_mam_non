@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/utils/date_helper.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/date_helper.dart';
+import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 
 class HomeWelcomeHeader extends StatelessWidget {
   final String userName;
@@ -9,7 +10,7 @@ class HomeWelcomeHeader extends StatelessWidget {
   const HomeWelcomeHeader({
     super.key,
     required this.userName,
-    this.greeting = 'Xin chào,',
+    this.greeting = AppStrings.labelGreeting,
   });
 
   @override

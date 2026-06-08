@@ -7,10 +7,13 @@ import '../../../../core/utils/date_helper.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../routes/app_routes.dart';
-import '../../../../global_widgets/home/home_section_header.dart';
-import '../../../../global_widgets/home/quick_feature_card.dart';
-import '../../../../global_widgets/home/home_welcome_header.dart';
+import '../widgets/home_section_header.dart';
+import '../widgets/quick_feature_card.dart';
+import '../widgets/home_welcome_header.dart';
 import '../../../../global_widgets/buttons/action_pill_button.dart';
+import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/values/app_strings.dart';
 
 class ParentHomeView extends StatelessWidget {
   const ParentHomeView({super.key});
@@ -29,7 +32,7 @@ class ParentHomeView extends StatelessWidget {
             children: [
               // Welcome Header
               HomeWelcomeHeader(
-                userName: AuthService.to.userProfile[AppDatabase.colName] ?? "Phụ huynh học sinh",
+                userName: AuthService.to.userProfile[AppDatabase.colName] ?? AppStrings.labelParent,
               ),
               
               const SizedBox(height: 24),
@@ -52,7 +55,7 @@ class ParentHomeView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.08),
+                        color: AppColors.primary.withValues(alpha: 0.08),
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       ),
@@ -67,7 +70,7 @@ class ParentHomeView extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -84,11 +87,11 @@ class ParentHomeView extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: const Text(
-                              'THÔNG TIN BÉ',
+                              AppStrings.studentInfo,
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
@@ -104,12 +107,12 @@ class ParentHomeView extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(2),
                                 decoration: BoxDecoration(
-                                  color: AppColors.onPrimaryContainer.withOpacity(0.1),
+                                  color: AppColors.onPrimaryContainer.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: CircleAvatar(
                                   radius: 32,
-                                  backgroundColor: Colors.white.withOpacity(0.5),
+                                  backgroundColor: Colors.white.withValues(alpha: 0.5),
                                   backgroundImage: student.avatarUrl != null
                                       ? NetworkImage(student.avatarUrl!)
                                       : null,
@@ -142,7 +145,7 @@ class ParentHomeView extends StatelessWidget {
                                         Text(
                                           student.birthday != null
                                               ? DateHelper.formatDate(student.birthday!)
-                                              : 'Chưa cập nhật',
+                                              : AppStrings.notUpdated,
                                           style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
@@ -158,7 +161,7 @@ class ParentHomeView extends StatelessWidget {
                                             size: 16, color: AppColors.onPrimaryContainer),
                                         const SizedBox(width: 8),
                                         Text(
-                                          'Lớp: ${student.classroomName ?? "..."}',
+                                          '${AppStrings.classLabel} ${student.classroomName ?? "..."}',
                                           style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
@@ -179,7 +182,7 @@ class ParentHomeView extends StatelessWidget {
                               Expanded(
                                 child: ActionPillButton(
                                   icon: Icons.qr_code_rounded,
-                                  label: 'QR bé',
+                                  label: AppStrings.labelStudentQr,
                                   onTap: () => Get.toNamed(Routes.PARENT_STUDENT_QR, arguments: student.id),
                                 ),
                               ),
@@ -187,8 +190,13 @@ class ParentHomeView extends StatelessWidget {
                               Expanded(
                                 child: ActionPillButton(
                                   icon: Icons.person_pin_rounded,
-                                  label: 'Hồ sơ',
-                                  onTap: () {},
+                                  label: AppStrings.labelProfile,
+                                  onTap: () {
+                                    Get.toNamed(
+                                      Routes.PARENT_STUDENT_PROFILE_DETAIL,
+                                      arguments: student,
+                                    );
+                                  },
                                 ),
                               ),
                             ],
@@ -216,7 +224,7 @@ class ParentHomeView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Chọn con',
+          AppStrings.selectChild,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColors.onSurfaceVariant,
@@ -225,11 +233,11 @@ class ParentHomeView extends StatelessWidget {
         const SizedBox(height: 12),
         Obx(() {
           if (service.isLoading.value && service.students.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+            return const AppLoading(size: 24);
           }
 
           if (service.students.isEmpty) {
-            return const Text('Không tìm thấy thông tin học sinh');
+            return const Text(AppStrings.noStudentInfo);
           }
 
           return SizedBox(
@@ -255,13 +263,13 @@ class ParentHomeView extends StatelessWidget {
                         color: isSelected ? AppColors.primary : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.primary.withOpacity(0.1),
+                          color: isSelected ? AppColors.primary : AppColors.primary.withValues(alpha: 0.1),
                           width: 1.5,
                         ),
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.3),
+                                  color: AppColors.primary.withValues(alpha: 0.3),
                                   blurRadius: 8,
                                   offset: const Offset(0, 4),
                                 )
@@ -274,7 +282,7 @@ class ParentHomeView extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(1.5),
                             decoration: BoxDecoration(
-                              color: isSelected ? Colors.white.withOpacity(0.3) : AppColors.primary.withOpacity(0.1),
+                              color: isSelected ? Colors.white.withValues(alpha: 0.3) : AppColors.primary.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
                             child: CircleAvatar(
@@ -312,12 +320,25 @@ class ParentHomeView extends StatelessWidget {
     );
   }
 
+  void _runWithStudentGuard(ParentStudentService service, VoidCallback action) {
+    final student = service.selectedStudent.value;
+    if (student == null) {
+      AppDialogs.warning(message: AppStrings.errorNoStudentSelected);
+      return;
+    }
+    if (student.classroomId == null || student.classroomId!.isEmpty) {
+      AppDialogs.warning(message: AppStrings.errorStudentNoClass);
+      return;
+    }
+    action();
+  }
+
   Widget _buildFeatureSection(BuildContext context) {
     final studentService = ParentStudentService.to;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const HomeSectionHeader(title: 'Tiện ích hệ thống'),
+        const HomeSectionHeader(title: AppStrings.homeUtilities),
         const SizedBox(height: 16),
         GridView.count(
           shrinkWrap: true,
@@ -325,57 +346,77 @@ class ParentHomeView extends StatelessWidget {
           crossAxisCount: 4,
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
-          childAspectRatio: 0.75,
+          childAspectRatio: 0.8,
           children: [
             QuickFeatureCard(
               icon: Icons.schedule_rounded,
-              label: 'Sinh hoạt',
-              onTap: () => Get.toNamed(Routes.PARENT_STUDENT_SCHEDULE),
+              label: AppStrings.menuParentSchedule,
+              onTap: () => _runWithStudentGuard(
+                studentService,
+                () => Get.toNamed(Routes.PARENT_STUDENT_SCHEDULE),
+              ),
             ),
             QuickFeatureCard(
               icon: Icons.restaurant_rounded,
-              label: 'Thực đơn',
-              onTap: () {
-                final student = studentService.selectedStudent.value;
-                if (student != null) {
+              label: AppStrings.menuMeals,
+              onTap: () => _runWithStudentGuard(
+                studentService,
+                () {
+                  final student = studentService.selectedStudent.value!;
                   Get.toNamed(Routes.MEAL_PLAN, arguments: {
                     'gradeId': student.gradeId,
-                    'title': 'Thực đơn Khối ${student.gradeName}',
+                    'title': '${AppStrings.menuMeals} Khối ${student.gradeName}',
                   });
-                } else {
-                  Get.snackbar('Thông báo', 'Vui lòng chọn bé để xem thực đơn');
-                }
-              },
+                },
+              ),
             ),
             QuickFeatureCard(
               icon: Icons.assignment_ind_rounded,
-              label: 'Xin nghỉ',
-              onTap: () => Get.toNamed(Routes.PARENT_LEAVE_REQUEST),
+              label: AppStrings.menuLeaveRequest,
+              onTap: () => _runWithStudentGuard(
+                studentService,
+                () => Get.toNamed(Routes.PARENT_LEAVE_REQUEST),
+              ),
             ),
             QuickFeatureCard(
               icon: Icons.history_edu_rounded,
-              label: 'Nhật ký',
-              onTap: () => Get.toNamed(Routes.PARENT_ACTIVITY_LOG),
+              label: AppStrings.menuLog,
+              onTap: () => _runWithStudentGuard(
+                studentService,
+                () => Get.toNamed(Routes.PARENT_ACTIVITY_LOG),
+              ),
             ),
             QuickFeatureCard(
               icon: Icons.payment_rounded,
-              label: 'Học phí',
-              onTap: () => Get.toNamed(Routes.PARENT_INVOICE),
+              label: AppStrings.menuInvoice,
+              onTap: () => _runWithStudentGuard(
+                studentService,
+                () => Get.toNamed(Routes.PARENT_INVOICE),
+              ),
             ),
             QuickFeatureCard(
               icon: Icons.timeline_rounded,
-              label: 'Chuyên cần',
-              onTap: () => Get.toNamed(Routes.PARENT_ATTENDANCE_HISTORY),
+              label: AppStrings.menuAttendanceHistory,
+              onTap: () => _runWithStudentGuard(
+                studentService,
+                () => Get.toNamed(Routes.PARENT_ATTENDANCE_HISTORY),
+              ),
             ),
             QuickFeatureCard(
               icon: Icons.health_and_safety_rounded,
-              label: 'Sức khỏe',
-              onTap: () => Get.toNamed(Routes.PARENT_HEALTH),
+              label: AppStrings.menuHealth,
+              onTap: () => _runWithStudentGuard(
+                studentService,
+                () => Get.toNamed(Routes.PARENT_HEALTH),
+              ),
             ),
             QuickFeatureCard(
               icon: Icons.medication_rounded,
-              label: 'Dặn thuốc',
-              onTap: () => Get.toNamed(Routes.PARENT_MEDICATION_REQUEST),
+              label: AppStrings.menuMedication,
+              onTap: () => _runWithStudentGuard(
+                studentService,
+                () => Get.toNamed(Routes.PARENT_MEDICATION_REQUEST),
+              ),
             ),
           ],
         ),

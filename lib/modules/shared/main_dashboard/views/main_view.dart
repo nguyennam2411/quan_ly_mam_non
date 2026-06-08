@@ -29,9 +29,9 @@ const List<_NavItemData> _navItems = [
     label: AppStrings.tabHome,
   ),
   _NavItemData(
-    outlinedIcon: AppAssets.icChatOutlined,
-    filledIcon: AppAssets.icChatFilled,
-    label: AppStrings.tabMessage,
+    outlinedIcon: AppAssets.icEventOutlined,
+    filledIcon: AppAssets.icEventFilled,
+    label: AppStrings.tabEvent,
   ),
   _NavItemData(
     outlinedIcon: AppAssets.icNotificationOutlined,

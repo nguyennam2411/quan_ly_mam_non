@@ -6,6 +6,7 @@ import '../../../../core/values/app_constants.dart';
 import '../../../../data/models/notification_model.dart';
 import 'notification_ui_extension.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
+import '../../../../core/values/app_strings.dart';
 
 class NotificationDetailDialog extends StatelessWidget {
   final NotificationModel item;
@@ -105,7 +106,7 @@ class NotificationDetailDialog extends StatelessWidget {
           
           // Action Button
           PrimaryButton(
-            text: 'Đóng',
+            text: AppStrings.labelClose,
             onPressed: () => Get.back(),
           ),
         ],

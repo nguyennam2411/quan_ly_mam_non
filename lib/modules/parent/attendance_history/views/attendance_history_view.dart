@@ -7,6 +7,9 @@ import '../../../../../core/values/app_database.dart';
 import '../../../../../core/values/app_strings.dart';
 import '../../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../../global_widgets/headers/page_header.dart';
+import '../../../../../global_widgets/headers/section_header.dart';
+import '../../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../../global_widgets/state/app_empty_state.dart';
 import '../controllers/attendance_history_controller.dart';
 
 class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
@@ -31,7 +34,7 @@ class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return const AppLoading();
               }
 
               if (controller.filteredAbsentList.isEmpty) {
@@ -64,21 +67,21 @@ class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
           physics: const BouncingScrollPhysics(),
           children: [
             _buildFilterChip(
-              label: 'Tất cả',
+              label: AppStrings.leaveStatusAll,
               count: controller.absentList.length,
               isSelected: controller.selectedFilter.value == AttendanceHistoryFilter.all,
               onTap: () => controller.selectedFilter.value = AttendanceHistoryFilter.all,
             ),
             const SizedBox(width: 8),
             _buildFilterChip(
-              label: 'Có phép',
+              label: AppStrings.attendanceHistoryExcused,
               count: controller.totalExcused.value,
               isSelected: controller.selectedFilter.value == AttendanceHistoryFilter.excused,
               onTap: () => controller.selectedFilter.value = AttendanceHistoryFilter.excused,
             ),
             const SizedBox(width: 8),
             _buildFilterChip(
-              label: 'Không phép',
+              label: AppStrings.attendanceHistoryUnexcused,
               count: controller.totalUnexcused.value,
               isSelected: controller.selectedFilter.value == AttendanceHistoryFilter.unexcused,
               onTap: () => controller.selectedFilter.value = AttendanceHistoryFilter.unexcused,
@@ -152,28 +155,7 @@ class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
   Widget _buildSeparatorSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
-      child: Row(
-        children: [
-          Container(
-            width: 4.5,
-            height: 18,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(2.5),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            'Danh sách vắng mặt',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.onBackground.withValues(alpha: 0.9),
-              letterSpacing: -0.2,
-            ),
-          ),
-        ],
-      ),
+      child: const SectionHeader(title: AppStrings.attendanceHistoryAbsentList),
     );
   }
 
@@ -188,7 +170,7 @@ class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppConstants.radiusL),
         border: Border.all(
-          color: (isExcused ? AppColors.warning : AppColors.error).withOpacity(0.2),
+          color: (isExcused ? AppColors.warning : AppColors.error).withValues(alpha: 0.2),
         ),
       ),
       child: ListTile(
@@ -196,7 +178,7 @@ class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: (isExcused ? AppColors.warning : AppColors.error).withOpacity(0.1),
+            color: (isExcused ? AppColors.warning : AppColors.error).withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -215,11 +197,11 @@ class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: (isExcused ? AppColors.warning : AppColors.error).withOpacity(0.1),
+                color: (isExcused ? AppColors.warning : AppColors.error).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
-                isExcused ? 'Vắng có phép' : 'Vắng không phép',
+                isExcused ? AppStrings.attendanceHistoryAbsentExcused : AppStrings.attendanceHistoryAbsentUnexcused,
                 style: TextStyle(
                   fontSize: 11,
                   color: isExcused ? AppColors.warning : AppColors.error,
@@ -233,7 +215,7 @@ class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
                 item.note!,
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.onSurface.withOpacity(0.7),
+                  color: AppColors.onSurface.withValues(alpha: 0.7),
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -245,27 +227,10 @@ class AttendanceHistoryView extends GetView<AttendanceHistoryController> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.verified_user_rounded, size: 80, color: AppColors.success.withOpacity(0.2)),
-          AppConstants.spacingM,
-          Text(
-            'Chưa có ngày vắng mặt',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Bé đi học rất chuyên cần!',
-            style: TextStyle(color: AppColors.outline),
-          ),
-        ],
-      ),
+    return const AppEmptyState(
+      title: AppStrings.attendanceHistoryEmptyTitle,
+      description: AppStrings.attendanceHistoryEmptyDesc,
+      icon: Icons.verified_user_rounded,
     );
   }
 }

@@ -58,6 +58,25 @@ class ParentMedicationRequestController extends GetxController {
     return list;
   }
 
+  Map<String, int> get statusCounts {
+    final currentStudent = ParentStudentService.to.selectedStudent.value;
+    final relevantRequests = medicationRequests.where((r) {
+      if (currentStudent != null && r.studentId != currentStudent.id) return false;
+      return true;
+    }).toList();
+
+    int pendingCount = relevantRequests.where((r) => r.status == AppDatabase.pending).length;
+    int completedCount = relevantRequests.where((r) => r.status == AppDatabase.completed).length;
+    int medicalCount = relevantRequests.where((r) => r.status == AppDatabase.rejected).length;
+
+    return {
+      AppStrings.leaveStatusAll: relevantRequests.length,
+      AppStrings.medicationStatusPending: pendingCount,
+      AppStrings.medicationStatusCompleted: completedCount,
+      AppStrings.medicationStatusMedical: medicalCount,
+    };
+  }
+
   String _mapLabelToStatus(String label) {
     if (label == AppStrings.medicationStatusPending) return AppDatabase.pending;
     if (label == AppStrings.medicationStatusCompleted) return AppDatabase.completed;

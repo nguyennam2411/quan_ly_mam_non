@@ -9,8 +9,6 @@ import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/values/app_strings.dart';
 import 'routes/app_pages.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 Future<void> main() async {
   // 1. Phải có ensureInitialized vì chúng ta gọi Native Code (Supabase) trước runApp
@@ -19,11 +17,6 @@ Future<void> main() async {
 
   // 2. Load biến môi trường từ .env
   await dotenv.load(fileName: ".env");
-
-  // 3. Khởi tạo Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   // 4. Khởi tạo Supabase Service bằng GetX
   await Get.putAsync(() => SupabaseService().init());

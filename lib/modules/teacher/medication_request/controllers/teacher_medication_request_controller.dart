@@ -59,6 +59,25 @@ class TeacherMedicationRequestController extends GetxController {
     return list;
   }
 
+  Map<String, int> get statusCounts {
+    final relevantRequests = allRequests.where((r) {
+      if (r.student == null) return false;
+      if (r.status == AppDatabase.cancelled) return false;
+      return true;
+    }).toList();
+
+    int pendingCount = relevantRequests.where((r) => r.status == AppDatabase.pending).length;
+    int completedCount = relevantRequests.where((r) => r.status == AppDatabase.completed).length;
+    int medicalCount = relevantRequests.where((r) => r.status == AppDatabase.rejected).length;
+
+    return {
+      AppStrings.leaveStatusAll: relevantRequests.length,
+      AppStrings.medicationStatusPending: pendingCount,
+      AppStrings.medicationStatusCompleted: completedCount,
+      AppStrings.medicationStatusMedical: medicalCount,
+    };
+  }
+
   String _mapLabelToStatus(String label) {
     if (label == AppStrings.medicationStatusPending) return AppDatabase.pending;
     if (label == AppStrings.medicationStatusCompleted) return AppDatabase.completed;

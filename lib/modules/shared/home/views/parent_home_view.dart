@@ -346,7 +346,7 @@ class ParentHomeView extends StatelessWidget {
           crossAxisCount: 4,
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
-          childAspectRatio: 0.8,
+          childAspectRatio: 0.72,
           children: [
             QuickFeatureCard(
               icon: Icons.schedule_rounded,

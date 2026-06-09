@@ -123,6 +123,7 @@ class ParentMedicationRequestView extends GetView<ParentMedicationRequestControl
   Widget _buildStatusChip(String label) {
     final isSelected = controller.selectedStatus.value == label;
     final activeColor = AppColors.primary;
+    final count = controller.statusCounts[label];
 
     return InkWell(
       onTap: () => controller.selectedStatus.value = label,
@@ -137,13 +138,42 @@ class ParentMedicationRequestView extends GetView<ParentMedicationRequestControl
             width: 1.2,
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? activeColor : AppColors.onBackground.withValues(alpha: 0.7),
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            fontSize: 13,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? activeColor : AppColors.onBackground.withValues(alpha: 0.7),
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                fontSize: 13,
+              ),
+            ),
+            if (count != null) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.all(2),
+                constraints: const BoxConstraints(
+                  minWidth: 18,
+                  minHeight: 18,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected ? activeColor : AppColors.outlineVariant.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    '$count',
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : AppColors.outline,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );

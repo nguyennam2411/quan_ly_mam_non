@@ -1,4 +1,6 @@
 // lib/data/repositories/notification_repository.dart
+import 'package:uuid/uuid.dart';
+import '../../../core/values/app_database.dart';
 import '../models/notification_model.dart';
 import '../providers/notification_provider.dart';
 
@@ -11,6 +13,27 @@ class NotificationRepository {
     return (response as List)
         .map((item) => NotificationModel.fromJson(item))
         .toList();
+  }
+
+  // Tạo thông báo mới
+  Future<void> createNotification({
+    required String userId,
+    required String title,
+    required String content,
+    String? type,
+    String? referenceId,
+  }) async {
+    final data = {
+      AppDatabase.colId: const Uuid().v4(),
+      AppDatabase.colUserId: userId,
+      AppDatabase.colTitle: title,
+      AppDatabase.colContent: content,
+      if (type != null) AppDatabase.colType: type,
+      if (referenceId != null) AppDatabase.colReferenceId: referenceId,
+      AppDatabase.colCreatedAt: DateTime.now().toUtc().toIso8601String(),
+      AppDatabase.colIsRead: false,
+    };
+    await _provider.createNotification(data);
   }
 
   // Đánh dấu đã đọc

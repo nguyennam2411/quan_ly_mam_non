@@ -11,7 +11,7 @@ import '../../../../global_widgets/headers/page_header.dart';
 import '../../../../global_widgets/headers/section_header.dart';
 import '../../../../global_widgets/dialogs/app_loading.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
-import '../../../../global_widgets/leave_request/leave_request_filter_tabs.dart';
+import '../../../../global_widgets/chips/filter_tabs.dart';
 import '../../../../global_widgets/leave_request/leave_request_card.dart';
 import '../controllers/parent_leave_request_controller.dart';
 import 'parent_leave_request_detail.dart';
@@ -53,7 +53,16 @@ class ParentLeaveRequestView extends GetView<ParentLeaveRequestController> {
   }
   
   Widget _buildFilterAndSort(BuildContext context) {
-    return Obx(() => LeaveRequestFilterTabs(
+    final statuses = [
+      AppStrings.leaveStatusAll,
+      AppStrings.leaveStatusPending,
+      AppStrings.leaveStatusApproved,
+      AppStrings.leaveStatusRejected,
+      AppStrings.leaveStatusCancelled,
+    ];
+
+    return Obx(() => FilterTabs(
+      statuses: statuses,
       selectedStatus: controller.selectedStatus.value,
       onStatusChanged: (status) => controller.selectedStatus.value = status,
       statusCounts: controller.statusCounts,

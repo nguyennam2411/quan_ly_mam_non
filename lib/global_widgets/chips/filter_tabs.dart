@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/values/app_constants.dart';
-import '../../core/values/app_strings.dart';
 
-class LeaveRequestFilterTabs extends StatelessWidget {
+class FilterTabs extends StatelessWidget {
+  final List<String> statuses;
   final String selectedStatus;
   final Function(String) onStatusChanged;
   final Map<String, int>? statusCounts; // Optional mapping of status label -> count
   final EdgeInsetsGeometry? padding;
 
-  const LeaveRequestFilterTabs({
+  const FilterTabs({
     super.key,
+    required this.statuses,
     required this.selectedStatus,
     required this.onStatusChanged,
     this.statusCounts,
@@ -19,14 +19,6 @@ class LeaveRequestFilterTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statuses = [
-      AppStrings.leaveStatusAll,
-      AppStrings.leaveStatusPending,
-      AppStrings.leaveStatusApproved,
-      AppStrings.leaveStatusRejected,
-      AppStrings.leaveStatusCancelled,
-    ];
-
     return SizedBox(
       height: 36,
       child: ListView.separated(

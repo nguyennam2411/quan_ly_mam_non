@@ -11,7 +11,7 @@ import '../../../../global_widgets/headers/section_header.dart';
 import '../../../../global_widgets/inputs/app_search_bar.dart';
 import '../../../../global_widgets/dialogs/app_loading.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
-import '../../../../global_widgets/leave_request/leave_request_filter_tabs.dart';
+import '../../../../global_widgets/chips/filter_tabs.dart';
 import '../../../../global_widgets/leave_request/leave_request_card.dart';
 import '../controllers/teacher_leave_request_controller.dart';
 import 'leave_request_detail_modal.dart';
@@ -64,12 +64,22 @@ class TeacherLeaveRequestView extends GetView<TeacherLeaveRequestController> {
         AppConstants.spacingM,
         
         // 2. Bộ lọc trạng thái 
-        Obx(() => LeaveRequestFilterTabs(
-          selectedStatus: controller.selectedStatus.value,
-          onStatusChanged: (status) => controller.selectedStatus.value = status,
-          statusCounts: controller.statusCounts,
-          padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
-        )),
+        Obx(() {
+          final statuses = [
+            AppStrings.leaveStatusAll,
+            AppStrings.leaveStatusPending,
+            AppStrings.leaveStatusApproved,
+            AppStrings.leaveStatusRejected,
+            AppStrings.leaveStatusCancelled,
+          ];
+          return FilterTabs(
+            statuses: statuses,
+            selectedStatus: controller.selectedStatus.value,
+            onStatusChanged: (status) => controller.selectedStatus.value = status,
+            statusCounts: controller.statusCounts,
+            padding: const EdgeInsets.symmetric(horizontal: AppConstants.horizontalPadding),
+          );
+        }),
       ],
     );
   }

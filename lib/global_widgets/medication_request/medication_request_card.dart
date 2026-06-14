@@ -4,15 +4,15 @@ import '../../core/theme/app_colors.dart';
 import '../../core/values/app_constants.dart';
 import '../../core/values/app_database.dart';
 import '../../core/values/app_strings.dart';
-import '../../data/models/leave_request_model.dart';
-import '../../global_widgets/chips/status_badge.dart';
+import '../../data/models/medication_request_model.dart';
+import '../chips/status_badge.dart';
 
-class AppLeaveRequestCard extends StatelessWidget {
-  final LeaveRequestModel request;
+class AppMedicationRequestCard extends StatelessWidget {
+  final MedicationRequestModel request;
   final Widget? actions;
   final VoidCallback? onDetail;
 
-  const AppLeaveRequestCard({
+  const AppMedicationRequestCard({
     super.key,
     required this.request,
     this.actions,
@@ -40,7 +40,7 @@ class AppLeaveRequestCard extends StatelessWidget {
         children: [
           _buildHeader(context),
           AppConstants.spacingM,
-          _buildReason(context),
+          _buildMedicationDetails(context),
           AppConstants.spacingM,
           _buildActionsRow(context),
         ],
@@ -51,7 +51,7 @@ class AppLeaveRequestCard extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     final student = request.student;
     final createdAt = request.createdAt ?? DateTime.now();
-    
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -67,7 +67,7 @@ class AppLeaveRequestCard extends StatelessWidget {
               : null,
         ),
         const SizedBox(width: AppConstants.paddingM),
-        
+
         // Info
         Expanded(
           child: Column(
@@ -76,18 +76,23 @@ class AppLeaveRequestCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    student?.name ?? AppStrings.unknownLabel,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      student?.name ?? AppStrings.unknownLabel,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 8),
                   _buildStatusBadge(),
                 ],
               ),
               AppConstants.spacingXXS,
               Text(
-                '${AppStrings.leaveRequestSentAt} ${DateFormat('HH:mm - dd/MM/yyyy').format(createdAt.toLocal())}',
+                'Đã gửi lúc: ${DateFormat('HH:mm - dd/MM/yyyy').format(createdAt.toLocal())}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.outline,
                 ),
@@ -98,7 +103,7 @@ class AppLeaveRequestCard extends StatelessWidget {
                   Icon(Icons.calendar_today_rounded, size: 16, color: AppColors.primary),
                   const SizedBox(width: AppConstants.paddingS),
                   Text(
-                    _formatLeaveDates(),
+                    _formatMedicationDate(),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
@@ -116,19 +121,19 @@ class AppLeaveRequestCard extends StatelessWidget {
   Widget _buildStatusBadge() {
     Color color;
     String text;
-    
+
     switch (request.status) {
       case AppDatabase.pending:
         color = AppColors.warning;
-        text = AppStrings.leaveStatusPending;
+        text = AppStrings.medicationStatusPending;
         break;
-      case AppDatabase.approved:
+      case AppDatabase.completed:
         color = AppColors.success;
-        text = AppStrings.leaveStatusApproved;
+        text = AppStrings.medicationStatusCompleted;
         break;
       case AppDatabase.rejected:
         color = AppColors.error;
-        text = AppStrings.leaveStatusRejected;
+        text = AppStrings.medicationStatusMedical;
         break;
       case AppDatabase.cancelled:
       default:
@@ -143,24 +148,71 @@ class AppLeaveRequestCard extends StatelessWidget {
     );
   }
 
-  Widget _buildReason(BuildContext context) {
-    return Row(
+  Widget _buildMedicationDetails(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '${AppStrings.leaveRequestReasonLabel}: ',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Expanded(
-          child: Text(
-            request.reason,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.onSurfaceVariant,
+        Row(
+          children: [
+            Text(
+              'Tên thuốc: ',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+            Expanded(
+              child: Text(
+                request.medicineName,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Text(
+              'Liều lượng: ',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Expanded(
+              child: Text(
+                request.dosage,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Text(
+              'Giờ uống: ',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Expanded(
+              child: Text(
+                request.time,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -170,9 +222,7 @@ class AppLeaveRequestCard extends StatelessWidget {
     return Row(
       children: [
         if (actions != null) actions!,
-        
         const Spacer(),
-        
         TextButton(
           onPressed: onDetail,
           style: TextButton.styleFrom(
@@ -182,7 +232,7 @@ class AppLeaveRequestCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                AppStrings.leaveRequestDetail,
+                'Chi tiết',
                 style: TextStyle(
                   color: AppColors.primary,
                   fontWeight: FontWeight.bold,
@@ -198,18 +248,12 @@ class AppLeaveRequestCard extends StatelessWidget {
     );
   }
 
-  String _formatLeaveDates() {
+  String _formatMedicationDate() {
     try {
-      final start = DateTime.parse(request.startDate);
-      final end = DateTime.parse(request.endDate);
-      
-      if (start == end) {
-        return DateFormat('EEEE, dd/MM/yyyy', 'vi_VN').format(start);
-      } else {
-        return '${DateFormat('dd/MM').format(start)} - ${DateFormat('dd/MM/yyyy').format(end)}';
-      }
+      final parsed = DateTime.parse(request.date);
+      return DateFormat('EEEE, dd/MM/yyyy', 'vi_VN').format(parsed);
     } catch (e) {
-      return '${request.startDate} - ${request.endDate}';
+      return request.date;
     }
   }
 }

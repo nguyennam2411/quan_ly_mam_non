@@ -343,6 +343,148 @@ Deno.serve(async (req) => {
         );
       }
     }
+
+    if (table === "medication_requests") {
+      const studentId = record.student_id;
+      console.log(`FCM Edge Function: medication_requests event for studentId: ${studentId}`);
+
+      // A. Phụ huynh nộp đơn dặn thuốc mới (INSERT) -> Gửi thông báo cho Giáo viên
+      if (type === "INSERT") {
+        console.log(`FCM Edge Function: Handle INSERT. Fetching student classroom and name...`);
+        const { data: student, error: studentErr } = await supabaseAdmin
+          .from("students")
+          .select("classroom_id, name")
+          .eq("id", studentId)
+          .single();
+
+        if (studentErr || !student) {
+          console.error("FCM trigger: Error fetching student data:", studentErr);
+          return new Response(
+            JSON.stringify({ success: false, error: "Student not found" }),
+            { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+          );
+        }
+
+        const classroomId = student.classroom_id;
+        console.log(`FCM Edge Function: Student name: ${student.name}, classroomId: ${classroomId}`);
+        if (!classroomId) {
+          return new Response(
+            JSON.stringify({ success: true, message: "Student has no classroom assigned" }),
+            { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+          );
+        }
+
+        // Lấy giáo viên quản lý lớp học đó
+        const { data: classroom, error: classErr } = await supabaseAdmin
+          .from("classrooms")
+          .select("teacher_id")
+          .eq("id", classroomId)
+          .single();
+
+        if (classErr || !classroom || !classroom.teacher_id) {
+          console.error("FCM trigger: Error fetching teacher_id for classroom:", classErr);
+          return new Response(
+            JSON.stringify({ success: false, error: "Teacher not found for classroom" }),
+            { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+          );
+        }
+
+        // Lấy danh sách FCM Token của Giáo viên
+        const { data: devices, error: deviceErr } = await supabaseAdmin
+          .from("user_devices")
+          .select("fcm_token")
+          .eq("user_id", classroom.teacher_id);
+
+        if (deviceErr) {
+          return new Response(
+            JSON.stringify({ success: false, error: deviceErr.message }),
+            { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+          );
+        }
+
+        const tokens = devices?.map((d: any) => d.fcm_token) || [];
+        if (tokens.length > 0) {
+          const results = await sendToTokens(
+            accessToken,
+            projectId,
+            tokens,
+            "Đơn dặn thuốc mới 💊",
+            `Phụ huynh bé ${student.name} vừa gửi đơn dặn thuốc mới.`,
+            { type: "medication_request", reference_id: record.id }
+          );
+          return new Response(
+            JSON.stringify({ success: true, message: "Medication request notification sent to teacher", results }),
+            { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+          );
+        }
+        return new Response(
+          JSON.stringify({ success: true, message: "Teacher has no registered devices" }),
+          { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+        );
+      }
+
+      // B. Giáo viên cập nhật đơn dặn thuốc (UPDATE trạng thái) -> Gửi thông báo cho Phụ huynh
+      if (type === "UPDATE" && old_record && record.status !== old_record.status) {
+        // Chỉ xử lý nếu trạng thái được thay đổi thành APPROVED hoặc REJECTED
+        if (record.status === "APPROVED" || record.status === "REJECTED") {
+          const { data: student, error: studentErr } = await supabaseAdmin
+            .from("students")
+            .select("name, parent_id")
+            .eq("id", studentId)
+            .single();
+
+          if (studentErr || !student || !student.parent_id) {
+            return new Response(
+              JSON.stringify({ success: false, error: "Student or parent not found" }),
+              { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+            );
+          }
+
+          const { data: devices, error: deviceErr } = await supabaseAdmin
+            .from("user_devices")
+            .select("fcm_token")
+            .eq("user_id", student.parent_id);
+
+          if (deviceErr) {
+            return new Response(
+              JSON.stringify({ success: false, error: deviceErr.message }),
+              { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+            );
+          }
+
+          const tokens = devices?.map((d: any) => d.fcm_token) || [];
+          if (tokens.length > 0) {
+            let bodyText = `Đơn dặn thuốc của bé ${student.name} đã được cập nhật trạng thái thành ${record.status}.`;
+            let titleText = "Cập nhật Đơn dặn thuốc 💊";
+
+            if (record.status === "APPROVED") {
+              titleText = "Đã uống thuốc thành công 💊";
+              bodyText = `Cô giáo đã cho bé ${student.name} uống thuốc thành công.`;
+            } else if (record.status === "REJECTED") {
+              titleText = "Chuyển Phòng Y Tế 🏥";
+              bodyText = `Bé ${student.name} đã được chuyển xuống phòng Y tế.`;
+            }
+
+            const results = await sendToTokens(
+              accessToken,
+              projectId,
+              tokens,
+              titleText,
+              bodyText,
+              { type: "medication_request", reference_id: record.id }
+            );
+            return new Response(
+              JSON.stringify({ success: true, message: "Medication status update notification sent to parent", results }),
+              { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+            );
+          }
+          return new Response(
+            JSON.stringify({ success: true, message: "Parent has no registered devices" }),
+            { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+          );
+        }
+      }
+    }
   }
 
   if (table === "attendance") {

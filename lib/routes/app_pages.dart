@@ -78,6 +78,12 @@ import '../modules/parent/student_qr/views/student_qr_view.dart';
 import '../modules/parent/student_profile/bindings/student_profile_binding.dart';
 import '../modules/parent/student_profile/views/student_profile_detail_view.dart';
 
+// Talent Classes
+import '../modules/shared/talent_classes/bindings/teacher_talent_binding.dart';
+import '../modules/shared/talent_classes/views/teacher_talent_view.dart';
+import '../modules/shared/talent_classes/bindings/parent_talent_binding.dart';
+import '../modules/shared/talent_classes/views/parent_talent_view.dart';
+
 class AppPages {
   // Màn hình khởi đầu khi mở App
   static const INITIAL = Routes.SPLASH;
@@ -276,6 +282,18 @@ class AppPages {
       name: Routes.PARENT_STUDENT_PROFILE_DETAIL,
       page: () => const StudentProfileDetailView(),
       binding: StudentProfileBinding(),
+    ),
+
+    // 19. Talent Classes
+    GetPage(
+      name: Routes.TEACHER_TALENT,
+      page: () => const TeacherTalentView(),
+      binding: TeacherTalentBinding(),
+    ),
+    GetPage(
+      name: Routes.PARENT_TALENT,
+      page: () => const ParentTalentView(),
+      binding: ParentTalentBinding(),
     ),
   ];
 }

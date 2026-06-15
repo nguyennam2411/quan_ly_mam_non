@@ -110,6 +110,13 @@ class TeacherHomeView extends GetView<TeacherHomeController> {
                       () => Get.toNamed(Routes.TEACHER_HEALTH),
                     ),
                   ),
+                  QuickFeatureCard(
+                    icon: Icons.star_rounded,
+                    label: 'Năng khiếu',
+                    onTap: () => _runWithClassroomGuard(
+                      () => Get.toNamed(Routes.TEACHER_TALENT),
+                    ),
+                  ),
                 ],
               ),
             ],

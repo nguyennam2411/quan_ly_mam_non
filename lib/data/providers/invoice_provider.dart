@@ -57,6 +57,77 @@ class InvoiceProvider {
         .eq(AppDatabase.colId, invoiceId);
   }
 
+  // Cập nhật hóa đơn khi Phụ huynh đăng ký Năng khiếu
+  Future<void> addTalentFeeToCurrentInvoice(String studentId, String className, int fee) async {
+    final now = DateTime.now();
+    // Tìm hóa đơn chưa thanh toán của tháng hiện tại
+    final response = await _client
+        .from(AppDatabase.tableInvoices)
+        .select()
+        .eq(AppDatabase.colStudentId, studentId)
+        .eq(AppDatabase.colStatus, AppDatabase.invoiceStatusUnpaid)
+        .eq(AppDatabase.colMonth, now.month)
+        .eq(AppDatabase.colYear, now.year)
+        .maybeSingle();
+
+    if (response != null) {
+      List<dynamic> items = List.from(response[AppDatabase.colItems] ?? []);
+      double totalAmount = (response[AppDatabase.colTotalAmount] ?? 0).toDouble();
+
+      // Thêm khoản phí năng khiếu
+      items.add({
+        'group': 'talent',
+        'type': 'addition',
+        'name': 'Năng khiếu: $className',
+        'amount': fee,
+      });
+      totalAmount += fee;
+
+      // Cập nhật lại hóa đơn
+      await _client
+          .from(AppDatabase.tableInvoices)
+          .update({
+            AppDatabase.colItems: items,
+            AppDatabase.colTotalAmount: totalAmount,
+          })
+          .eq(AppDatabase.colId, response[AppDatabase.colId]);
+    }
+  }
+
+  // Cập nhật hóa đơn khi Phụ huynh HỦY Năng khiếu
+  Future<void> removeTalentFeeFromCurrentInvoice(String studentId, String className, int fee) async {
+    final now = DateTime.now();
+    final response = await _client
+        .from(AppDatabase.tableInvoices)
+        .select()
+        .eq(AppDatabase.colStudentId, studentId)
+        .eq(AppDatabase.colStatus, AppDatabase.invoiceStatusUnpaid)
+        .eq(AppDatabase.colMonth, now.month)
+        .eq(AppDatabase.colYear, now.year)
+        .maybeSingle();
+
+    if (response != null) {
+      List<dynamic> items = List.from(response[AppDatabase.colItems] ?? []);
+      double totalAmount = (response[AppDatabase.colTotalAmount] ?? 0).toDouble();
+
+      final targetName = 'Năng khiếu: $className';
+      final itemIndex = items.indexWhere((item) => item['name'] == targetName);
+
+      if (itemIndex != -1) {
+        items.removeAt(itemIndex);
+        totalAmount -= fee;
+
+        await _client
+            .from(AppDatabase.tableInvoices)
+            .update({
+              AppDatabase.colItems: items,
+              AppDatabase.colTotalAmount: totalAmount,
+            })
+            .eq(AppDatabase.colId, response[AppDatabase.colId]);
+      }
+    }
+  }
+
   // Lấy tổng số ngày nghỉ có phép của 1 bé trong khoảng thời gian
   Future<int> countExcusedAbsences(String studentId, String startDate, String endDate) async {
     final response = await _client

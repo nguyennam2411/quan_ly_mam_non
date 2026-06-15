@@ -13,6 +13,8 @@ import '../../../../data/providers/profile_provider.dart';
 import '../../../../data/repositories/profile_repository.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../controllers/main_controller.dart';
+import '../../../../data/repositories/event_repository.dart';
+import '../../events/controllers/event_controller.dart';
 
 class MainBinding extends Bindings {
   @override
@@ -23,6 +25,10 @@ class MainBinding extends Bindings {
       () => ProfileController(ProfileRepository(ProfileProvider())),
       fenix: true,
     );
+
+    // Sự kiện & Ngoại khóa
+    Get.lazyPut<EventRepository>(() => EventRepository(), fenix: true);
+    Get.lazyPut<EventController>(() => EventController(Get.find()), fenix: true);
 
     // Nếu người dùng là phụ huynh, khởi tạo ParentStudentService để quản lý học sinh
     if (UserRole.isParent(AuthService.to.userRole.value)) {

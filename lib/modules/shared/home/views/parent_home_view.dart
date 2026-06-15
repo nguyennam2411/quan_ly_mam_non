@@ -418,6 +418,14 @@ class ParentHomeView extends StatelessWidget {
                 () => Get.toNamed(Routes.PARENT_MEDICATION_REQUEST),
               ),
             ),
+            QuickFeatureCard(
+              icon: Icons.star_rounded,
+              label: 'Năng khiếu',
+              onTap: () => _runWithStudentGuard(
+                studentService,
+                () => Get.toNamed(Routes.PARENT_TALENT),
+              ),
+            ),
           ],
         ),
       ],

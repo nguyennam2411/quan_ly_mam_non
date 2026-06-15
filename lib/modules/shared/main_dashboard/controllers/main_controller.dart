@@ -8,6 +8,7 @@ import 'package:quan_ly_mam_non/modules/shared/home/views/parent_home_view.dart'
 import 'package:quan_ly_mam_non/modules/shared/home/views/teacher_home_view.dart';
 import 'package:quan_ly_mam_non/modules/shared/notifications/views/notification_view.dart';
 
+import 'package:quan_ly_mam_non/modules/shared/events/views/event_view.dart';
 import 'package:quan_ly_mam_non/global_widgets/dialogs/app_loading.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 
@@ -22,14 +23,14 @@ class MainController extends GetxController {
     if (UserRole.isTeacher(role)) {
       return [
         const TeacherHomeView(), 
-        const SizedBox(), 
+        const EventView(), 
         const NotificationView(), 
         const TeacherProfileView()
       ];
     } else if (UserRole.isParent(role)) {
       return [
         const ParentHomeView(), 
-        const SizedBox(), 
+        const EventView(), 
         const NotificationView(), 
         const ParentProfileView()
       ];
@@ -38,7 +39,7 @@ class MainController extends GetxController {
         const Scaffold(
           body: AppLoading(),
         ),
-        const SizedBox(), 
+        const EventView(), 
         const NotificationView(), 
         const Scaffold(
           body: Center(

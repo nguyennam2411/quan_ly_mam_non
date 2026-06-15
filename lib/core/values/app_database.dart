@@ -149,4 +149,29 @@ class AppDatabase {
   static const String colAttachmentUrl = 'attachment_url';
   static const String colPreparation = 'preparation';
   static const String colProcedures = 'procedures';
+
+  // --- Talent Classes (Năng khiếu) ---
+  static const String tableTalentClasses = 'talent_classes';
+  static const String tableTalentEnrollments = 'talent_enrollments';
+  static const String tableTalentAttendance = 'talent_attendance';
+  static const String colFeePerMonth = 'fee_per_month';
+  static const String colScheduleInfo = 'schedule_info';
+  static const String colTalentClassId = 'talent_class_id';
+  static const String colRegisteredAt = 'registered_at';
+
+  // --- Events (Sự kiện / Ngoại khóa) ---
+  static const String tableEvents = 'events';
+  static const String tableEventRegistrations = 'event_registrations';
+  static const String colDeadlineDate = 'deadline_date';
+  static const String colLocation = 'location';
+  static const String colFee = 'fee';
+  static const String colEventId = 'event_id';
+
+  // --- Event/Talent Status ---
+  static const String statusActive = 'ACTIVE';
+  static const String statusInactive = 'INACTIVE';
+  static const String statusUpcoming = 'UPCOMING';
+  static const String statusOngoing = 'ONGOING';
+  static const String statusRegistered = 'REGISTERED';
+  static const String statusDeclined = 'DECLINED';
 }

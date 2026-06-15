@@ -19,10 +19,11 @@ class ParentInvoiceDetailView extends GetView<ParentInvoiceController> {
   Widget build(BuildContext context) {
     final formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
 
-    // Nhóm các items theo group (A, B, D)
+    // Nhóm các items theo group (A, B, D, E)
     final groupA = invoice.items.where((i) => i.group == 'A').toList();
     final groupB = invoice.items.where((i) => i.group == 'B').toList();
     final groupD = invoice.items.where((i) => i.group == 'D').toList();
+    final groupE = invoice.items.where((i) => i.group == 'E').toList();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -81,6 +82,13 @@ class ParentInvoiceDetailView extends GetView<ParentInvoiceController> {
             if (groupD.isNotEmpty) ...[
               _buildSectionTitle('Giảm trừ (Tiền thừa / Nghỉ học)'),
               ...groupD.map((item) => _buildFeeRow(item.name, item.amount, formatCurrency, isDeduction: true)),
+              const Divider(height: 32),
+            ],
+
+            // Nhóm E: Nợ cũ
+            if (groupE.isNotEmpty) ...[
+              _buildSectionTitle('Nợ kỳ trước chuyển sang'),
+              ...groupE.map((item) => _buildFeeRow(item.name, item.amount, formatCurrency)),
               const Divider(height: 32),
             ],
 

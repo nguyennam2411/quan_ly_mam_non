@@ -34,6 +34,7 @@ abstract class Routes {
   static const TEACHER_MEDICATION_REQUEST = '/teacher/medication-request';
   static const TEACHER_ACTIVITY_LOG = '/teacher/activity-log';
   static const TEACHER_ADD_ACTIVITY_LOG = '/teacher/activity-log/add';
+  static const TEACHER_PHOTO_ALLOCATOR = '/teacher/activity-log/photo-allocator';
   static const TEACHER_INVOICE = '/teacher/invoice';
 
   // Nhật ký (Parent)

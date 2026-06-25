@@ -123,6 +123,14 @@ class ActivityLogProvider {
     return response;
   }
 
+  Future<List<Map<String, dynamic>>> insertLogs(List<Map<String, dynamic>> dataList) async {
+    final response = await client
+        .from(AppDatabase.tableActivityLogs)
+        .insert(dataList)
+        .select();
+    return List<Map<String, dynamic>>.from(response);
+  }
+
   Future<void> insertImages(List<Map<String, dynamic>> imagesData) async {
     await client.from(AppDatabase.tableActivityImages).insert(imagesData);
   }

@@ -53,7 +53,64 @@ class TeacherActivityLogView extends GetView<TeacherActivityLogController> {
         );
       }),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.toNamed(Routes.TEACHER_ADD_ACTIVITY_LOG),
+        onPressed: () {
+          Get.bottomSheet(
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(AppConstants.radiusL),
+                  topRight: Radius.circular(AppConstants.radiusL),
+                ),
+              ),
+              child: SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.outlineVariant,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ListTile(
+                      leading: const Icon(Icons.groups_rounded, color: AppColors.primary),
+                      title: const Text(
+                        'Đăng hoạt động chung',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: const Text('Đăng một ghi chú & ảnh chung cho cả lớp hoặc một nhóm'),
+                      onTap: () {
+                        Get.back();
+                        Get.toNamed(Routes.TEACHER_ADD_ACTIVITY_LOG);
+                      },
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.photo_library_rounded, color: AppColors.primary),
+                      title: const Text(
+                        'Phân bổ ảnh riêng lẻ (Đăng nhanh)',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: const Text('Chọn nhiều ảnh từ máy, gán riêng từng bé để phụ huynh xem'),
+                      onTap: () {
+                        Get.back();
+                        controller.resetAllocatorForm();
+                        Get.toNamed(Routes.TEACHER_PHOTO_ALLOCATOR);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+            backgroundColor: Colors.transparent,
+          );
+        },
         label: const Text('Đăng hoạt động'),
         icon: const Icon(Icons.add_photo_alternate_rounded),
         backgroundColor: AppColors.primary,

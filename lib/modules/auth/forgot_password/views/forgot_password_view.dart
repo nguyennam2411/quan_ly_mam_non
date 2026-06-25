@@ -38,8 +38,8 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                 icon: Icons.lock_reset_rounded,
               ),
 
-              Form(
-                //autovalidateMode: AutovalidateMode.onUserInteraction,
+              Obx(() => Form(
+                autovalidateMode: controller.emailAutovalidateMode.value,
                 key: controller.emailFormKey,
                 child: Column(
                   children: [
@@ -73,7 +73,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                     )),
                   ],
                 ),
-              ),
+              )),
 
               AppConstants.spacingXL,
 

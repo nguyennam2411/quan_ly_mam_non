@@ -8,7 +8,10 @@ import 'package:quan_ly_mam_non/global_widgets/calendar/app_calendar_picker.dart
 import 'package:quan_ly_mam_non/modules/parent/student_schedule/controllers/student_schedule_controller.dart';
 import 'package:quan_ly_mam_non/modules/parent/student_schedule/widgets/student_schedule_tile.dart';
 import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
+import 'package:quan_ly_mam_non/global_widgets/headers/section_header.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
+import 'package:quan_ly_mam_non/global_widgets/dialogs/app_loading.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_empty_state.dart';
 
 class StudentScheduleView extends GetView<StudentScheduleController> {
   const StudentScheduleView({super.key});
@@ -26,26 +29,13 @@ class StudentScheduleView extends GetView<StudentScheduleController> {
           // Tiêu đề phụ
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-            child: Row(
-              children: [
-                const Text(
-                  'Chi tiết lịch sinh hoạt',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(child: Divider(color: Colors.grey.shade200)),
-              ],
-            ),
+            child: const SectionHeader(title: AppStrings.scheduleDetailTitle),
           ),
 
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return const AppLoading();
               }
               
               if (controller.dailySchedule.isEmpty) {
@@ -105,7 +95,7 @@ class StudentScheduleView extends GetView<StudentScheduleController> {
                   icon: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.calendar_month_rounded, color: AppColors.primary, size: 22),
@@ -143,7 +133,7 @@ class StudentScheduleView extends GetView<StudentScheduleController> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: isSelected ? [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           )
@@ -215,18 +205,11 @@ class StudentScheduleView extends GetView<StudentScheduleController> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.calendar_today_rounded, size: 64, color: Colors.grey.shade200),
-          const SizedBox(height: 16),
-          Text(
-            'Không có lịch học cho ngày này',
-            style: TextStyle(color: Colors.grey.shade400, fontSize: 15),
-          ),
-        ],
-      ),
+    final formattedDate = DateFormat('dd/MM/yyyy').format(controller.selectedDate.value);
+    return AppEmptyState(
+      title: AppStrings.emptyScheduleParentTitle,
+      description: '${AppStrings.emptyScheduleParentDesc} (ngày $formattedDate)',
+      icon: Icons.calendar_today_rounded,
     );
   }
 }

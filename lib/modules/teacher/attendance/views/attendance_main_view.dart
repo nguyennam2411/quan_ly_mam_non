@@ -23,7 +23,7 @@ class AttendanceMainView extends GetView<AttendanceController> {
           IconButton(
             onPressed: () => controller.goToStatistics(),
             icon: const Icon(Icons.bar_chart_rounded, color: AppColors.primary),
-            tooltip: 'Thống kê',
+            tooltip: AppStrings.statsTitle,
           ),
           const SizedBox(width: 8),
         ],

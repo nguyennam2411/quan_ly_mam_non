@@ -1,21 +1,24 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/services/parent_student_service.dart';
-import '../../../../core/utils/image_helper.dart';
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/utils/app_error_message.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../data/models/leave_request_model.dart';
 import '../../../../data/repositories/leave_request_repository.dart';
 
 class ParentLeaveRequestController extends GetxController {
-  final LeaveRequestRepository repository = Get.find();
+  final LeaveRequestRepository repository;
+  ParentLeaveRequestController({required this.repository});
 
   // --- States ---
   var isLoading = false.obs;
   var leaveRequests = <LeaveRequestModel>[].obs;
+  RealtimeChannel? _realtimeChannel;
   
   // Lọc và Tìm kiếm
   var searchQuery = ''.obs;
@@ -100,21 +103,25 @@ class ParentLeaveRequestController extends GetxController {
   }
 
   // States cho Form tạo đơn
+  final formKey = GlobalKey<FormState>();
+  final autovalidateMode = AutovalidateMode.disabled.obs;
   var startDate = Rxn<DateTime>();
   var endDate = Rxn<DateTime>();
   final reasonController = TextEditingController();
   var selectedImages = <File>[].obs;
   var hasChanges = false.obs;
+  final List<Worker> _workers = [];
 
   @override
   void onInit() {
     super.onInit();
     fetchMyLeaveRequests();
+    _setupRealtimeListener();
     
     // Lắng nghe thay đổi học sinh để làm mới hoặc cập nhật UI nếu cần
-    ever(ParentStudentService.to.selectedStudent, (_) {
+    _workers.add(ever(ParentStudentService.to.selectedStudent, (_) {
       fetchMyLeaveRequests();
-    });
+    }));
 
     // Theo dõi thay đổi trong Form để cảnh báo thoát
     reasonController.addListener(() {
@@ -124,9 +131,9 @@ class ParentLeaveRequestController extends GetxController {
     });
 
     // Theo dõi các trường Rx khác
-    ever(startDate, (_) => hasChanges.value = true);
-    ever(endDate, (_) => hasChanges.value = true);
-    ever(selectedImages, (_) => hasChanges.value = true);
+    _workers.add(ever(startDate, (_) => hasChanges.value = true));
+    _workers.add(ever(endDate, (_) => hasChanges.value = true));
+    _workers.add(ever(selectedImages, (_) => hasChanges.value = true));
   }
 
   void resetForm() {
@@ -135,6 +142,8 @@ class ParentLeaveRequestController extends GetxController {
     reasonController.clear();
     selectedImages.clear();
     hasChanges.value = false;
+    autovalidateMode.value = AutovalidateMode.disabled;
+    formKey.currentState?.reset();
   }
 
   // 1. Lấy danh sách đơn
@@ -147,19 +156,12 @@ class ParentLeaveRequestController extends GetxController {
         leaveRequests.assignAll(results);
       }
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể tải lịch sử đơn: $e');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }
   }
 
-  // 2. Chọn ảnh minh chứng
-  Future<void> pickImage() async {
-    final file = await ImageHelper.pickImage(ImageSource.gallery, crop: true);
-    if (file != null) {
-      selectedImages.add(file);
-    }
-  }
 
   void removeImage(int index) {
     if (index >= 0 && index < selectedImages.length) {
@@ -171,20 +173,20 @@ class ParentLeaveRequestController extends GetxController {
   Future<void> submitRequest() async {
     final currentStudent = ParentStudentService.to.selectedStudent.value;
     if (currentStudent == null) {
-      Get.snackbar('Lỗi', 'Không xác định được học sinh học sinh');
+      AppDialogs.error(message: AppStrings.errorStudentNotFound);
       return;
     }
 
-    if (startDate.value == null || endDate.value == null || reasonController.text.isEmpty) {
-      Get.snackbar('Thông báo', 'Vui lòng điền đầy đủ thông tin');
+    if (!formKey.currentState!.validate()) {
+      autovalidateMode.value = AutovalidateMode.onUserInteraction;
       return;
     }
 
     // Kiểm tra không cho phép chọn ngày quá khứ
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    if (startDate.value!.isBefore(today)) {
-      Get.snackbar('Thông báo', 'Không thể gửi đơn xin nghỉ cho các ngày trong quá khứ');
+    if (startDate.value != null && startDate.value!.isBefore(today)) {
+      AppDialogs.warning(message: AppStrings.leaveRequestPastDateWarning);
       return;
     }
 
@@ -202,13 +204,12 @@ class ParentLeaveRequestController extends GetxController {
       await repository.submitLeaveRequestWithImages(request, selectedImages.toList());
       
       Get.back();
-      Get.snackbar('Thành công', 'Đơn xin nghỉ đã được gửi và đang chờ duyệt',
-          backgroundColor: Colors.green, colorText: Colors.white);
+      AppDialogs.success(message: AppStrings.leaveRequestSubmitSuccess);
       
       resetForm(); // Reset form sau khi gửi thành công
       fetchMyLeaveRequests();
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể gửi đơn: $e');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }
@@ -219,9 +220,45 @@ class ParentLeaveRequestController extends GetxController {
     try {
       await repository.cancelRequest(requestId, reason);
       fetchMyLeaveRequests();
-      Get.snackbar('Thông báo', 'Đã hủy đơn thành công');
+      AppDialogs.success(message: AppStrings.leaveRequestCancelSuccess);
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể hủy đơn: $e');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     }
+  }
+
+  void _setupRealtimeListener() {
+    final parentId = AuthService.to.currentUser.value?.id;
+    if (parentId == null) return;
+
+    _realtimeChannel = Supabase.instance.client
+        .channel('parent_leave_requests_changes')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: AppDatabase.tableLeaveRequests,
+          callback: (payload) {
+            final newRecord = payload.newRecord;
+            final oldRecord = payload.oldRecord;
+            final recordParentId = newRecord[AppDatabase.colParentId] ?? oldRecord[AppDatabase.colParentId];
+            if (recordParentId == parentId) {
+              debugPrint('Realtime: Leave request update detected for parent $parentId. Refreshing...');
+              fetchMyLeaveRequests();
+            }
+          },
+        );
+    
+    _realtimeChannel?.subscribe();
+  }
+
+  @override
+  void onClose() {
+    for (var worker in _workers) {
+      worker.dispose();
+    }
+    if (_realtimeChannel != null) {
+      Supabase.instance.client.removeChannel(_realtimeChannel!);
+    }
+    reasonController.dispose();
+    super.onClose();
   }
 }

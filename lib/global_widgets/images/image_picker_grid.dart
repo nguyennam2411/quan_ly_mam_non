@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:quan_ly_mam_non/core/utils/image_helper.dart';
+import 'package:quan_ly_mam_non/core/utils/dialog.dart';
 import 'package:quan_ly_mam_non/global_widgets/dialogs/app_image_viewer.dart';
 
 class ImagePickerGrid extends StatelessWidget {
@@ -19,9 +19,14 @@ class ImagePickerGrid extends StatelessWidget {
   });
 
   Future<void> _pickImage() async {
-    final file = await ImageHelper.pickImage(ImageSource.gallery);
-    if (file != null) {
-      onImageAdded(file);
+    final source = await AppDialogs.showImageSourcePicker(
+      title: 'Chọn nguồn ảnh minh họa',
+    );
+    if (source != null) {
+      final file = await ImageHelper.pickImage(source, crop: true);
+      if (file != null) {
+        onImageAdded(file);
+      }
     }
   }
 

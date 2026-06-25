@@ -33,4 +33,13 @@ class StudentProvider {
     
     return List<Map<String, dynamic>>.from(response);
   }
+
+  Future<void> updateStudentAvatar(String studentId, String avatarUrl) async {
+    await _client
+        .from(AppDatabase.tableStudents)
+        .update({AppDatabase.colAvatarUrl: avatarUrl})
+        .eq(AppDatabase.colId, studentId)
+        .select()
+        .single();
+  }
 }

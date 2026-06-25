@@ -77,4 +77,30 @@ class StudentModel {
     );
   }
   Map<String, dynamic> toJson() => _$StudentModelToJson(this);
+
+  StudentModel copyWith({
+    String? id,
+    String? name,
+    String? classroomId,
+    String? parentId,
+    String? avatarUrl,
+    String? classroomName,
+    String? gradeId,
+    String? gradeName,
+    DateTime? birthday,
+    String? gender,
+  }) {
+    return StudentModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      classroomId: classroomId ?? this.classroomId,
+      parentId: parentId ?? this.parentId,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      classroomName: classroomName ?? this.classroomName,
+      gradeId: gradeId ?? this.gradeId,
+      gradeName: gradeName ?? this.gradeName,
+      birthday: birthday ?? this.birthday,
+      gender: gender ?? this.gender,
+    );
+  }
 }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../data/models/leave_request_model.dart';
 import '../../../../data/repositories/leave_request_repository.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/utils/app_error_message.dart';
 
 class TeacherLeaveRequestController extends GetxController {
   final LeaveRequestRepository repository;
@@ -13,6 +16,7 @@ class TeacherLeaveRequestController extends GetxController {
   // --- States ---
   var isLoading = false.obs;
   var allRequests = <LeaveRequestModel>[].obs;
+  RealtimeChannel? _realtimeChannel;
   
   // Lọc và Tìm kiếm
   var searchQuery = ''.obs;
@@ -85,6 +89,7 @@ class TeacherLeaveRequestController extends GetxController {
   void onInit() {
     super.onInit();
     fetchRequests();
+    _setupRealtimeListener();
   }
 
   Future<void> fetchRequests() async {
@@ -97,7 +102,7 @@ class TeacherLeaveRequestController extends GetxController {
       final result = await repository.getTeacherLeaveRequests(classroomId);
       allRequests.assignAll(result);
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể tải danh sách đơn nghỉ: $e');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }
@@ -110,12 +115,54 @@ class TeacherLeaveRequestController extends GetxController {
       final teacherId = AuthService.to.currentUser.value!.id;
       await repository.updateRequestStatus(requestId, newStatus, teacherId, reason: reason);
       
-      Get.snackbar('Thành công', 'Đã cập nhật trạng thái đơn nghỉ');
+      AppDialogs.success(message: AppStrings.leaveRequestUpdateStatusSuccess);
       await fetchRequests(); // Refresh lại danh sách
     } catch (e) {
-      Get.snackbar('Lỗi', 'Thao tác thất bại: $e');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void _setupRealtimeListener() {
+    final classroomId = AuthService.to.classroomId.value;
+    if (classroomId.isEmpty) return;
+
+    _realtimeChannel = Supabase.instance.client
+        .channel('teacher_leave_requests_changes')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: AppDatabase.tableLeaveRequests,
+          callback: (payload) async {
+            final newRecord = payload.newRecord;
+            final oldRecord = payload.oldRecord;
+            final studentId = newRecord[AppDatabase.colStudentId] ?? oldRecord[AppDatabase.colStudentId];
+            
+            if (studentId != null) {
+              try {
+                // Kiểm tra nhanh xem học sinh của đơn này có thuộc lớp của giáo viên hiện tại không
+                final studentClassroomId = await repository.getStudentClassroomId(studentId);
+
+                if (studentClassroomId == classroomId) {
+                  debugPrint('Realtime: Leave request update detected for student $studentId in classroom $classroomId. Refreshing...');
+                  await fetchRequests();
+                }
+              } catch (e) {
+                debugPrint('Realtime Error verifying student classroom: $e');
+              }
+            }
+          },
+        );
+    
+    _realtimeChannel?.subscribe();
+  }
+
+  @override
+  void onClose() {
+    if (_realtimeChannel != null) {
+      Supabase.instance.client.removeChannel(_realtimeChannel!);
+    }
+    super.onClose();
   }
 }

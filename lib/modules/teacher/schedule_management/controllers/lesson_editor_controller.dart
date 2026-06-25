@@ -9,6 +9,10 @@ import '../../../../data/repositories/lesson_repository.dart';
 import '../../../../data/models/lesson_model.dart';
 import '../../../../data/models/schedule_model.dart';
 import '../../../../data/providers/schedule_provider.dart';
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/utils/app_error_message.dart';
+import '../../../../core/utils/image_helper.dart';
+import '../../../../core/values/app_strings.dart';
 
 class LessonEditorController extends GetxController {
   final LessonRepository _repository;
@@ -22,12 +26,40 @@ class LessonEditorController extends GetxController {
   final RxList<dynamic> selectedImages = <dynamic>[].obs;
   final RxString status = AppDatabase.statusDraft.obs;
   final RxBool isSaving = false.obs;
+  final formKey = GlobalKey<FormState>();
+  final autovalidateMode = AutovalidateMode.disabled.obs;
   
   final RxList<ScheduleModel> availableSchedules = <ScheduleModel>[].obs;
   final Rx<ScheduleModel?> selectedSchedule = Rx<ScheduleModel?>(null);
   
   String? _existingLessonId;
   DateTime? _currentDate;
+
+  // Trạng thái theo dõi thay đổi
+  final RxBool hasChanges = false.obs;
+  final List<Worker> _workers = [];
+  String _initialTitle = '';
+  String _initialObjectives = '';
+  String _initialContent = '';
+  String _initialYoutube = '';
+  String _initialStatus = AppDatabase.statusDraft;
+  int _initialImagesCount = 0;
+
+  void checkChanges() {
+    final titleChanged = titleController.text != _initialTitle;
+    final objectivesChanged = objectivesController.text != _initialObjectives;
+    final contentChanged = contentController.text != _initialContent;
+    final youtubeChanged = youtubeController.text != _initialYoutube;
+    final statusChanged = status.value != _initialStatus;
+    final imagesChanged = selectedImages.length != _initialImagesCount;
+
+    hasChanges.value = titleChanged ||
+        objectivesChanged ||
+        contentChanged ||
+        youtubeChanged ||
+        statusChanged ||
+        imagesChanged;
+  }
   
   @override
   void onInit() {
@@ -42,6 +74,15 @@ class LessonEditorController extends GetxController {
         fetchAvailableSchedules(_currentDate!);
       }
     }
+
+    // Đăng ký lắng nghe thay đổi
+    titleController.addListener(checkChanges);
+    objectivesController.addListener(checkChanges);
+    contentController.addListener(checkChanges);
+    youtubeController.addListener(checkChanges);
+    
+    _workers.add(ever(status, (_) => checkChanges()));
+    _workers.add(ever(selectedImages, (_) => checkChanges()));
   }
 
   // Lấy danh sách các khung giờ "học" của ngày đó
@@ -100,6 +141,16 @@ class LessonEditorController extends GetxController {
       _existingLessonId = null;
       _clearForm();
     }
+    autovalidateMode.value = AutovalidateMode.disabled;
+
+    // Ghi nhận giá trị ban đầu để đối chiếu
+    _initialTitle = titleController.text;
+    _initialObjectives = objectivesController.text;
+    _initialContent = contentController.text;
+    _initialYoutube = youtubeController.text;
+    _initialStatus = status.value;
+    _initialImagesCount = selectedImages.length;
+    hasChanges.value = false;
   }
 
   void _clearForm() {
@@ -109,12 +160,14 @@ class LessonEditorController extends GetxController {
     youtubeController.clear();
     selectedImages.clear();
     status.value = AppDatabase.statusDraft;
+    autovalidateMode.value = AutovalidateMode.disabled;
+    formKey.currentState?.reset();
   }
 
   // --- LOGIC LƯU BÀI HỌC ---
   Future<void> saveLesson(DateTime date) async {
-    if (titleController.text.isEmpty) {
-      Get.snackbar('Lỗi', 'Vui lòng nhập tiêu đề bài học');
+    if (!formKey.currentState!.validate()) {
+      autovalidateMode.value = AutovalidateMode.onUserInteraction;
       return;
     }
 
@@ -143,10 +196,11 @@ class LessonEditorController extends GetxController {
       // 3. Lưu vào database
       await _repository.saveLesson(lesson);
       
+      hasChanges.value = false;
       Get.back(result: true);
-      Get.snackbar('Thành công', 'Đã lưu nội dung bài học');
+      AppDialogs.success(message: AppStrings.lessonSaveSuccessMessage);
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể lưu bài học: $e');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isSaving.value = false;
     }
@@ -167,9 +221,17 @@ class LessonEditorController extends GetxController {
       if (item is String) {
         finalUrls.add(item);
       } else if (item is File) {
-        final imageUrl = await CloudinaryService.to.uploadImage(item, folder: uploadFolder);
+        // Nén ảnh trước khi tải lên
+        final compressedFile = await ImageHelper.compressImage(item);
+        
+        final imageUrl = await CloudinaryService.to.uploadImage(compressedFile, folder: uploadFolder);
         if (imageUrl != null) {
           finalUrls.add(imageUrl);
+        }
+
+        // Xóa file tạm để giải phóng bộ nhớ đệm
+        if (compressedFile.path != item.path) {
+          await ImageHelper.deleteTempFile(compressedFile);
         }
       }
     }
@@ -181,6 +243,9 @@ class LessonEditorController extends GetxController {
 
   @override
   void onClose() {
+    for (var worker in _workers) {
+      worker.dispose();
+    }
     titleController.dispose();
     objectivesController.dispose();
     contentController.dispose();

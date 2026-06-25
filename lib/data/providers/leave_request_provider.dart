@@ -67,4 +67,13 @@ class LeaveRequestProvider {
         // Chi xoa ban ghi do he thong/trigger tao, giu nguyen diem danh manual cua giao vien.
         .or('${AppDatabase.colMethod}.is.null,${AppDatabase.colMethod}.neq.${AppDatabase.methodManual}');
   }
+
+  Future<String?> getStudentClassroomId(String studentId) async {
+    final response = await _client
+        .from(AppDatabase.tableStudents)
+        .select(AppDatabase.colClassroomId)
+        .eq(AppDatabase.colId, studentId)
+        .maybeSingle();
+    return response?[AppDatabase.colClassroomId] as String?;
+  }
 }

@@ -2,6 +2,9 @@ import 'package:get/get.dart';
 import '../../../../core/services/parent_student_service.dart';
 import '../../../../data/repositories/schedule_repository.dart';
 
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/utils/app_error_message.dart';
+
 class StudentScheduleController extends GetxController {
   final ScheduleRepository _repository;
   StudentScheduleController({required ScheduleRepository repository}) : _repository = repository;
@@ -35,7 +38,7 @@ class StudentScheduleController extends GetxController {
       );
       dailySchedule.assignAll(data);
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể tải lịch học');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }

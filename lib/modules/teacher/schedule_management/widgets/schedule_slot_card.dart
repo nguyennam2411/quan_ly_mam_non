@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/data/repositories/schedule_repository.dart';
 import 'package:quan_ly_mam_non/core/values/app_database.dart';
+import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 
 class ScheduleSlotCard extends StatelessWidget {
   final ScheduleItem item;
@@ -168,7 +169,7 @@ class ScheduleSlotCard extends StatelessWidget {
           Icon(Icons.add_circle_outline_rounded, size: 14, color: Colors.grey.shade400),
           const SizedBox(width: 6),
           Text(
-            'Chưa có bài soạn',
+            AppStrings.scheduleNoLessonBadge,
             style: TextStyle(
               color: Colors.grey.shade500,
               fontSize: 11,
@@ -201,7 +202,7 @@ class ScheduleSlotCard extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           Text(
-            isPublished ? 'Đã công khai' : 'Đang soạn thảo',
+            isPublished ? AppStrings.schedulePublishedBadge : AppStrings.scheduleDraftBadge,
             style: TextStyle(
               color: color, 
               fontSize: 11, 

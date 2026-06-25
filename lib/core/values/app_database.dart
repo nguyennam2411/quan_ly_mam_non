@@ -6,6 +6,7 @@ class AppDatabase {
   static const String approved = 'APPROVED';
   static const String rejected = 'REJECTED';
   static const String cancelled = 'CANCELLED';
+  static const String completed = 'APPROVED';
 
   // --- Attendance Status ---
   static const String statusPresent = 'PRESENT';
@@ -35,6 +36,7 @@ class AppDatabase {
   static const String tableMealPlans = 'meal_plans';  
   static const String tableSchedules = 'schedules';
   static const String tableLessons = 'lessons';   
+  static const String tableStudentGuardians = 'student_guardians';
 
   // --- Common Columns ---
   static const String colId = 'id';
@@ -48,8 +50,9 @@ class AppDatabase {
   static const String colTeacherId = 'teacher_id';      
   static const String colNote = 'note';
   static const String colScheduleId = 'schedule_id';
-
   static const String colCode = 'code';
+  static const String colRelationship = 'relationship';
+  static const String colPhone = 'phone';
 
   // --- Students Columns ---
   static const String colClassroomId = 'classroom_id';
@@ -71,7 +74,7 @@ class AppDatabase {
   static const String colApprovedAt = 'approved_at';
   static const String colImages = 'images';
 
-  // --- Notifications Columns ---
+  // Notifications Columns
   static const String colTitle = 'title';
   static const String colContent = 'content';
   static const String colIsRead = 'is_read';
@@ -108,6 +111,31 @@ class AppDatabase {
   static const String colLunchTime = 'lunch_time';
   static const String colSnackTime = 'snack_time';
 
+  // --- Medication Requests (Đơn thuốc) ---
+  static const String tableMedicationRequests = 'medication_requests';
+  static const String colMedicineName = 'medicine_name'; 
+  static const String colDosage = 'dosage';            
+  static const String colTime = 'time';              
+  static const String colPrescriptionImage = 'prescription_image'; 
+
+  // --- Invoices & Payments (Học phí) ---
+  static const String tableInvoices = 'invoices';
+  static const String tablePayments = 'payments';
+  
+  static const String colMonth = 'month';
+  static const String colYear = 'year';
+  static const String colTotalAmount = 'total_amount';
+  static const String colDueDate = 'due_date';
+  static const String colItems = 'items'; // jsonb column
+  static const String colInvoiceId = 'invoice_id';
+  static const String colAmount = 'amount';
+  static const String colPaidAt = 'paid_at';
+
+  // --- Invoice Status ---
+  static const String invoiceStatusUnpaid = 'UNPAID';
+  static const String invoiceStatusPaid = 'PAID';
+  static const String invoiceStatusOverdue = 'OVERDUE';
+
   // --- Schedules Columns ---
   static const String colStartTime = 'start_time';
   static const String colEndTime = 'end_time';
@@ -121,4 +149,29 @@ class AppDatabase {
   static const String colAttachmentUrl = 'attachment_url';
   static const String colPreparation = 'preparation';
   static const String colProcedures = 'procedures';
+
+  // --- Talent Classes (Năng khiếu) ---
+  static const String tableTalentClasses = 'talent_classes';
+  static const String tableTalentEnrollments = 'talent_enrollments';
+  static const String tableTalentAttendance = 'talent_attendance';
+  static const String colFeePerMonth = 'fee_per_month';
+  static const String colScheduleInfo = 'schedule_info';
+  static const String colTalentClassId = 'talent_class_id';
+  static const String colRegisteredAt = 'registered_at';
+
+  // --- Events (Sự kiện / Ngoại khóa) ---
+  static const String tableEvents = 'events';
+  static const String tableEventRegistrations = 'event_registrations';
+  static const String colDeadlineDate = 'deadline_date';
+  static const String colLocation = 'location';
+  static const String colFee = 'fee';
+  static const String colEventId = 'event_id';
+
+  // --- Event/Talent Status ---
+  static const String statusActive = 'ACTIVE';
+  static const String statusInactive = 'INACTIVE';
+  static const String statusUpcoming = 'UPCOMING';
+  static const String statusOngoing = 'ONGOING';
+  static const String statusRegistered = 'REGISTERED';
+  static const String statusDeclined = 'DECLINED';
 }

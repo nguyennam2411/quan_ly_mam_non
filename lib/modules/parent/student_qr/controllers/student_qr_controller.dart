@@ -4,6 +4,8 @@ import '../../../../data/models/student_model.dart';
 import '../../../../data/repositories/qr_token_repository.dart';
 import '../../../../core/utils/dialog.dart';
 import '../../../../core/services/parent_student_service.dart';
+import '../../../../core/utils/app_error_message.dart';
+import '../../../../core/values/app_strings.dart';
 
 class StudentQrController extends GetxController {
   final QrRepository repository;
@@ -26,7 +28,7 @@ class StudentQrController extends GetxController {
       fetchQrToken();
     } else {
       Get.back();
-      AppDialogs.error(message: 'Không tìm thấy thông tin học sinh');
+      AppDialogs.error(message: AppStrings.noStudentInfo);
     }
   }
 
@@ -36,7 +38,7 @@ class StudentQrController extends GetxController {
       final result = await repository.getOrGenerateQrToken(studentId);
       qrToken.value = result;
     } catch (e) {
-      AppDialogs.error(message: 'Lỗi khi lấy mã QR: ${e.toString()}');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }

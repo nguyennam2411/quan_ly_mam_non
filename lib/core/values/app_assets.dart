@@ -31,6 +31,8 @@ class AppAssets {
   static const String icHomeFilled = '$iconPath/ic_home_filled.svg';
   static const String icChatOutlined = '$iconPath/ic_chat_outline.svg';
   static const String icChatFilled = '$iconPath/ic_chat_filled.svg';
+  static const String icEventOutlined = '$iconPath/ic_event_outline.svg';
+  static const String icEventFilled = '$iconPath/ic_event_filled.svg';
   static const String icNotificationOutlined = '$iconPath/ic_notification_outline.svg';
   static const String icNotificationFilled = '$iconPath/ic_notification_filled.svg';
   static const String icPersonOutlined = '$iconPath/ic_person_outline.svg';

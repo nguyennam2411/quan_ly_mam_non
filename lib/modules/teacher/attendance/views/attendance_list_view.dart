@@ -5,9 +5,11 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/headers/section_header.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
 import '../../../../global_widgets/inputs/app_search_bar.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
+import '../../../../global_widgets/dialogs/app_loading.dart';
 import '../controllers/attendance_controller.dart';
 import '../widgets/attendance_item_card.dart';
 import '../../../../routes/app_routes.dart';
@@ -68,12 +70,7 @@ class AttendanceListView extends GetView<AttendanceController> {
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 3,
-                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                      ),
-                    );
+                    return const AppLoading();
                   }
                   
                   if (controller.filteredStudents.isEmpty) {
@@ -124,25 +121,25 @@ class AttendanceListView extends GetView<AttendanceController> {
         children: [
           _buildFilterItem(
             filter: AttendanceFilter.all,
-            label: 'Tất cả',
+            label: AppStrings.leaveStatusAll,
             count: controller.allFilterCount,
           ),
           const SizedBox(width: 8),
           _buildFilterItem(
             filter: AttendanceFilter.notTaken,
-            label: 'Chưa điểm danh',
+            label: AppStrings.attendanceNotTaken,
             count: controller.notTakenFilterCount,
           ),
           const SizedBox(width: 8),
           _buildFilterItem(
             filter: AttendanceFilter.present,
-            label: 'Có mặt',
+            label: AppStrings.attendancePresent,
             count: controller.presentFilterCount,
           ),
           const SizedBox(width: 8),
           _buildFilterItem(
             filter: AttendanceFilter.absent,
-            label: 'Vắng',
+            label: AppStrings.attendanceAbsent,
             count: controller.absentFilterCount,
           ),
         ],
@@ -213,57 +210,31 @@ class AttendanceListView extends GetView<AttendanceController> {
   Widget _buildSeparatorSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingL),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Bên trái: Tiêu đề Danh sách học sinh nổi bật hơn với vạch đứng dày và cao hơn
-          Row(
-            children: [
-              Container(
-                width: 4.5,
-                height: 18,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(2.5),
+      child: SectionHeader(
+        title: AppStrings.attendanceStudentList,
+        trailing: !controller.isFuture
+            ? TextButton.icon(
+                onPressed: () => controller.markAllPresent(),
+                icon: const Icon(Icons.done_all_rounded, size: 18, color: AppColors.primary),
+                label: const Text(
+                  AppStrings.attendanceTitle,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'Danh sách học sinh',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.onBackground.withValues(alpha: 0.9),
-                  letterSpacing: -0.2,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-              ),
-            ],
-          ),
-          
-          // Bên phải: Nút điểm danh tất cả được đóng gói thành dạng Chip có màu nền mỏng sang trọng
-          if (!controller.isFuture)
-            TextButton.icon(
-              onPressed: () => controller.markAllPresent(),
-              icon: const Icon(Icons.done_all_rounded, size: 18, color: AppColors.primary),
-              label: const Text(
-                'Điểm danh',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                backgroundColor: AppColors.primary.withValues(alpha: 0.08),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-            ),
-        ],
+              )
+            : null,
       ),
     );
   }

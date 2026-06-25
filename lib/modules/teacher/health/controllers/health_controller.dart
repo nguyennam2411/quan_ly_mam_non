@@ -5,6 +5,9 @@ import '../../../../core/services/auth_service.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../data/models/health_record_model.dart';
 import '../../../../data/repositories/health_record_repository.dart';
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/utils/app_error_message.dart';
+import '../../../../core/values/app_strings.dart';
 
 /// Model tạm để quản lý trạng thái nhập liệu của từng hàng trong bảng.
 class HealthInputRow {
@@ -41,10 +44,10 @@ class HealthInputRow {
   String get bmiLabel {
     final b = bmi;
     if (b == null) return '—';
-    if (b < 14.0) return 'Suy dinh dưỡng';
-    if (b < 18.5) return 'Bình thường';
-    if (b < 22.0) return 'Thừa cân';
-    return 'Béo phì';
+    if (b < 14.0) return AppStrings.healthBmiUnderweight;
+    if (b < 18.5) return AppStrings.healthBmiNormal;
+    if (b < 22.0) return AppStrings.healthBmiOverweight;
+    return AppStrings.healthBmiObese;
   }
 
   void dispose() {
@@ -94,7 +97,7 @@ class HealthController extends GetxController {
   Future<void> fetchData() async {
     if (classroomId.isEmpty) {
       debugPrint('HealthController: classroomId is empty, skipping fetch.');
-      Get.snackbar('Lưu ý', 'Tài khoản chưa được gán lớp học');
+      AppDialogs.warning(message: AppStrings.errorNoClassAssigned);
       return;
     }
     try {
@@ -138,7 +141,7 @@ class HealthController extends GetxController {
       rows.assignAll(newRows);
     } catch (e, stack) {
       debugPrint('HealthController.fetchData error: $e\n$stack');
-      Get.snackbar('Lỗi', 'Không thể tải dữ liệu sức khỏe: ${e.toString()}');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }
@@ -153,15 +156,28 @@ class HealthController extends GetxController {
     final dateStr = '${selectedMonth.value.year}-${selectedMonth.value.month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
 
     for (final row in rows) {
-      final h = row.height;
-      final w = row.weight;
-      if (h == null || w == null) continue;
+      final hText = row.heightCtrl.text.trim();
+      final wText = row.weightCtrl.text.trim();
+
+      // Cả hai cùng trống -> bỏ qua dòng này (hợp lệ)
+      if (hText.isEmpty && wText.isEmpty) continue;
+
+      // Một trong hai trống -> báo lỗi
+      if (hText.isEmpty || wText.isEmpty) {
+        AppDialogs.warning(message: '${AppStrings.healthErrorEmptyRow} ${row.studentName}');
+        return;
+      }
+
+      // Có nhập nhưng không phải số -> báo lỗi
+      final h = double.tryParse(hText);
+      final w = double.tryParse(wText);
+      if (h == null || w == null) {
+        AppDialogs.warning(message: '${AppStrings.healthErrorInvalidNumberPrefix} ${row.studentName} ${AppStrings.healthErrorInvalidNumberSuffix}');
+        return;
+      }
 
       if (h <= 0 || w <= 0) {
-        Get.snackbar('Lỗi dữ liệu',
-            'Chiều cao và cân nặng của ${row.studentName} phải lớn hơn 0',
-            backgroundColor: Colors.red.withOpacity(0.8),
-            colorText: Colors.white);
+        AppDialogs.warning(message: '${AppStrings.healthErrorInvalidNumberPrefix} ${row.studentName} ${AppStrings.healthErrorNegativeNumberSuffix}');
         return;
       }
 
@@ -178,19 +194,17 @@ class HealthController extends GetxController {
     }
 
     if (records.isEmpty) {
-      Get.snackbar('Lưu ý', 'Chưa có dữ liệu nào để lưu');
+      AppDialogs.warning(message: AppStrings.healthErrorNoDataToSave);
       return;
     }
 
     try {
       isSaving.value = true;
       await _repository.saveHealthRecords(records);
-      Get.snackbar('Thành công', 'Đã lưu ${records.length} hồ sơ sức khỏe',
-          backgroundColor: const Color(0xFF2E7D32),
-          colorText: const Color(0xFFF1F8F1));
+      AppDialogs.success(message: '${AppStrings.healthSaveSuccessPrefix} ${records.length} ${AppStrings.healthSaveSuccessSuffix}');
     } catch (e, stack) {
       debugPrint('HealthController.saveAll error: $e\n$stack');
-      Get.snackbar('Lỗi', 'Không thể lưu dữ liệu. Vui lòng thử lại.');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isSaving.value = false;
     }

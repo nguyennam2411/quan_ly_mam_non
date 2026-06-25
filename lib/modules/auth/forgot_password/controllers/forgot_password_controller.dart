@@ -6,6 +6,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/utils/app_error_message.dart';
 
 class ForgotPasswordController extends GetxController {
   final _supabase = Supabase.instance.client;
@@ -13,6 +15,8 @@ class ForgotPasswordController extends GetxController {
   // --- FORM KEYS ---
   final emailFormKey = GlobalKey<FormState>();
   final resetFormKey = GlobalKey<FormState>();
+  final emailAutovalidateMode = AutovalidateMode.disabled.obs;
+  final resetAutovalidateMode = AutovalidateMode.disabled.obs;
 
   // --- TEXT CONTROLLERS ---
   final emailController = TextEditingController();
@@ -31,7 +35,10 @@ class ForgotPasswordController extends GetxController {
 
   // BƯỚC 1: GỬI MÃ XÁC NHẬN
   Future<void> sendResetCode() async {
-    if (!emailFormKey.currentState!.validate()) return;
+    if (!emailFormKey.currentState!.validate()) {
+      emailAutovalidateMode.value = AutovalidateMode.onUserInteraction;
+      return;
+    }
     
     isLoading.value = true;
     emailError.value = null;
@@ -67,7 +74,10 @@ class ForgotPasswordController extends GetxController {
 
   // BƯỚC 3: CẬP NHẬT MẬT KHẨU MỚI
   Future<void> updatePassword() async {
-    if (!resetFormKey.currentState!.validate()) return;
+    if (!resetFormKey.currentState!.validate()) {
+      resetAutovalidateMode.value = AutovalidateMode.onUserInteraction;
+      return;
+    }
 
     isLoading.value = true;
     try {
@@ -78,32 +88,15 @@ class ForgotPasswordController extends GetxController {
       isLoading.value = false;
 
       Get.offAllNamed(Routes.LOGIN);
-      _showSuccessNotification();
+      AppDialogs.success(message: AppStrings.successUpdatePassword);
 
     } catch (e) {
       isLoading.value = false;
-      Get.snackbar(
-        AppStrings.errorTitle, 
-        AppStrings.errorUpdatePassword,
-        backgroundColor: AppColors.errorContainer,
-        colorText: AppColors.onErrorContainer,
-      );
+      AppDialogs.error(message: AppErrorMessage.from(e));
     }
   }
 
   // --- HÀM HỖ TRỢ ---
-  void _showSuccessNotification() {
-    Get.snackbar(
-      AppStrings.successTitle,
-      AppStrings.successUpdatePassword,
-      backgroundColor: AppColors.successContainer,
-      colorText: AppColors.success,
-      snackPosition: SnackPosition.TOP,
-      duration: AppConstants.snackbarDuration,
-      margin: const EdgeInsets.all(AppConstants.paddingM),
-      icon: const Icon(Icons.check_circle, color: AppColors.success),
-    );
-  }
 
   void _startTimer() {
     resendCount.value = AppConstants.otpCountdownSeconds;

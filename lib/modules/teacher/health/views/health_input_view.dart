@@ -7,6 +7,8 @@ import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/headers/page_header.dart';
 import '../../../../global_widgets/inputs/app_search_bar.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
+import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_empty_state.dart';
 import '../controllers/health_controller.dart';
 import '../../../../core/values/app_strings.dart';
 
@@ -32,24 +34,17 @@ class HealthInputView extends GetView<HealthController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return const AppLoading();
               }
               if (controller.filteredRows.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.search_off_rounded,
-                          size: 64, color: AppColors.outlineVariant),
-                      AppConstants.spacingM,
-                      Text(
-                        controller.searchQuery.value.isNotEmpty
-                            ? 'Không tìm thấy học sinh "${controller.searchQuery.value}"'
-                            : 'Lớp chưa có học sinh nào',
-                        style: const TextStyle(color: AppColors.outline, fontSize: 15),
-                      ),
-                    ],
-                  ),
+                return AppEmptyState(
+                  title: controller.searchQuery.value.isNotEmpty
+                      ? AppStrings.errorNoResults
+                      : AppStrings.healthClassEmptyTitle,
+                  description: controller.searchQuery.value.isNotEmpty
+                      ? '${AppStrings.healthNoStudentMatch} "${controller.searchQuery.value}"'
+                      : AppStrings.healthClassEmptyDesc,
+                  icon: Icons.search_off_rounded,
                 );
               }
               return RefreshIndicator(
@@ -83,7 +78,7 @@ class HealthInputView extends GetView<HealthController> {
         ),
         child: SafeArea(
           child: Obx(() => PrimaryButton(
-                text: 'Lưu hồ sơ sức khỏe',
+                text: AppStrings.healthSaveRecordButton,
                 trailingIcon: Icons.check_circle_outline_rounded,
                 isLoading: controller.isSaving.value,
                 onPressed: controller.saveAll,
@@ -101,7 +96,7 @@ class HealthInputView extends GetView<HealthController> {
         children: [
           // Thanh tìm kiếm
           AppSearchBar(
-            hintText: 'Tìm kiếm tên học sinh...',
+            hintText: AppStrings.attendanceSearchHint,
             onChanged: (value) => controller.searchQuery.value = value,
             height: 46,
             borderRadius: BorderRadius.circular(23),
@@ -183,10 +178,10 @@ class HealthInputView extends GetView<HealthController> {
       ),
       child: Row(
         children: [
-          Expanded(flex: 4, child: Text('HỌC SINH', style: style)),
-          Expanded(flex: 2, child: Text('CAO (M)', style: style, textAlign: TextAlign.center)),
-          Expanded(flex: 2, child: Text('NẶNG (KG)', style: style, textAlign: TextAlign.center)),
-          Expanded(flex: 3, child: Text('BMI / PHÂN LOẠI', style: style, textAlign: TextAlign.center)),
+          Expanded(flex: 4, child: Text(AppStrings.healthHeaderStudent, style: style)),
+          Expanded(flex: 2, child: Text(AppStrings.healthHeaderHeight, style: style, textAlign: TextAlign.center)),
+          Expanded(flex: 2, child: Text(AppStrings.healthHeaderWeight, style: style, textAlign: TextAlign.center)),
+          Expanded(flex: 3, child: Text(AppStrings.healthHeaderBmi, style: style, textAlign: TextAlign.center)),
         ],
       ),
     );
@@ -357,12 +352,12 @@ class HealthInputView extends GetView<HealthController> {
   // Lấy màu sắc cho BMI
   Color _getBmiColor(String label) {
     switch (label) {
-      case 'Bình thường':
+      case AppStrings.healthBmiNormal:
         return AppColors.success;
-      case 'Thừa cân':
+      case AppStrings.healthBmiOverweight:
         return AppColors.warning;
-      case 'Suy dinh dưỡng':
-      case 'Béo phì':
+      case AppStrings.healthBmiUnderweight:
+      case AppStrings.healthBmiObese:
         return AppColors.error;
       default:
         return AppColors.outlineVariant;
@@ -376,7 +371,7 @@ class HealthInputView extends GetView<HealthController> {
       initialDate: controller.selectedMonth.value,
       firstDate: DateTime(2024),
       lastDate: DateTime.now(),
-      helpText: 'CHỌN THÁNG ĐO',
+      helpText: AppStrings.healthMonthPickerHelp,
     );
     if (picked != null) {
       controller.changeMonth(picked);

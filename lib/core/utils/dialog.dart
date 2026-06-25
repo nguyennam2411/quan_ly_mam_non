@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import '../theme/app_colors.dart';
 import '../values/app_constants.dart';
 import '../values/app_strings.dart';
@@ -24,7 +25,7 @@ class AppDialogs {
     Get.snackbar(
       title ?? AppStrings.successTitle,
       message,
-      backgroundColor: Colors.green.withOpacity(0.9),
+      backgroundColor: Colors.green.withValues(alpha: 0.9),
       colorText: Colors.white,
       snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(AppConstants.paddingM),
@@ -39,13 +40,43 @@ class AppDialogs {
     Get.snackbar(
       title ?? AppStrings.errorTitle,
       message,
-      backgroundColor: Colors.redAccent.withOpacity(0.9),
+      backgroundColor: Colors.redAccent.withValues(alpha: 0.9),
       colorText: Colors.white,
       snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(AppConstants.paddingM),
       borderRadius: AppConstants.radiusM,
       icon: const Icon(Icons.error_outline, color: Colors.white),
       duration: const Duration(seconds: 4),
+    );
+  }
+
+  // Snackbar Thông báo cảnh báo
+  static void warning({String? title, required String message}) {
+    Get.snackbar(
+      title ?? AppStrings.attendanceWarning,
+      message,
+      backgroundColor: Colors.orange.withValues(alpha: 0.9),
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(AppConstants.paddingM),
+      borderRadius: AppConstants.radiusM,
+      icon: const Icon(Icons.warning_amber_rounded, color: Colors.white),
+      duration: const Duration(milliseconds: 3500),
+    );
+  }
+
+  // Snackbar Thông báo thông tin
+  static void info({String? title, required String message}) {
+    Get.snackbar(
+      title ?? AppStrings.attendanceNotice,
+      message,
+      backgroundColor: AppColors.primary.withValues(alpha: 0.9),
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(AppConstants.paddingM),
+      borderRadius: AppConstants.radiusM,
+      icon: const Icon(Icons.info_outline, color: Colors.white),
+      duration: const Duration(seconds: 3),
     );
   }
 
@@ -132,6 +163,49 @@ class AppDialogs {
       icon: Icons.warning_amber_rounded,
       iconColor: Colors.orange,
       agreeColor: Colors.redAccent,
+    );
+  }
+
+  // Hộp thoại BottomSheet chọn nguồn ảnh dùng chung cho toàn bộ app
+  static Future<ImageSource?> showImageSourcePicker({String? title}) async {
+    return await Get.bottomSheet<ImageSource>(
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Text(
+                  title ?? 'Chọn hình ảnh',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.onSurface,
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt_rounded, color: AppColors.primary),
+                title: const Text('Chụp ảnh mới'),
+                onTap: () => Get.back(result: ImageSource.camera),
+              ),
+              const Divider(height: 1, indent: 56, endIndent: 16),
+              ListTile(
+                leading: const Icon(Icons.photo_library_rounded, color: AppColors.primary),
+                title: const Text('Chọn từ thư viện'),
+                onTap: () => Get.back(result: ImageSource.gallery),
+              ),
+            ],
+          ),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
     );
   }
 }

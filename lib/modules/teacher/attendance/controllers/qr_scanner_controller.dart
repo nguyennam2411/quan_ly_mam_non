@@ -4,6 +4,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../data/repositories/attendance_repository.dart';
 import 'attendance_controller.dart';
+import '../../../../core/values/app_strings.dart';
+import '../../../../core/utils/app_error_message.dart';
 
 // Trạng thái sau mỗi lần quét
 enum QrScanState { success, error }
@@ -65,8 +67,8 @@ class QrScannerController extends GetxController {
 
       final timeStr = DateFormat('HH:mm').format(DateTime.now());
       final subtitle = result.isLateArrival
-          ? 'Cập nhật: Vắng → Có mặt  •  $timeStr'
-          : 'Check-in lúc $timeStr';
+          ? '${AppStrings.attendanceQrUpdateLate}$timeStr'
+          : '${AppStrings.attendanceQrCheckinAtTime}$timeStr';
 
       scanResult.value = QrScanResult(
         state: QrScanState.success,
@@ -76,7 +78,7 @@ class QrScannerController extends GetxController {
     } catch (e) {
       scanResult.value = QrScanResult(
         state: QrScanState.error,
-        title: e.toString(),
+        title: AppErrorMessage.from(e),
       );
     } finally {
       _isProcessing = false;

@@ -3,6 +3,9 @@ import '../../../../core/services/parent_student_service.dart';
 import '../../../../data/models/attendance_model.dart';
 import '../../../../data/repositories/attendance_repository.dart';
 
+import '../../../../core/utils/dialog.dart';
+import '../../../../core/utils/app_error_message.dart';
+
 enum AttendanceHistoryFilter { all, excused, unexcused }
 
 class AttendanceHistoryController extends GetxController {
@@ -49,7 +52,7 @@ class AttendanceHistoryController extends GetxController {
       absentList.assignAll(history);
       _calculateStats();
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể tải lịch sử chuyên cần');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }

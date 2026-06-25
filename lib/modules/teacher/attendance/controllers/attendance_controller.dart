@@ -9,6 +9,7 @@ import 'package:quan_ly_mam_non/core/services/auth_service.dart';
 import 'package:quan_ly_mam_non/core/values/app_database.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 import 'package:quan_ly_mam_non/core/utils/dialog.dart';
+import 'package:quan_ly_mam_non/core/utils/app_error_message.dart';
 
 enum AttendanceFilter {
   all,
@@ -143,13 +144,7 @@ class AttendanceController extends GetxController {
   Future<void> fetchAttendanceList() async {
     if (currentClassId.isEmpty) {
       print("DEBUG: Classroom ID đang bị RỖNG! Vui lòng kiểm tra bảng classrooms.");
-      Get.snackbar(
-        AppStrings.errorTitle,
-        AppStrings.attendanceNoClass,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
-      );
+      AppDialogs.error(message: AppStrings.attendanceNoClass);
       isLoading.value = false;
       return;
     }
@@ -160,7 +155,7 @@ class AttendanceController extends GetxController {
       studentsWithAttendance.assignAll(result);
       hasChanges.value = false;
     } catch (e) {
-      Get.snackbar(AppStrings.errorTitle, '${AppStrings.attendanceErrorLoad}: $e');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }
@@ -183,7 +178,7 @@ class AttendanceController extends GetxController {
 
     // 2. Kiểm tra quyền sửa (Chặn nếu là đơn nghỉ phép từ phụ huynh)
     if (currentAttendance?.status == AppDatabase.statusAbsentExcused && currentAttendance?.method != AppDatabase.methodManual) {
-      Get.snackbar(AppStrings.attendanceNotice, AppStrings.attendanceStatusConflict);
+      AppDialogs.warning(message: AppStrings.attendanceStatusConflict);
       return;
     }
 
@@ -236,7 +231,7 @@ class AttendanceController extends GetxController {
   // 3. Lưu dữ liệu
   Future<void> submitAttendance() async {
     if (isFuture) {
-      Get.snackbar(AppStrings.attendanceWarning, AppStrings.attendanceFutureWarning);
+      AppDialogs.warning(message: AppStrings.attendanceFutureWarning);
       return;
     }
 
@@ -254,7 +249,7 @@ class AttendanceController extends GetxController {
           .toList();
 
       if (listToSave.isEmpty) {
-        Get.snackbar(AppStrings.attendanceWarning, AppStrings.attendanceNoSelection);
+        AppDialogs.warning(message: AppStrings.attendanceNoSelection);
         return;
       }
 
@@ -265,10 +260,9 @@ class AttendanceController extends GetxController {
       await fetchMonthlyStatus(selectedDate.value);
       
       Get.back();
-      Get.snackbar(AppStrings.successTitle, AppStrings.attendanceSuccess,
-          backgroundColor: Colors.green.withValues(alpha: 0.7), colorText: Colors.white);
+      AppDialogs.success(message: AppStrings.attendanceSuccess);
     } catch (e) {
-      Get.snackbar(AppStrings.errorTitle, '${AppStrings.attendanceErrorSave}: $e');
+      AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
     }
@@ -278,7 +272,7 @@ class AttendanceController extends GetxController {
   
   Future<void> goToAttendance() async {
     if (currentClassId.isEmpty) {
-      Get.snackbar(AppStrings.attendanceWarning, AppStrings.attendanceNoClass);
+      AppDialogs.warning(message: AppStrings.attendanceNoClass);
       return;
     }
     await fetchAttendanceList(); 
@@ -287,7 +281,7 @@ class AttendanceController extends GetxController {
 
   Future<void> goToHistory() async {
     if (currentClassId.isEmpty) {
-      Get.snackbar(AppStrings.attendanceWarning, AppStrings.attendanceNoClass);
+      AppDialogs.warning(message: AppStrings.attendanceNoClass);
       return;
     }
     isEditMode.value = false; // Luôn vào chế độ xem trước
@@ -297,7 +291,7 @@ class AttendanceController extends GetxController {
 
   Future<void> goToStatistics() async {
     if (currentClassId.isEmpty) {
-      Get.snackbar(AppStrings.attendanceWarning, AppStrings.attendanceNoClass);
+      AppDialogs.warning(message: AppStrings.attendanceNoClass);
       return;
     }
     Get.toNamed(Routes.ATTENDANCE_STATISTIC);

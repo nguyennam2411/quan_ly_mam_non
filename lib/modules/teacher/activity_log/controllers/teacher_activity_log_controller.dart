@@ -33,6 +33,10 @@ class TeacherActivityLogController extends GetxController {
   var contentController = TextEditingController();
   var selectedImages = <File>[].obs;
 
+  // Photo Allocator State
+  var allocations = <ImageAllocation>[].obs;
+  var generalNoteController = TextEditingController();
+
   final List<String> quickTags = ["Ăn ngoan", "Ngủ tốt", "Học tập tích cực", "Vui vẻ", "Cần cố gắng"];
 
   String get currentClassId => AuthService.to.classroomId.value;
@@ -239,4 +243,97 @@ class TeacherActivityLogController extends GetxController {
       backgroundColor: Colors.transparent,
     );
   }
+
+  // --- PHOTO ALLOCATOR METHODS ---
+
+  Future<void> pickAllocatorImages() async {
+    final ImagePicker picker = ImagePicker();
+    final List<XFile> images = await picker.pickMultiImage();
+    if (images.isNotEmpty) {
+      allocations.addAll(images.map((img) => ImageAllocation(file: File(img.path))));
+    }
+  }
+
+  void removeAllocation(int index) {
+    if (index >= 0 && index < allocations.length) {
+      allocations[index].noteController.dispose();
+      allocations.removeAt(index);
+    }
+  }
+
+  void assignStudentToPhoto(int index, String? studentId) {
+    if (index >= 0 && index < allocations.length) {
+      allocations[index].studentId = studentId;
+      allocations.refresh();
+    }
+  }
+
+  Future<void> submitAllocations() async {
+    if (allocations.isEmpty) {
+      Get.snackbar('Cảnh báo', 'Vui lòng chọn ít nhất một hình ảnh');
+      return;
+    }
+
+    final hasUnassigned = allocations.any((element) => element.studentId == null);
+    if (hasUnassigned) {
+      Get.snackbar('Cảnh báo', 'Vui lòng gán học sinh cho tất cả các bức ảnh');
+      return;
+    }
+
+    isUploading.value = true;
+    try {
+      final List<StudentActivityInput> studentActivities = allocations.map((alloc) {
+        return StudentActivityInput(
+          studentId: alloc.studentId!,
+          content: alloc.noteController.text.trim(),
+          image: alloc.file,
+        );
+      }).toList();
+
+      await repository.createActivitiesBatch(
+        teacherId: currentTeacherId,
+        classroomId: currentClassId,
+        generalContent: generalNoteController.text.trim(),
+        studentActivities: studentActivities,
+      );
+
+      Get.back(); // Quay lại
+      Get.snackbar('Thành công', 'Đã phân bổ và đăng nhật ký hoạt động cho các bé');
+      fetchLogs();
+      resetAllocatorForm();
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Đã xảy ra lỗi khi đăng: $e');
+    } finally {
+      isUploading.value = false;
+    }
+  }
+
+  void resetAllocatorForm() {
+    for (var alloc in allocations) {
+      alloc.noteController.dispose();
+    }
+    allocations.clear();
+    generalNoteController.clear();
+  }
+
+  @override
+  void onClose() {
+    contentController.dispose();
+    generalNoteController.dispose();
+    for (var alloc in allocations) {
+      alloc.noteController.dispose();
+    }
+    super.onClose();
+  }
+}
+
+class ImageAllocation {
+  final File file;
+  String? studentId;
+  final noteController = TextEditingController();
+
+  ImageAllocation({
+    required this.file,
+    this.studentId,
+  });
 }

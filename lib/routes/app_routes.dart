@@ -28,6 +28,7 @@ abstract class Routes {
   static const TEACHER_HEALTH = '/teacher/health';
   static const TEACHER_ACTIVITY_LOG = '/teacher/activity-log';
   static const TEACHER_ADD_ACTIVITY_LOG = '/teacher/activity-log/add';
+  static const TEACHER_PHOTO_ALLOCATOR = '/teacher/activity-log/photo-allocator';
 
   // Nhật ký (Parent)
   static const PARENT_ACTIVITY_LOG = '/parent/activity-log';

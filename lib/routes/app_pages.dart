@@ -30,6 +30,7 @@ import '../modules/teacher/leave_request/views/teacher_leave_request_view.dart';
 import '../modules/teacher/activity_log/bindings/teacher_activity_log_binding.dart';
 import '../modules/teacher/activity_log/views/teacher_activity_log_view.dart';
 import '../modules/teacher/activity_log/views/add_activity_log_view.dart';
+import '../modules/teacher/activity_log/views/photo_allocator_view.dart';
 
 // Parent
 import '../modules/parent/attendance_history/bindings/attendance_history_binding.dart';
@@ -140,6 +141,11 @@ class AppPages {
     GetPage(
       name: Routes.TEACHER_ADD_ACTIVITY_LOG,
       page: () => const AddActivityLogView(),
+      binding: TeacherActivityLogBinding(),
+    ),
+    GetPage(
+      name: Routes.TEACHER_PHOTO_ALLOCATOR,
+      page: () => const PhotoAllocatorView(),
       binding: TeacherActivityLogBinding(),
     ),
 

@@ -6,7 +6,8 @@ import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../core/values/user_role.dart';
 import '../../../../core/services/auth_service.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/buttons/primary_button.dart';
 import '../../../../data/models/invoice_model.dart';
 import '../controllers/parent_invoice_controller.dart';
 
@@ -27,15 +28,8 @@ class ParentInvoiceDetailView extends GetView<ParentInvoiceController> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: const Text(
-          'Chi tiết Học phí',
-          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
-        ),
-        centerTitle: true,
+      appBar: const MainAppBar(
+        title: 'Chi tiết Học phí',
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.paddingL),
@@ -128,17 +122,9 @@ class ParentInvoiceDetailView extends GetView<ParentInvoiceController> {
           : (invoice.status != AppDatabase.invoiceStatusPaid && invoice.status != AppDatabase.pending)
               ? Padding(
                   padding: const EdgeInsets.all(AppConstants.paddingL),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => controller.simulatePayment(invoice),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.radiusM)),
-                      ),
-                      child: const Text('THANH TOÁN NGAY', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                    ),
+                  child: PrimaryButton(
+                    text: 'THANH TOÁN NGAY',
+                    onPressed: () => controller.simulatePayment(invoice),
                   ),
                 )
               : null,

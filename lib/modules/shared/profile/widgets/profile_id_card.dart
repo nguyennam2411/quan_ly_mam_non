@@ -6,6 +6,7 @@ import 'package:quan_ly_mam_non/core/values/app_database.dart';
 import 'package:quan_ly_mam_non/core/values/user_role.dart';
 import 'package:quan_ly_mam_non/core/utils/dialog.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_loading.dart';
 import '../controllers/profile_controller.dart';
 
 /// Thẻ profile dạng card trắng, đổ bóng nhẹ, căn giữa avatar + tên + lớp.
@@ -107,15 +108,9 @@ class ProfileIdCard extends StatelessWidget {
                                 color: Colors.black38,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                  ),
-                                ),
+                              child: const AppLoading(
+                                color: Colors.white,
+                                size: 24,
                               ),
                             ),
                         ],

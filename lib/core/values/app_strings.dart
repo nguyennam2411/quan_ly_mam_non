@@ -4,7 +4,7 @@ class AppStrings {
   // ===========================================================================
   // 1. Branding
   // ===========================================================================
-  static const String appName = 'Mầm Non Sao Mai';
+  static const String appName = 'Quản Lý Mầm Non';
   static const String appSlogan = 'Khơi dậy tiềm năng, thắp sáng tương lai';
   static const String contactSupport = 'Liên hệ tổng đài';
   static const String needHelp = 'Bạn cần hỗ trợ?';
@@ -61,6 +61,8 @@ class AppStrings {
   static const String menuHealth = 'Sức khỏe';
   static const String menuAttendanceHistory = 'Chuyên cần';
   static const String menuLeaveRequest = 'Xin nghỉ';
+  static const String menuClassroom = 'Lớp học';
+  static const String menuTalent = 'Năng khiếu';
   
   static const String labelTeacher = 'Giáo viên';
   static const String labelParent = 'Phụ huynh học sinh';
@@ -361,6 +363,8 @@ class AppStrings {
   static const String studentProfileNotFound = 'Không tìm thấy thông tin học sinh';
   static const String studentProfileLabelBoy = 'Nam';
   static const String studentProfileLabelGirl = 'Nữ';
+  static const String studentProfileFaceRegistered = 'Đã đăng ký khuôn mặt (Cập nhật)';
+  static const String studentProfileFaceRegisterAction = 'Đăng ký nhận diện khuôn mặt';
 
   // ===========================================================================
   // 10. Profile & Settings

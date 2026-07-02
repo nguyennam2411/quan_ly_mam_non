@@ -50,27 +50,23 @@ class ActivityLogRepository {
     final logResponse = await provider.insertLog(logData);
     final String logId = logResponse['id'];
 
-    // 2. Upload ảnh và tạo bản ghi Image
+    // 2. Upload tất cả ảnh song song (Future.wait)
     if (images.isNotEmpty) {
-      final List<Map<String, dynamic>> imagesToInsert = [];
       final uploadFolder = AppMediaFolders.activity(classroomId, logId);
-      
-      for (var image in images) {
-        // Nén ảnh trước khi tải lên
-        final compressedFile = await ImageHelper.compressImage(image);
-        
-        final imageUrl = await provider.uploadFile(compressedFile, uploadFolder);
-        
-        imagesToInsert.add({
-          'activity_id': logId,
-          'image_url': imageUrl,
-        });
 
+      final uploadedUrls = await Future.wait(images.map((image) async {
+        final compressedFile = await ImageHelper.compressImage(image);
+        final imageUrl = await provider.uploadFile(compressedFile, uploadFolder);
         // Xóa file tạm thời sau khi tải lên để giải phóng bộ nhớ
         if (compressedFile.path != image.path) {
           await ImageHelper.deleteTempFile(compressedFile);
         }
-      }
+        return imageUrl;
+      }));
+
+      final imagesToInsert = uploadedUrls
+          .map((url) => {'activity_id': logId, 'image_url': url})
+          .toList();
 
       await provider.insertImages(imagesToInsert);
     }

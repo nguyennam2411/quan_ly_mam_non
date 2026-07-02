@@ -4,6 +4,10 @@ import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import 'package:quan_ly_mam_non/routes/app_routes.dart';
 import 'package:quan_ly_mam_non/data/models/activity_log_model.dart';
+import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_empty_state.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_loading.dart';
+import 'package:quan_ly_mam_non/global_widgets/images/custom_cached_image.dart';
 import '../controllers/teacher_activity_log_controller.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -14,29 +18,20 @@ class TeacherActivityLogView extends GetView<TeacherActivityLogController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Nhật ký hoạt động'),
-        centerTitle: true,
-        elevation: 0,
+      appBar: const MainAppBar(
+        title: 'Nhật ký hoạt động',
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const AppLoading();
         }
 
         if (controller.logs.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.history_edu_rounded, size: 64, color: AppColors.outlineVariant),
-                const SizedBox(height: 16),
-                Text(
-                  'Chưa có hoạt động nào được đăng',
-                  style: TextStyle(color: AppColors.onSurfaceVariant),
-                ),
-              ],
-            ),
+          return AppEmptyState(
+            title: 'Chưa có hoạt động nào',
+            description: 'Các hoạt động của lớp học sẽ được giáo viên đăng tại đây.',
+            icon: Icons.history_edu_rounded,
+            onRetry: controller.fetchLogs,
           );
         }
 
@@ -213,8 +208,8 @@ class TeacherActivityLogView extends GetView<TeacherActivityLogController> {
   Widget _buildImageGrid(List<dynamic> images) {
     if (images.length == 1) {
       return ClipRRect(
-        child: Image.network(
-          images[0].imageUrl,
+        child: CustomCachedImage(
+          imageUrl: images[0].imageUrl,
           width: double.infinity,
           height: 200,
           fit: BoxFit.cover,
@@ -233,8 +228,8 @@ class TeacherActivityLogView extends GetView<TeacherActivityLogController> {
             padding: const EdgeInsets.only(right: 8),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppConstants.radiusM),
-              child: Image.network(
-                images[index].imageUrl,
+              child: CustomCachedImage(
+                imageUrl: images[index].imageUrl,
                 width: 150,
                 height: 200,
                 fit: BoxFit.cover,

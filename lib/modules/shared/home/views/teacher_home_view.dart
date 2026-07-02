@@ -48,7 +48,7 @@ class TeacherHomeView extends GetView<TeacherHomeController> {
                 crossAxisCount: 4,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 0.72,
+                childAspectRatio: 0.88,
                 children: [
                   QuickFeatureCard(
                     icon: Icons.assignment_turned_in_rounded,
@@ -57,6 +57,13 @@ class TeacherHomeView extends GetView<TeacherHomeController> {
                       await Get.toNamed(Routes.ATTENDANCE_MAIN);
                       controller.fetchClassroomStats();
                     }),
+                  ),
+                  QuickFeatureCard(
+                    icon: Icons.people_alt_rounded,
+                    label: AppStrings.menuClassroom,
+                    onTap: () => _runWithClassroomGuard(
+                      () => Get.toNamed(Routes.TEACHER_CLASSROOM),
+                    ),
                   ),
                   QuickFeatureCard(
                     icon: Icons.event_busy_rounded,
@@ -112,7 +119,7 @@ class TeacherHomeView extends GetView<TeacherHomeController> {
                   ),
                   QuickFeatureCard(
                     icon: Icons.star_rounded,
-                    label: 'Năng khiếu',
+                    label: AppStrings.menuTalent,
                     onTap: () => _runWithClassroomGuard(
                       () => Get.toNamed(Routes.TEACHER_TALENT),
                     ),

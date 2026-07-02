@@ -15,6 +15,8 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/utils/image_helper.dart';
 import '../../../../core/services/cloudinary_service.dart';
 import 'package:file_picker/file_picker.dart';
+import '../../../../global_widgets/state/app_loading.dart';
+import '../../../../global_widgets/images/custom_cached_image.dart';
 
 class EventController extends GetxController {
   final EventRepository repository;
@@ -130,14 +132,12 @@ class EventController extends GetxController {
                   ),
                   child: Column(
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.network(
-                          'https://img.vietqr.io/image/970436-1041252698-compact2.png?amount=${event.fee}&addInfo=$transferContent&accountName=DOAN QUY NHAN',
-                          height: 250,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.qr_code_2, size: 150, color: Colors.grey),
-                        ),
+                      CustomCachedImage(
+                        imageUrl: 'https://img.vietqr.io/image/970436-1041252698-compact2.png?amount=${event.fee}&addInfo=$transferContent&accountName=DOAN QUY NHAN',
+                        height: 250,
+                        fit: BoxFit.contain,
+                        borderRadius: 16,
+                        errorWidget: const Icon(Icons.qr_code_2, size: 150, color: Colors.grey),
                       ),
                       const SizedBox(height: 20),
                       const Divider(color: Colors.black12),
@@ -187,14 +187,7 @@ class EventController extends GetxController {
                   
                   // Báo đang xử lý
                   Get.dialog(
-                    const Center(
-                      child: Card(
-                        child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ), 
+                    const AppLoading(color: Colors.white), 
                     barrierDismissible: false
                   );
                   
@@ -279,7 +272,7 @@ class EventController extends GetxController {
     }
 
     try {
-      Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+      Get.dialog(const AppLoading(), barrierDismissible: false);
       
       String? imageUrl;
       String? documentUrl;
@@ -325,7 +318,7 @@ class EventController extends GetxController {
     if (!UserRole.isTeacher(role)) return;
 
     try {
-      Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+      Get.dialog(const AppLoading(), barrierDismissible: false);
       await repository.deleteEvent(eventId);
       Get.back(); // close loading
       Get.back(); // back to list view
@@ -349,7 +342,7 @@ class EventController extends GetxController {
     }
 
     try {
-      Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+      Get.dialog(const AppLoading(), barrierDismissible: false);
       
       // Load lazy
       final studentRepo = Get.put(StudentRepository(StudentProvider()));

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/state/app_empty_state.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../controllers/teacher_talent_controller.dart';
 import '../../../../data/models/talent_class_model.dart';
 
@@ -10,22 +13,22 @@ class TeacherTalentView extends GetView<TeacherTalentController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Quản lý Lớp Năng Khiếu', style: TextStyle(color: Colors.white)),
+      appBar: const MainAppBar(
+        title: 'Quản lý Lớp Năng Khiếu',
         backgroundColor: AppColors.primary,
-        iconTheme: const IconThemeData(color: Colors.white),
+        titleColor: Colors.white,
+        iconColor: Colors.white,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const AppLoading();
         }
 
         if (controller.talentClasses.isEmpty) {
-          return const Center(
-            child: Text(
-              'Chưa có lớp năng khiếu nào được tạo.',
-              style: TextStyle(color: Colors.grey, fontSize: 16),
-            ),
+          return const AppEmptyState(
+            title: 'Chưa có lớp năng khiếu nào',
+            description: 'Tạo lớp học năng khiếu mới bằng cách ấn nút Thêm bên dưới.',
+            icon: Icons.star_border_rounded,
           );
         }
 

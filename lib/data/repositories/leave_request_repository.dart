@@ -61,27 +61,24 @@ class LeaveRequestRepository {
     // 1. Sinh UUID ngẫu nhiên cho requestId ở phía client trước
     final generatedRequestId = const Uuid().v4();
 
-    // 2. Nếu có ảnh, nén ảnh và upload lên Cloudinary để lấy URL
+    // 2. Nếu có ảnh, nén và upload tất cả song song lên Cloudinary để lấy URL
     if (imageFiles.isNotEmpty) {
-      // Xác định thư mục lưu trữ động trên Cloudinary: mam-non/{env}/leave-requests/students/{studentId}/{requestId}
+      // Xác định thư mục lưu trữ động trên Cloudinary
       final uploadFolder = AppMediaFolders.leaveRequest(request.studentId, generatedRequestId);
 
-      for (var imageFile in imageFiles) {
+      final results = await Future.wait(imageFiles.map((imageFile) async {
         // Sử dụng Helper dùng chung để nén ảnh
         final compressedFile = await ImageHelper.compressImage(imageFile);
-        
         // Upload file đã nén lên Cloudinary vào đúng thư mục của đơn nghỉ phép
         final imageUrl = await _provider.uploadEvidence(compressedFile, folder: uploadFolder);
-        
-        if (imageUrl != null) {
-          imageUrls.add(imageUrl);
-        }
-        
         // Nếu là file tạm (khác file gốc), hãy xóa đi để tiết kiệm bộ nhớ máy
         if (compressedFile.path != imageFile.path) {
           await ImageHelper.deleteTempFile(compressedFile);
         }
-      }
+        return imageUrl;
+      }));
+
+      imageUrls = results.whereType<String>().toList();
     }
 
     // 3. Tạo bản copy của model có kèm id đã sinh trước và URL ảnh

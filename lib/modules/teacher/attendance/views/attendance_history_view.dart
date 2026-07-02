@@ -8,7 +8,7 @@ import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
-import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../controllers/attendance_controller.dart';
 import '../widgets/attendance_item_card.dart';
 

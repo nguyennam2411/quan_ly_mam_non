@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/values/app_constants.dart';
-import '../../core/values/app_database.dart';
-import '../../core/values/app_strings.dart';
-import '../../core/utils/dialog.dart';
-import '../../data/models/medication_request_model.dart';
-import '../dialogs/app_image_viewer.dart';
-import '../chips/status_badge.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/values/app_constants.dart';
+import '../../../../core/values/app_database.dart';
+import '../../../../core/values/app_strings.dart';
+import '../../../../core/utils/dialog.dart';
+import '../../../../data/models/medication_request_model.dart';
+import '../../../../global_widgets/dialogs/app_image_viewer.dart';
+import '../../../../global_widgets/chips/status_badge.dart';
+import '../../../../global_widgets/images/custom_cached_image.dart';
 
 class MedicationRequestDetailModal extends StatelessWidget {
   final MedicationRequestModel request;
@@ -183,20 +184,12 @@ class MedicationRequestDetailModal extends StatelessWidget {
           const SizedBox(height: 8),
           GestureDetector(
             onTap: () => AppImageViewer.show(imageUrls: [request.prescriptionImage!]),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppConstants.radiusM),
-              child: Image.network(
-                request.prescriptionImage!,
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 150,
-                  width: double.infinity,
-                  color: AppColors.surfaceContainerHigh,
-                  child: const Icon(Icons.broken_image, color: AppColors.outline),
-                ),
-              ),
+            child: CustomCachedImage(
+              imageUrl: request.prescriptionImage!,
+              height: 150,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              borderRadius: AppConstants.radiusM,
             ),
           ),
         ],

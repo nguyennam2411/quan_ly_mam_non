@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import '../theme/app_colors.dart';
 import '../values/app_constants.dart';
 import '../values/app_strings.dart';
-import '../../global_widgets/dialogs/app_loading.dart';
+import '../../global_widgets/state/app_loading.dart';
 
 class AppDialogs {
   static void showLoading() {

@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_database.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/chips/filter_tabs.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/chips/status_badge.dart';
 import '../../../parent/invoice/views/parent_invoice_detail_view.dart';
@@ -17,15 +19,8 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: const Text(
-          'Thu Học Phí',
-          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
-        ),
-        centerTitle: true,
+      appBar: const MainAppBar(
+        title: 'Thu Học Phí',
       ),
       body: Column(
         children: [
@@ -88,7 +83,7 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
   Widget _buildStudentList() {
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return const AppLoading();
       }
 
       if (controller.filteredInvoices.isEmpty) {
@@ -291,46 +286,26 @@ class TeacherInvoiceView extends GetView<TeacherInvoiceController> {
       ),
     );
   }
-  Widget _buildFilterChips() {
-    return Obx(() {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingL),
-        child: Row(
-          children: [
-            _buildFilterChip('ALL', 'Tất cả'),
-            const SizedBox(width: 8),
-            _buildFilterChip('PAID', 'Đã đóng'),
-            const SizedBox(width: 8),
-            _buildFilterChip('UNPAID', 'Chưa đóng'),
-            const SizedBox(width: 8),
-            _buildFilterChip('DEBT', 'Còn nợ'),
-          ],
-        ),
-      );
-    });
+  String _mapFilterToLabel(String filter) {
+    if (filter == 'PAID') return 'Đã đóng';
+    if (filter == 'UNPAID') return 'Chưa đóng';
+    if (filter == 'DEBT') return 'Còn nợ';
+    return 'Tất cả';
   }
 
-  Widget _buildFilterChip(String value, String label) {
-    final isSelected = controller.selectedFilter.value == value;
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (selected) {
-        if (selected) controller.selectedFilter.value = value;
-      },
-      selectedColor: AppColors.primaryContainer,
-      backgroundColor: AppColors.surfaceContainerLowest,
-      labelStyle: TextStyle(
-        color: isSelected ? AppColors.primary : AppColors.onSurfaceVariant,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      side: BorderSide(
-        color: isSelected ? AppColors.primary : AppColors.outlineVariant,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.radiusL),
-      ),
-    );
+  String _mapLabelToFilter(String label) {
+    if (label == 'Đã đóng') return 'PAID';
+    if (label == 'Chưa đóng') return 'UNPAID';
+    if (label == 'Còn nợ') return 'DEBT';
+    return 'ALL';
+  }
+
+  Widget _buildFilterChips() {
+    return Obx(() => FilterTabs(
+      statuses: const ['Tất cả', 'Đã đóng', 'Chưa đóng', 'Còn nợ'],
+      selectedStatus: _mapFilterToLabel(controller.selectedFilter.value),
+      onStatusChanged: (label) => controller.selectedFilter.value = _mapLabelToFilter(label),
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingL),
+    ));
   }
 }

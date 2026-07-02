@@ -4,6 +4,7 @@ import 'package:quan_ly_mam_non/data/repositories/schedule_repository.dart';
 import 'package:quan_ly_mam_non/global_widgets/dialogs/app_image_viewer.dart';
 import 'package:quan_ly_mam_non/global_widgets/video/youtube_player_widget.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
+import 'package:quan_ly_mam_non/global_widgets/images/custom_cached_image.dart';
 
 class StudentScheduleTile extends StatelessWidget {
   final ScheduleItem item;
@@ -131,14 +132,12 @@ class StudentScheduleTile extends StatelessWidget {
                         ),
                         child: Stack(
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                lesson.images.first,
-                                height: 180,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
+                            CustomCachedImage(
+                              imageUrl: lesson.images.first,
+                              height: 180,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              borderRadius: 12,
                             ),
                             if (lesson.images.length > 1)
                               Positioned(

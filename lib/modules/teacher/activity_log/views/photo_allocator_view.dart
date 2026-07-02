@@ -3,6 +3,10 @@ import 'package:get/get.dart';
 import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import 'package:quan_ly_mam_non/data/models/student_model.dart';
+import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
+import 'package:quan_ly_mam_non/global_widgets/buttons/primary_button.dart';
+import 'package:quan_ly_mam_non/global_widgets/inputs/app_search_bar.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_loading.dart';
 import '../controllers/teacher_activity_log_controller.dart';
 
 class PhotoAllocatorView extends GetView<TeacherActivityLogController> {
@@ -12,19 +16,13 @@ class PhotoAllocatorView extends GetView<TeacherActivityLogController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Phân bổ ảnh học sinh'),
+      appBar: MainAppBar(
+        title: 'Phân bổ ảnh học sinh',
         actions: [
           Obx(() => controller.isUploading.value
-              ? const Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 16),
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
+              ? const Padding(
+                  padding: EdgeInsets.only(right: 16),
+                  child: AppLoading(size: 20),
                 )
               : TextButton(
                   onPressed: controller.submitAllocations,
@@ -108,35 +106,10 @@ class PhotoAllocatorView extends GetView<TeacherActivityLogController> {
                   ],
                 ),
                 child: SafeArea(
-                  child: Obx(() => ElevatedButton(
-                        onPressed: controller.isUploading.value
-                            ? null
-                            : controller.submitAllocations,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppConstants.radiusM),
-                          ),
-                          elevation: 2,
-                        ),
-                        child: controller.isUploading.value
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Text(
-                                'HOÀN THÀNH (ĐĂNG ${controller.allocations.length} HOẠT ĐỘNG)',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
+                  child: Obx(() => PrimaryButton(
+                        text: 'HOÀN THÀNH (ĐĂNG ${controller.allocations.length} HOẠT ĐỘNG)',
+                        isLoading: controller.isUploading.value,
+                        onPressed: controller.submitAllocations,
                       )),
                 ),
               ),
@@ -376,17 +349,15 @@ class PhotoAllocatorView extends GetView<TeacherActivityLogController> {
               const SizedBox(height: 12),
 
               // Search field
-              TextField(
+              AppSearchBar(
+                hintText: 'Tìm tên bé...',
                 controller: searchController,
                 onChanged: (val) => filterQuery.value = val,
-                decoration: InputDecoration(
-                  hintText: 'Tìm tên bé...',
-                  prefixIcon: const Icon(Icons.search),
-                  isDense: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.radiusM),
-                  ),
-                ),
+                height: 46,
+                borderRadius: BorderRadius.circular(AppConstants.radiusM),
+                backgroundColor: AppColors.surfaceContainerHigh.withValues(alpha: 0.5),
+                boxShadow: const [],
+                iconSize: 22,
               ),
               const SizedBox(height: 16),
 

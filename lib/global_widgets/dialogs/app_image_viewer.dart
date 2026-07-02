@@ -5,6 +5,8 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import '../../core/theme/app_colors.dart';
 
+import '../state/app_loading.dart';
+
 class AppImageViewer extends StatefulWidget {
   final List<String> imageUrls;
   final int initialIndex;
@@ -108,9 +110,7 @@ class _AppImageViewerState extends State<AppImageViewer> {
           );
         },
         itemCount: widget.imageUrls.length,
-        loadingBuilder: (context, event) => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
+        loadingBuilder: (context, event) => const AppLoading(color: Colors.white, size: 30),
         backgroundDecoration: const BoxDecoration(color: Colors.black),
         pageController: _pageController,
         onPageChanged: (index) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/values/app_constants.dart';
-import '../dialogs/app_loading.dart';
+import '../state/app_loading.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;
@@ -33,22 +33,25 @@ class PrimaryButton extends StatelessWidget {
                 size: AppConstants.buttonIconSize,
                 color: Colors.white,
               )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    text,
-                    style: GoogleFonts.beVietnamPro(
-                      fontSize: AppConstants.buttonFontSize,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2, // standard line height for perfect diacritic marks positioning
+            : FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      text,
+                      style: GoogleFonts.beVietnamPro(
+                        fontSize: AppConstants.buttonFontSize,
+                        fontWeight: FontWeight.bold,
+                        height: 1.2, // standard line height for perfect diacritic marks positioning
+                      ),
                     ),
-                  ),
-                  if (trailingIcon != null) ...[
-                    const SizedBox(width: AppConstants.paddingS),
-                    Icon(trailingIcon, size: 20),
-                  ]
-                ],
+                    if (trailingIcon != null) ...[
+                      const SizedBox(width: AppConstants.paddingS),
+                      Icon(trailingIcon, size: 20),
+                    ]
+                  ],
+                ),
               ),
       ),
     );

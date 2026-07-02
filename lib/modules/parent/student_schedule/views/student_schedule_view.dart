@@ -10,7 +10,7 @@ import 'package:quan_ly_mam_non/modules/parent/student_schedule/widgets/student_
 import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
 import 'package:quan_ly_mam_non/global_widgets/headers/section_header.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
-import 'package:quan_ly_mam_non/global_widgets/dialogs/app_loading.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_loading.dart';
 import 'package:quan_ly_mam_non/global_widgets/state/app_empty_state.dart';
 
 class StudentScheduleView extends GetView<StudentScheduleController> {

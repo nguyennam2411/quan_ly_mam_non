@@ -18,6 +18,7 @@ abstract class Routes {
   static const ATTENDANCE_HISTORY = '/teacher/attendance/history';
   static const ATTENDANCE_STATISTIC = '/teacher/attendance/statistic';
   static const ATTENDANCE_QR = '/teacher/attendance/qr-scanner';
+  static const ATTENDANCE_FACE = '/teacher/attendance/face-scanner';
   
   // Chức năng Phụ huynh
   static const PARENT_LEAVE_REQUEST = '/parent/leave-request';
@@ -29,6 +30,8 @@ abstract class Routes {
   static const PARENT_INVOICE = '/parent/invoice';
 
   // Chức năng Giáo viên (Tiếp tục)
+  static const TEACHER_CLASSROOM = '/teacher/classroom';
+  static const TEACHER_STUDENT_DETAIL = '/teacher/classroom/student-detail';
   static const TEACHER_LEAVE_REQUEST = '/teacher/leave-request';
   static const TEACHER_HEALTH = '/teacher/health';
   static const TEACHER_MEDICATION_REQUEST = '/teacher/medication-request';

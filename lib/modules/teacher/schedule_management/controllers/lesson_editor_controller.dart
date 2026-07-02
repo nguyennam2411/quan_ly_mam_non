@@ -206,10 +206,8 @@ class LessonEditorController extends GetxController {
     }
   }
 
-  // Logic upload ảnh lên Cloudinary
+  // Logic upload ảnh lên Cloudinary — chạy song song với Future.wait
   Future<List<String>> _uploadImages(String classroomId, DateTime date) async {
-    final List<String> finalUrls = [];
-    
     // Thư mục lưu trữ trên Cloudinary tương ứng với bài học
     final uploadFolder = AppMediaFolders.lesson(
       classroomId: classroomId,
@@ -217,25 +215,23 @@ class LessonEditorController extends GetxController {
       scheduleId: selectedSchedule.value?.id,
     );
 
-    for (var item in selectedImages) {
-      if (item is String) {
-        finalUrls.add(item);
-      } else if (item is File) {
-        // Nén ảnh trước khi tải lên
-        final compressedFile = await ImageHelper.compressImage(item);
-        
-        final imageUrl = await CloudinaryService.to.uploadImage(compressedFile, folder: uploadFolder);
-        if (imageUrl != null) {
-          finalUrls.add(imageUrl);
-        }
+    // Tách ảnh đã có URL (String) và ảnh mới (File) cần upload
+    final existingUrls = selectedImages.whereType<String>().toList();
+    final newFiles = selectedImages.whereType<File>().toList();
 
-        // Xóa file tạm để giải phóng bộ nhớ đệm
-        if (compressedFile.path != item.path) {
-          await ImageHelper.deleteTempFile(compressedFile);
-        }
+    // Upload tất cả File mới song song
+    final uploadedUrls = await Future.wait(newFiles.map((file) async {
+      final compressedFile = await ImageHelper.compressImage(file);
+      final imageUrl = await CloudinaryService.to.uploadImage(compressedFile, folder: uploadFolder);
+      // Xóa file tạm để giải phóng bộ nhớ đệm
+      if (compressedFile.path != file.path) {
+        await ImageHelper.deleteTempFile(compressedFile);
       }
-    }
-    return finalUrls;
+      return imageUrl;
+    }));
+
+    // Gộp URL cũ + URL mới (bỏ null nếu upload thất bại)
+    return [...existingUrls, ...uploadedUrls.whereType<String>()];
   }
 
   void addImage(File file) => selectedImages.add(file);

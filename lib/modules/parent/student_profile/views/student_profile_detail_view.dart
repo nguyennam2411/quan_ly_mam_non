@@ -7,7 +7,7 @@ import '../../../../core/values/app_strings.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
-import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../../../../core/utils/date_helper.dart';
 import '../../../../core/utils/dialog.dart';
 import '../../../../data/models/student_guardian_model.dart';
@@ -109,15 +109,9 @@ class StudentProfileDetailView extends GetView<StudentProfileController> {
                               color: Colors.black38,
                               shape: BoxShape.circle,
                             ),
-                            child: const Center(
-                              child: SizedBox(
-                                width: 28,
-                                height: 28,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              ),
+                            child: const AppLoading(
+                              color: Colors.white,
+                              size: 28,
                             ),
                           );
                         }
@@ -180,6 +174,35 @@ class StudentProfileDetailView extends GetView<StudentProfileController> {
               ),
             ),
           ),
+          const SizedBox(height: 12),
+          Obx(() {
+            final hasFace = controller.hasRegisteredFace.value;
+            return TextButton.icon(
+              onPressed: () => controller.registerStudentFace(),
+              icon: Icon(
+                hasFace ? Icons.check_circle_rounded : Icons.face_retouching_natural_rounded,
+                size: 18,
+                color: hasFace ? AppColors.success : themeColor,
+              ),
+              label: Text(
+                hasFace ? AppStrings.studentProfileFaceRegistered : AppStrings.studentProfileFaceRegisterAction,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: hasFace ? AppColors.success : themeColor,
+                backgroundColor: hasFace 
+                    ? AppColors.success.withValues(alpha: 0.08) 
+                    : themeColor.withValues(alpha: 0.08),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -211,7 +234,7 @@ class StudentProfileDetailView extends GetView<StudentProfileController> {
 
   Widget _buildHealthCard(BuildContext context, Color themeColor) {
     return Obx(() {
-      if (controller.isLoading.value) {
+      if (controller.isHealthLoading.value) {
         return Container(
           height: 150,
           decoration: _cardDecoration(),

@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/core/values/app_constants.dart';
+import 'package:quan_ly_mam_non/data/models/activity_image_model.dart';
 import 'package:quan_ly_mam_non/data/models/activity_log_model.dart';
 import '../controllers/parent_activity_log_controller.dart';
-import 'package:quan_ly_mam_non/global_widgets/comment_bottom_sheet.dart';
+import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_empty_state.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_loading.dart';
+import 'package:quan_ly_mam_non/global_widgets/dialogs/comment_bottom_sheet.dart';
+import 'package:quan_ly_mam_non/global_widgets/images/custom_cached_image.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ParentActivityLogView extends GetView<ParentActivityLogController> {
@@ -14,39 +19,31 @@ class ParentActivityLogView extends GetView<ParentActivityLogController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Nhật ký của bé'),
-        centerTitle: true,
+      appBar: const MainAppBar(
+        title: 'Nhật ký của bé',
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const AppLoading();
         }
 
         if (controller.logs.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.auto_awesome_motion_rounded, size: 64, color: AppColors.outlineVariant),
-                const SizedBox(height: 16),
-                Text(
-                  'Bé chưa có hoạt động nào hôm nay',
-                  style: TextStyle(color: AppColors.onSurfaceVariant),
-                ),
-              ],
-            ),
+          return AppEmptyState(
+            title: 'Chưa có hoạt động nào',
+            description: 'Các hoạt động trong ngày của bé sẽ được cập nhật tại đây.',
+            icon: Icons.auto_awesome_motion_rounded,
+            onRetry: controller.fetchLogs,
           );
         }
 
         return RefreshIndicator(
           onRefresh: controller.fetchLogs,
           child: ListView.builder(
-            padding: const EdgeInsets.all(AppConstants.paddingM),
+            padding: const EdgeInsets.all(AppConstants.paddingL),
             itemCount: controller.logs.length,
             itemBuilder: (context, index) {
               final log = controller.logs[index];
-              return _buildActivityCard(context, log);
+              return _buildLogCard(context, log);
             },
           ),
         );
@@ -54,17 +51,21 @@ class ParentActivityLogView extends GetView<ParentActivityLogController> {
     );
   }
 
-  Widget _buildActivityCard(BuildContext context, dynamic log) {
+  Widget _buildLogCard(BuildContext context, ActivityLogModel log) {
+    // Tên giáo viên: lấy từ student model nếu không có thì dùng teacherId rút ngắn
+    final displayName = log.student?.name ?? 'Giáo viên';
+    final avatarLetter = displayName.isNotEmpty ? displayName[0].toUpperCase() : 'G';
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: AppConstants.paddingL),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(AppConstants.radiusL),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppConstants.radiusXL),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -72,59 +73,85 @@ class ParentActivityLogView extends GetView<ParentActivityLogController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: AppColors.secondaryContainer,
-              child: Icon(
-                log.studentId == null ? Icons.school_rounded : Icons.face_rounded,
-                color: AppColors.onSecondaryContainer,
-              ),
-            ),
-            title: Text(
-              log.studentId == null ? 'Hoạt động cả lớp' : 'Hoạt động cá nhân',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-            subtitle: Text(
-              timeago.format((log.createdAt ?? DateTime.now()).toLocal(), locale: 'vi'),
-              style: const TextStyle(fontSize: 12),
+          Padding(
+            padding: const EdgeInsets.all(AppConstants.paddingM),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: AppColors.primaryContainer,
+                  child: Text(
+                    avatarLetter,
+                    style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        log.createdAt != null
+                            ? timeago.format(log.createdAt!, locale: 'vi')
+                            : '',
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
 
-          // Content
-          if (log.content != null && log.content!.isNotEmpty)
+          // Content Text
+          if (log.content.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              child: Text(
-                log.content!,
-                style: const TextStyle(fontSize: 15, height: 1.4),
-              ),
+              padding: const EdgeInsets.fromLTRB(AppConstants.paddingM, 0, AppConstants.paddingM, AppConstants.paddingM),
+              child: Text(log.content, style: const TextStyle(fontSize: 15, height: 1.4)),
             ),
 
           // Images
           if (log.images != null && log.images!.isNotEmpty)
             _buildImageDisplay(log.images!),
 
-          const SizedBox(height: 16),
-          
-          // Interaction (Optional: Like/Comment placeholder)
           const Divider(height: 1),
+
+          // Actions (Like & Comment)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Row(
               children: [
+                Obx(() {
+                  // Rebuild khi logs thay đổi để phản ánh trạng thái like mới nhất
+                  final currentLog = controller.logs.firstWhereOrNull((l) => l.id == log.id) ?? log;
+                  return TextButton.icon(
+                    onPressed: () => controller.toggleLike(currentLog),
+                    icon: Icon(
+                      currentLog.isLiked ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
+                      color: currentLog.isLiked ? Colors.red : Colors.grey,
+                    ),
+                    label: Text(
+                      currentLog.isLiked ? 'Đã thích' : 'Thích',
+                      style: TextStyle(color: currentLog.isLiked ? Colors.red : Colors.grey[700]),
+                    ),
+                  );
+                }),
+                const SizedBox(width: 16),
                 TextButton.icon(
-                  onPressed: () => controller.toggleLike(log),
-                  icon: Icon(
-                    log.isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded, 
-                    size: 20,
-                    color: log.isLiked ? Colors.red : null,
-                  ),
-                  label: Text('${log.likeCount > 0 ? log.likeCount : ''} Yêu thích'),
-                ),
-                TextButton.icon(
-                  onPressed: () => _showCommentBottomSheet(context, log),
-                  icon: const Icon(Icons.mode_comment_outlined, size: 20),
-                  label: Text('${log.commentCount > 0 ? log.commentCount : ''} Bình luận'),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => CommentBottomSheet(
+                        activityLog: log,
+                        onSend: (content) => controller.addComment(log, content),
+                        getComments: () => controller.getComments(log.id!),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.mode_comment_outlined, color: Colors.grey),
+                  label: Text('Bình luận', style: TextStyle(color: Colors.grey[700])),
                 ),
               ],
             ),
@@ -134,34 +161,12 @@ class ParentActivityLogView extends GetView<ParentActivityLogController> {
     );
   }
 
-  void _showCommentBottomSheet(BuildContext context, ActivityLogModel log) {
-    Get.bottomSheet(
-      CommentBottomSheet(
-        activityLog: log,
-        onSend: (content) => controller.addComment(log, content),
-        getComments: () => controller.getComments(log.id!),
-      ),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-    );
-  }
-
-  Widget _buildImageDisplay(List<dynamic> images) {
+  Widget _buildImageDisplay(List<ActivityImageModel> images) {
     if (images.length == 1) {
-      return ClipRRect(
-        child: Image.network(
-          images[0].imageUrl,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              height: 200,
-              color: AppColors.surfaceContainerLow,
-              child: const Center(child: CircularProgressIndicator()),
-            );
-          },
-        ),
+      return CustomCachedImage(
+        imageUrl: images[0].imageUrl,
+        width: double.infinity,
+        fit: BoxFit.cover,
       );
     }
 
@@ -172,12 +177,10 @@ class ParentActivityLogView extends GetView<ParentActivityLogController> {
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppConstants.radiusM),
-              child: Image.network(
-                images[index].imageUrl,
-                fit: BoxFit.cover,
-              ),
+            child: CustomCachedImage(
+              imageUrl: images[index].imageUrl,
+              fit: BoxFit.cover,
+              borderRadius: AppConstants.radiusM,
             ),
           );
         },

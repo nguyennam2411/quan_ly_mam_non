@@ -7,10 +7,12 @@ import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/headers/section_header.dart';
-import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/calendar/app_calendar_picker.dart';
 import '../controllers/meal_plan_controller.dart';
+
+import '../../../../global_widgets/images/custom_cached_image.dart';
 
 class MealPlanView extends GetView<MealPlanController> {
   const MealPlanView({super.key});
@@ -330,24 +332,10 @@ class MealPlanView extends GetView<MealPlanController> {
                       borderRadius: BorderRadius.circular(AppConstants.radiusL),
                       border: Border.all(color: AppColors.surfaceVariant.withValues(alpha: 0.5)),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(AppConstants.radiusL - 1),
-                      child: Image.network(
-                        images[index],
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: AppLoading(
-                              size: 20,
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: AppColors.surfaceContainerLow,
-                          child: const Icon(Icons.broken_image_rounded, color: AppColors.outline),
-                        ),
-                      ),
+                    child: CustomCachedImage(
+                      imageUrl: images[index],
+                      fit: BoxFit.cover,
+                      borderRadius: AppConstants.radiusL - 1,
                     ),
                   );
                 },

@@ -5,7 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/values/app_strings.dart';
 import '../../../core/values/app_assets.dart';
 import '../../../core/values/app_constants.dart';
-import '../../../global_widgets/dialogs/app_loading.dart';
+import '../../../global_widgets/state/app_loading.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {

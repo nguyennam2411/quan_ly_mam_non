@@ -36,6 +36,9 @@ class AppMediaFolders {
   // 4. Thư mục nhật ký hoạt động của trẻ
   static String activity(String classroomId, String logId) =>
       '$root/activities/classrooms/$classroomId/$logId';
+
+  // 5. Thư mục ảnh khuôn mặt đăng ký AI
+  static String studentFace(String studentId) => '$root/faces/students/$studentId';
 }
 
 

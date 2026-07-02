@@ -7,7 +7,7 @@ import '../../../../core/values/app_database.dart';
 import '../../../../core/values/app_strings.dart';
 import '../../../../data/models/leave_request_model.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
-import '../../../../global_widgets/leave_request/leave_request_detail_content.dart';
+import '../../../../modules/shared/widgets/leave_request/leave_request_detail_content.dart';
 import '../controllers/parent_leave_request_controller.dart';
 
 class ParentLeaveRequestDetail extends StatelessWidget {

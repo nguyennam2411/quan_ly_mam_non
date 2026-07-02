@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/core/values/app_constants.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../controllers/teacher_activity_log_controller.dart';
 
 class AddActivityLogView extends GetView<TeacherActivityLogController> {
@@ -11,19 +13,13 @@ class AddActivityLogView extends GetView<TeacherActivityLogController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Đăng hoạt động'),
+      appBar: MainAppBar(
+        title: 'Đăng hoạt động',
         actions: [
           Obx(() => controller.isUploading.value
-              ? const Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 16),
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
+              ? const Padding(
+                  padding: EdgeInsets.only(right: 16),
+                  child: AppLoading(size: 20),
                 )
               : TextButton(
                   onPressed: controller.submitLog,

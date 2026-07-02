@@ -96,10 +96,10 @@ class AttendanceItemCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(
-                              color: AppColors.primary.withOpacity(0.2),
+                              color: AppColors.primary.withValues(alpha: 0.2),
                               width: 0.5,
                             ),
                           ),
@@ -116,6 +116,39 @@ class AttendanceItemCard extends StatelessWidget {
                                 'QR',
                                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                       color: AppColors.primary,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      // Hiển thị nhãn Gương mặt nếu điểm danh bằng khuôn mặt
+                      if (item.attendance?.method == AppDatabase.methodFace)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2E7D32).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: const Color(0xFF2E7D32).withValues(alpha: 0.2),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.face_rounded,
+                                size: 10,
+                                color: Color(0xFF2E7D32),
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                'Khuôn mặt',
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      color: const Color(0xFF2E7D32),
                                       fontSize: 9,
                                       fontWeight: FontWeight.bold,
                                     ),

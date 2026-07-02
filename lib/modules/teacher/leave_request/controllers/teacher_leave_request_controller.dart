@@ -85,11 +85,27 @@ class TeacherLeaveRequestController extends GetxController {
     }
   }
 
+  Set<String> _classStudentIds = {};
+
+  Future<void> fetchClassStudentIds() async {
+    final classroomId = AuthService.to.classroomId.value;
+    if (classroomId.isEmpty) return;
+    try {
+      final List<dynamic> response = await Supabase.instance.client
+          .from(AppDatabase.tableStudents)
+          .select(AppDatabase.colId)
+          .eq(AppDatabase.colClassroomId, classroomId);
+      _classStudentIds = response.map((s) => s[AppDatabase.colId] as String).toSet();
+    } catch (e) {
+      debugPrint('Error fetching class student IDs: $e');
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
     fetchRequests();
-    _setupRealtimeListener();
+    fetchClassStudentIds().then((_) => _setupRealtimeListener());
   }
 
   Future<void> fetchRequests() async {
@@ -140,16 +156,10 @@ class TeacherLeaveRequestController extends GetxController {
             final studentId = newRecord[AppDatabase.colStudentId] ?? oldRecord[AppDatabase.colStudentId];
             
             if (studentId != null) {
-              try {
-                // Kiểm tra nhanh xem học sinh của đơn này có thuộc lớp của giáo viên hiện tại không
-                final studentClassroomId = await repository.getStudentClassroomId(studentId);
-
-                if (studentClassroomId == classroomId) {
-                  debugPrint('Realtime: Leave request update detected for student $studentId in classroom $classroomId. Refreshing...');
-                  await fetchRequests();
-                }
-              } catch (e) {
-                debugPrint('Realtime Error verifying student classroom: $e');
+              // So sánh trực tiếp trong bộ nhớ đệm (Set) thay vì gọi DB (Fix N+1 query trên realtime)
+              if (_classStudentIds.contains(studentId)) {
+                debugPrint('Realtime: Leave request update detected for student $studentId in classroom $classroomId. Refreshing...');
+                await fetchRequests();
               }
             }
           },

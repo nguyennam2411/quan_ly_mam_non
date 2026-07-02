@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/values/app_constants.dart';
-import '../../core/values/app_database.dart';
-import '../../core/values/app_strings.dart';
-import '../../data/models/leave_request_model.dart';
-import '../../global_widgets/chips/status_badge.dart';
-import '../../global_widgets/dialogs/app_image_viewer.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/values/app_constants.dart';
+import '../../../../core/values/app_database.dart';
+import '../../../../core/values/app_strings.dart';
+import '../../../../data/models/leave_request_model.dart';
+import '../../../../global_widgets/chips/status_badge.dart';
+import '../../../../global_widgets/dialogs/app_image_viewer.dart';
+import '../../../../global_widgets/images/custom_cached_image.dart';
 
 class LeaveRequestDetailContent extends StatelessWidget {
   final LeaveRequestModel request;
@@ -87,20 +88,12 @@ class LeaveRequestDetailContent extends StatelessWidget {
                       initialIndex: index,
                       title: AppStrings.leaveRequestEvidenceTitle,
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(AppConstants.radiusM),
-                      child: Image.network(
-                        imageUrl,
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          width: 120,
-                          height: 120,
-                          color: AppColors.surfaceVariant,
-                          child: const Icon(Icons.image_not_supported_outlined, color: AppColors.outline),
-                        ),
-                      ),
+                    child: CustomCachedImage(
+                      imageUrl: imageUrl,
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.cover,
+                      borderRadius: AppConstants.radiusM,
                     ),
                   );
                 },

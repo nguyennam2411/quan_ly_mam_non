@@ -7,6 +7,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
   final VoidCallback? onBack;
   final Color? backgroundColor;
+  final Color? titleColor;
+  final Color? iconColor;
 
   const MainAppBar({
     super.key,
@@ -15,6 +17,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBackButton = true,
     this.onBack,
     this.backgroundColor,
+    this.titleColor,
+    this.iconColor,
   });
 
   @override
@@ -23,11 +27,18 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: backgroundColor ?? Colors.transparent,
       elevation: 0,
       centerTitle: true,
-      leading: showBackButton ? CircleBackButton(onPressed: onBack) : null,
+      leading: showBackButton
+          ? CircleBackButton(
+              onPressed: onBack,
+              iconColor: iconColor,
+              backgroundColor: iconColor != null ? Colors.transparent : null,
+            )
+          : null,
       title: Text(
         title,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
+              color: titleColor,
             ),
       ),
       actions: actions,

@@ -10,11 +10,11 @@ import '../../../../core/utils/dialog.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/headers/page_header.dart';
 import '../../../../global_widgets/headers/section_header.dart';
-import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/chips/filter_tabs.dart';
-import '../../../../global_widgets/medication_request/medication_request_card.dart';
-import '../../../../global_widgets/medication_request/medication_request_detail_modal.dart';
+import '../../../../modules/shared/widgets/medication_request/medication_request_card.dart';
+import '../../../../modules/shared/widgets/medication_request/medication_request_detail_modal.dart';
 import '../controllers/parent_medication_request_controller.dart';
 import '../../../../data/models/medication_request_model.dart';
 

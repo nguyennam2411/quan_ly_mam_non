@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
-import 'package:quan_ly_mam_non/core/values/app_constants.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
+import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
 import 'package:quan_ly_mam_non/global_widgets/state/app_empty_state.dart';
-import 'package:quan_ly_mam_non/global_widgets/dialogs/app_loading.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_loading.dart';
 import '../controllers/notification_controller.dart';
 import '../widgets/notification_item.dart';
 
@@ -15,14 +15,10 @@ class NotificationView extends GetView<NotificationController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text(
-          AppStrings.notificationTitle,
-          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.onSurface),
-        ),
+      appBar: MainAppBar(
+        title: AppStrings.notificationTitle,
         backgroundColor: AppColors.surface,
-        elevation: 0,
-        centerTitle: true,
+        showBackButton: false,
         actions: [
           // Nút Đánh dấu đã đọc tất cả
           Obx(() => controller.unreadCount > 0 

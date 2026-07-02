@@ -20,6 +20,7 @@ class AppDatabase {
   // --- Attendance Method ---
   static const String methodManual = 'MANUAL';
   static const String methodQr = 'QR';
+  static const String methodFace = 'FACE';
 
   // --- Tables ---
   static const String tableUsers = 'users';

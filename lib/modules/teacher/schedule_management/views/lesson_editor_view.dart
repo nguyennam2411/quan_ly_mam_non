@@ -9,7 +9,7 @@ import 'package:quan_ly_mam_non/global_widgets/headers/main_app_bar.dart';
 import 'package:quan_ly_mam_non/global_widgets/images/image_picker_grid.dart';
 import 'package:quan_ly_mam_non/global_widgets/buttons/primary_button.dart';
 import 'package:quan_ly_mam_non/modules/teacher/schedule_management/controllers/lesson_editor_controller.dart';
-import 'package:quan_ly_mam_non/global_widgets/dialogs/app_loading.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_loading.dart';
 import 'package:quan_ly_mam_non/core/utils/validators.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 

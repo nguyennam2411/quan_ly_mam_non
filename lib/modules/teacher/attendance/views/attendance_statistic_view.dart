@@ -7,7 +7,7 @@ import '../../../../core/values/app_strings.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/charts/app_bar_chart.dart';
 import '../../../../global_widgets/charts/app_pie_chart.dart';
-import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../controllers/attendance_statistic_controller.dart';
 
 class AttendanceStatisticView extends GetView<AttendanceStatisticController> {

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/values/app_constants.dart';
-import '../../core/values/app_database.dart';
-import '../../core/values/app_strings.dart';
-import '../../data/models/medication_request_model.dart';
-import '../chips/status_badge.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/values/app_constants.dart';
+import '../../../../core/values/app_database.dart';
+import '../../../../core/values/app_strings.dart';
+import '../../../../data/models/leave_request_model.dart';
+import '../../../../global_widgets/chips/status_badge.dart';
 
-class AppMedicationRequestCard extends StatelessWidget {
-  final MedicationRequestModel request;
+class AppLeaveRequestCard extends StatelessWidget {
+  final LeaveRequestModel request;
   final Widget? actions;
   final VoidCallback? onDetail;
 
-  const AppMedicationRequestCard({
+  const AppLeaveRequestCard({
     super.key,
     required this.request,
     this.actions,
@@ -40,7 +40,7 @@ class AppMedicationRequestCard extends StatelessWidget {
         children: [
           _buildHeader(context),
           AppConstants.spacingM,
-          _buildMedicationDetails(context),
+          _buildReason(context),
           AppConstants.spacingM,
           _buildActionsRow(context),
         ],
@@ -51,7 +51,7 @@ class AppMedicationRequestCard extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     final student = request.student;
     final createdAt = request.createdAt ?? DateTime.now();
-
+    
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -67,7 +67,7 @@ class AppMedicationRequestCard extends StatelessWidget {
               : null,
         ),
         const SizedBox(width: AppConstants.paddingM),
-
+        
         // Info
         Expanded(
           child: Column(
@@ -76,23 +76,18 @@ class AppMedicationRequestCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: Text(
-                      student?.name ?? AppStrings.unknownLabel,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  Text(
+                    student?.name ?? AppStrings.unknownLabel,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 8),
                   _buildStatusBadge(),
                 ],
               ),
               AppConstants.spacingXXS,
               Text(
-                'Đã gửi lúc: ${DateFormat('HH:mm - dd/MM/yyyy').format(createdAt.toLocal())}',
+                '${AppStrings.leaveRequestSentAt} ${DateFormat('HH:mm - dd/MM/yyyy').format(createdAt.toLocal())}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.outline,
                 ),
@@ -103,7 +98,7 @@ class AppMedicationRequestCard extends StatelessWidget {
                   Icon(Icons.calendar_today_rounded, size: 16, color: AppColors.primary),
                   const SizedBox(width: AppConstants.paddingS),
                   Text(
-                    _formatMedicationDate(),
+                    _formatLeaveDates(),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
@@ -121,19 +116,19 @@ class AppMedicationRequestCard extends StatelessWidget {
   Widget _buildStatusBadge() {
     Color color;
     String text;
-
+    
     switch (request.status) {
       case AppDatabase.pending:
         color = AppColors.warning;
-        text = AppStrings.medicationStatusPending;
+        text = AppStrings.leaveStatusPending;
         break;
-      case AppDatabase.completed:
+      case AppDatabase.approved:
         color = AppColors.success;
-        text = AppStrings.medicationStatusCompleted;
+        text = AppStrings.leaveStatusApproved;
         break;
       case AppDatabase.rejected:
         color = AppColors.error;
-        text = AppStrings.medicationStatusMedical;
+        text = AppStrings.leaveStatusRejected;
         break;
       case AppDatabase.cancelled:
       default:
@@ -148,71 +143,24 @@ class AppMedicationRequestCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMedicationDetails(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildReason(BuildContext context) {
+    return Row(
       children: [
-        Row(
-          children: [
-            Text(
-              'Tên thuốc: ',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Expanded(
-              child: Text(
-                request.medicineName,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+        Text(
+          '${AppStrings.leaveRequestReasonLabel}: ',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Text(
-              'Liều lượng: ',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+        Expanded(
+          child: Text(
+            request.reason,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.onSurfaceVariant,
             ),
-            Expanded(
-              child: Text(
-                request.dosage,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Text(
-              'Giờ uống: ',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Expanded(
-              child: Text(
-                request.time,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -222,7 +170,9 @@ class AppMedicationRequestCard extends StatelessWidget {
     return Row(
       children: [
         if (actions != null) actions!,
+        
         const Spacer(),
+        
         TextButton(
           onPressed: onDetail,
           style: TextButton.styleFrom(
@@ -232,7 +182,7 @@ class AppMedicationRequestCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Chi tiết',
+                AppStrings.leaveRequestDetail,
                 style: TextStyle(
                   color: AppColors.primary,
                   fontWeight: FontWeight.bold,
@@ -248,12 +198,18 @@ class AppMedicationRequestCard extends StatelessWidget {
     );
   }
 
-  String _formatMedicationDate() {
+  String _formatLeaveDates() {
     try {
-      final parsed = DateTime.parse(request.date);
-      return DateFormat('EEEE, dd/MM/yyyy', 'vi_VN').format(parsed);
+      final start = DateTime.parse(request.startDate);
+      final end = DateTime.parse(request.endDate);
+      
+      if (start == end) {
+        return DateFormat('EEEE, dd/MM/yyyy', 'vi_VN').format(start);
+      } else {
+        return '${DateFormat('dd/MM').format(start)} - ${DateFormat('dd/MM/yyyy').format(end)}';
+      }
     } catch (e) {
-      return request.date;
+      return '${request.startDate} - ${request.endDate}';
     }
   }
 }

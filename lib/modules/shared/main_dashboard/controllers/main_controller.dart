@@ -9,7 +9,7 @@ import 'package:quan_ly_mam_non/modules/shared/home/views/teacher_home_view.dart
 import 'package:quan_ly_mam_non/modules/shared/notifications/views/notification_view.dart';
 
 import 'package:quan_ly_mam_non/modules/shared/events/views/event_view.dart';
-import 'package:quan_ly_mam_non/global_widgets/dialogs/app_loading.dart';
+import 'package:quan_ly_mam_non/global_widgets/state/app_loading.dart';
 import 'package:quan_ly_mam_non/core/values/app_strings.dart';
 
 class MainController extends GetxController {

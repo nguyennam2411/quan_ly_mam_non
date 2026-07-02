@@ -8,7 +8,7 @@ import 'package:quan_ly_mam_non/data/models/student_model.dart';
 import 'package:quan_ly_mam_non/data/repositories/activity_log_repository.dart';
 import 'package:quan_ly_mam_non/data/repositories/student_repository.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:quan_ly_mam_non/global_widgets/comment_bottom_sheet.dart';
+import 'package:quan_ly_mam_non/global_widgets/dialogs/comment_bottom_sheet.dart';
 
 class TeacherActivityLogController extends GetxController {
   final ActivityLogRepository repository;
@@ -127,16 +127,14 @@ class TeacherActivityLogController extends GetxController {
           studentId: null,
         );
       } else {
-        // Đăng cho từng bé đã chọn (Tạo mỗi bé 1 bản ghi để phụ huynh dễ theo dõi)
-        for (var studentId in selectedStudents) {
-          await repository.createActivity(
-            teacherId: currentTeacherId,
-            classroomId: currentClassId,
-            content: finalContent,
-            images: selectedImages,
-            studentId: studentId,
-          );
-        }
+        // Đăng cho tất cả bé được chọn song song (Future.wait)
+        await Future.wait(selectedStudents.map((studentId) => repository.createActivity(
+          teacherId: currentTeacherId,
+          classroomId: currentClassId,
+          content: finalContent,
+          images: selectedImages,
+          studentId: studentId,
+        )));
       }
 
       Get.back(); // Đóng màn hình add

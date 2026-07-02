@@ -3,6 +3,7 @@ import 'package:quan_ly_mam_non/core/theme/app_colors.dart';
 import 'package:quan_ly_mam_non/data/models/activity_comment_model.dart';
 import 'package:quan_ly_mam_non/data/models/activity_log_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:quan_ly_mam_non/global_widgets/state/app_loading.dart';
 
 class CommentBottomSheet extends StatefulWidget {
   final ActivityLogModel activityLog;
@@ -90,7 +91,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
           // Comments List
           Expanded(
             child: isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const AppLoading()
                 : comments.isEmpty
                     ? Center(
                         child: Text(

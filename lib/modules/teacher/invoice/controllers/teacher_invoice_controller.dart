@@ -107,14 +107,25 @@ class TeacherInvoiceController extends GetxController {
       // Tổng số ngày đi học (Thứ 2 - Thứ 6) dự kiến của cả tháng
       final mealDays = _calculateSchoolDays(currentYear.value, currentMonth.value);
 
+      // Lấy song song dữ liệu vắng mặt và hóa đơn chưa thanh toán cho tất cả học sinh để tối ưu hiệu năng (Fix N+1 query)
+      final List<String> studentIds = studentsData.map((s) => s[AppDatabase.colId] as String).toList();
+      
+      final absentDaysResults = await Future.wait(
+        studentIds.map((id) => repository.countExcusedAbsences(id, startDate, endDate))
+      );
+      
+      final unpaidInvoicesResults = await Future.wait(
+        studentIds.map((id) => repository.getUnpaidInvoicesByStudent(id))
+      );
+
       List<InvoiceModel> newInvoices = [];
+      List<Future<void>> updateStatusFutures = [];
 
       // 4. Lặp qua từng học sinh để tính tiền
-      for (var s in studentsData) {
-        final studentId = s[AppDatabase.colId];
-        
-        // Đếm ngày nghỉ có phép trực tiếp của tháng này
-        final absentDays = await repository.countExcusedAbsences(studentId, startDate, endDate);
+      for (int i = 0; i < studentsData.length; i++) {
+        final studentId = studentIds[i];
+        final absentDays = absentDaysResults[i];
+        final unpaidInvoices = unpaidInvoicesResults[i];
         
         double total = 0.0;
         List<InvoiceItemModel> items = [];
@@ -163,7 +174,6 @@ class TeacherInvoiceController extends GetxController {
         total += mealBreakfast * attendedDays;
 
         // Nhóm E: Nợ cũ chuyển sang (OVERDUE)
-        final unpaidInvoices = await repository.getUnpaidInvoicesByStudent(studentId as String);
         for (var oldInvoice in unpaidInvoices) {
           if (oldInvoice.month == currentMonth.value && oldInvoice.year == currentYear.value) continue;
           
@@ -175,7 +185,7 @@ class TeacherInvoiceController extends GetxController {
           total += oldInvoice.totalAmount;
           
           if (oldInvoice.id != null) {
-            await repository.updateInvoiceStatus(oldInvoice.id!, AppDatabase.invoiceStatusOverdue);
+            updateStatusFutures.add(repository.updateInvoiceStatus(oldInvoice.id!, AppDatabase.invoiceStatusOverdue));
           }
         }
 
@@ -202,6 +212,11 @@ class TeacherInvoiceController extends GetxController {
         newInvoices.add(invoice);
       }
 
+      // Cập nhật song song trạng thái các hoá đơn cũ
+      if (updateStatusFutures.isNotEmpty) {
+        await Future.wait(updateStatusFutures);
+      }
+
       // 5. Đẩy hàng loạt lên Database
       if (newInvoices.isNotEmpty) {
         await repository.insertInvoices(newInvoices);
@@ -225,27 +240,6 @@ class TeacherInvoiceController extends GetxController {
       if (date.weekday != DateTime.saturday && date.weekday != DateTime.sunday) {
         schoolDays++;
       }
-    }
-    return schoolDays;
-  }
-
-  // Hàm tính số ngày đi học (Thứ 2 - Thứ 6) giữa 2 mốc ngày bất kỳ
-  int _calculateSchoolDaysBetween(DateTime start, DateTime end) {
-    int schoolDays = 0;
-    if (start.isAfter(end)) {
-      final temp = start;
-      start = end;
-      end = temp;
-    }
-    
-    DateTime current = DateTime(start.year, start.month, start.day);
-    final stop = DateTime(end.year, end.month, end.day);
-    
-    while (!current.isAfter(stop)) {
-      if (current.weekday != DateTime.saturday && current.weekday != DateTime.sunday) {
-        schoolDays++;
-      }
-      current = current.add(const Duration(days: 1));
     }
     return schoolDays;
   }

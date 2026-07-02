@@ -6,7 +6,7 @@ import '../controllers/student_qr_controller.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
-import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../../../../global_widgets/state/app_error_state.dart';
 import '../../../../core/values/app_strings.dart';
 

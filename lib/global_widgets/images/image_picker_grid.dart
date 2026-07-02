@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quan_ly_mam_non/core/utils/image_helper.dart';
 import 'package:quan_ly_mam_non/core/utils/dialog.dart';
 import 'package:quan_ly_mam_non/global_widgets/dialogs/app_image_viewer.dart';
+import 'package:quan_ly_mam_non/global_widgets/images/custom_cached_image.dart';
 
 class ImagePickerGrid extends StatelessWidget {
   final List<dynamic> images;
@@ -85,12 +86,16 @@ class ImagePickerGrid extends StatelessWidget {
         Positioned.fill(
           child: GestureDetector(
             onTap: () => _viewImage(index),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: image is File
-                  ? Image.file(image, fit: BoxFit.cover)
-                  : Image.network(image.toString(), fit: BoxFit.cover),
-            ),
+            child: image is File
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(image, fit: BoxFit.cover),
+                  )
+                : CustomCachedImage(
+                    imageUrl: image.toString(),
+                    fit: BoxFit.cover,
+                    borderRadius: 12,
+                  ),
           ),
         ),
         Positioned(

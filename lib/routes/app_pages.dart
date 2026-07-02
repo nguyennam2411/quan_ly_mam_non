@@ -24,9 +24,13 @@ import '../modules/teacher/attendance/views/attendance_list_view.dart';
 import '../modules/teacher/attendance/views/attendance_history_view.dart';
 import '../modules/teacher/attendance/views/attendance_statistic_view.dart';
 import '../modules/teacher/attendance/views/qr_scanner_view.dart';
+import '../modules/teacher/attendance/views/face_scanner_view.dart';
 
 import '../modules/teacher/leave_request/bindings/teacher_leave_request_binding.dart';
 import '../modules/teacher/leave_request/views/teacher_leave_request_view.dart';
+import '../modules/teacher/classroom/bindings/teacher_classroom_binding.dart';
+import '../modules/teacher/classroom/views/teacher_classroom_view.dart';
+import '../modules/teacher/classroom/views/teacher_student_detail_view.dart';
 
 import '../modules/teacher/medication_request/bindings/teacher_medication_request_binding.dart';
 import '../modules/teacher/medication_request/views/teacher_medication_request_view.dart';
@@ -151,6 +155,22 @@ class AppPages {
       name: Routes.ATTENDANCE_QR,
       page: () => const QrScannerView(),
       binding: AttendanceBinding(),
+    ),
+    GetPage(
+      name: Routes.ATTENDANCE_FACE,
+      page: () => const FaceScannerView(),
+      binding: AttendanceBinding(),
+    ),
+
+    GetPage(
+      name: Routes.TEACHER_CLASSROOM,
+      page: () => const TeacherClassroomView(),
+      binding: TeacherClassroomBinding(),
+    ),
+    GetPage(
+      name: Routes.TEACHER_STUDENT_DETAIL,
+      page: () => const TeacherStudentDetailView(),
+      binding: TeacherClassroomBinding(),
     ),
 
     // 5. Teacher Leave Request

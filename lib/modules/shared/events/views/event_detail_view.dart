@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/buttons/primary_button.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../core/services/auth_service.dart';
@@ -8,6 +10,8 @@ import '../../../../core/values/user_role.dart';
 import '../../../../data/models/event_model.dart';
 import '../controllers/event_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../global_widgets/images/custom_cached_image.dart';
 
 class EventDetailView extends StatelessWidget {
   final EventModel event;
@@ -21,11 +25,11 @@ class EventDetailView extends StatelessWidget {
     
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Chi tiết sự kiện', style: TextStyle(color: AppColors.onBackground, fontWeight: FontWeight.bold)),
+      appBar: MainAppBar(
+        title: 'Chi tiết sự kiện',
         backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.onBackground),
+        titleColor: AppColors.onBackground,
+        iconColor: AppColors.onBackground,
         actions: [
           if (isTeacher)
             IconButton(
@@ -54,12 +58,12 @@ class EventDetailView extends StatelessWidget {
           children: [
             // Header Image or Gradient
             if (event.imageUrl != null && event.imageUrl!.isNotEmpty)
-              Image.network(
-                event.imageUrl!,
+              CustomCachedImage(
+                imageUrl: event.imageUrl!,
                 width: double.infinity,
                 height: 280,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _buildFallbackHeader(),
+                errorWidget: _buildFallbackHeader(),
               )
             else
               _buildFallbackHeader(),
@@ -265,23 +269,16 @@ class EventDetailView extends StatelessWidget {
 
   Widget _buildActionButtons(bool isTeacher) {
     if (isTeacher) {
-      return SizedBox(
-        height: 50,
-        child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          onPressed: () => controller.showRegistrations(event),
-          icon: const Icon(Icons.people, color: Colors.white),
-          label: const Text('Xem danh sách đăng ký', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-        ),
+      return PrimaryButton(
+        text: 'Xem danh sách đăng ký',
+        onPressed: () => controller.showRegistrations(event),
+        trailingIcon: Icons.people,
       );
     }
 
     return Obx(() {
       // Đọc observable variable để GetX theo dõi
-      final currentRegs = controller.registrations.value;
+      controller.registrations.length;
       final isPastDeadline = DateTime.now().isAfter(event.deadlineDate);
       
       final reg = controller.getRegistration(event.id!);
@@ -330,17 +327,9 @@ class EventDetailView extends StatelessWidget {
       return Row(
         children: [
           Expanded(
-            child: SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: () => controller.registerEvent(event, AppDatabase.statusRegistered, null),
-                child: const Text('Tham gia', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-              ),
+            child: PrimaryButton(
+              text: 'Tham gia',
+              onPressed: () => controller.registerEvent(event, AppDatabase.statusRegistered, null),
             ),
           ),
           const SizedBox(width: 12),

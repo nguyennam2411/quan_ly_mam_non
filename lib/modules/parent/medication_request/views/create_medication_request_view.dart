@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../../../../core/utils/dialog.dart';
@@ -8,7 +7,8 @@ import '../../../../core/services/parent_student_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/calendar/app_calendar_picker.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
 import '../controllers/parent_medication_request_controller.dart';
 
@@ -30,13 +30,8 @@ class CreateMedicationRequestView extends GetView<ParentMedicationRequestControl
       },
       child: Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(
-          leading: const CircleBackButton(),
-          title: const Text(
-            'Tạo đơn dặn thuốc',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
+        appBar: const MainAppBar(
+          title: 'Tạo đơn dặn thuốc',
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(AppConstants.paddingL),
@@ -390,10 +385,12 @@ class CreateMedicationRequestView extends GetView<ParentMedicationRequestControl
   }
 
   void _showDatePicker(BuildContext context) {
+    final datePickerController = DateRangePickerController();
+    datePickerController.selectedDate = controller.applyDate.value ?? DateTime.now();
+
     Get.bottomSheet(
       Container(
         height: 450,
-        padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
@@ -401,49 +398,14 @@ class CreateMedicationRequestView extends GetView<ParentMedicationRequestControl
             topRight: Radius.circular(AppConstants.radiusXL),
           ),
         ),
-        child: Column(
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: AppConstants.paddingM),
-              decoration: BoxDecoration(
-                color: AppColors.outlineVariant.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Text(
-              'Chọn ngày uống thuốc',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            AppConstants.spacingM,
-            Expanded(
-              child: SfDateRangePicker(
-                minDate: DateTime.now(), // Không cho chọn ngày quá khứ
-                onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
-                  if (args.value is DateTime) {
-                    controller.applyDate.value = args.value;
-                  }
-                },
-                selectionMode: DateRangePickerSelectionMode.single,
-                initialSelectedDate: controller.applyDate.value ?? DateTime.now(),
-                headerStyle: const DateRangePickerHeaderStyle(
-                  textAlign: TextAlign.center,
-                  textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                monthCellStyle: const DateRangePickerMonthCellStyle(
-                  todayTextStyle: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-                ),
-                selectionColor: AppColors.primary,
-                todayHighlightColor: AppColors.primary,
-              ),
-            ),
-            AppConstants.spacingM,
-            PrimaryButton(
-              text: AppStrings.confirmLabel,
-              onPressed: () => Get.back(),
-            ),
-          ],
+        child: AppCalendarPicker(
+          controller: datePickerController,
+          initialDate: controller.applyDate.value ?? DateTime.now(),
+          minDate: DateTime.now(),
+          title: 'Chọn ngày uống thuốc',
+          onSelectionChanged: (DateTime date) {
+            controller.applyDate.value = date;
+          },
         ),
       ),
       isScrollControlled: true,

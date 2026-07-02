@@ -11,7 +11,7 @@ import '../widgets/home_section_header.dart';
 import '../widgets/quick_feature_card.dart';
 import '../widgets/home_welcome_header.dart';
 import '../../../../global_widgets/buttons/action_pill_button.dart';
-import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../../../../core/utils/dialog.dart';
 import '../../../../core/values/app_strings.dart';
 
@@ -30,15 +30,19 @@ class ParentHomeView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome Header
-              HomeWelcomeHeader(
-                userName: AuthService.to.userProfile[AppDatabase.colName] ?? AppStrings.labelParent,
+              // Welcome Header & Student Selector
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: HomeWelcomeHeader(
+                      userName: AuthService.to.userProfile[AppDatabase.colName] ?? AppStrings.labelParent,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  _buildStudentSelector(context, studentService),
+                ],
               ),
-              
-              const SizedBox(height: 24),
-
-              // Student Selector
-              _buildStudentSelector(context, studentService),
 
               const SizedBox(height: 24),
               
@@ -219,105 +223,182 @@ class ParentHomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildStudentSelector(BuildContext context, ParentStudentService service) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppStrings.selectChild,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.onSurfaceVariant,
-              ),
+  void _showStudentSelectionBottomSheet(BuildContext context, ParentStudentService service) {
+    Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        const SizedBox(height: 12),
-        Obx(() {
-          if (service.isLoading.value && service.students.isEmpty) {
-            return const AppLoading(size: 24);
-          }
-
-          if (service.students.isEmpty) {
-            return const Text(AppStrings.noStudentInfo);
-          }
-
-          return SizedBox(
-            height: 52,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: service.students.length,
-              clipBehavior: Clip.none,
-              itemBuilder: (context, index) {
-                final student = service.students[index];
-
-                return Obx(() {
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.outlineVariant,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Chọn tài khoản của bé',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.onBackground,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Flexible(
+              child: Obx(() => ListView.separated(
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                itemCount: service.students.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final student = service.students[index];
                   final isSelected = service.selectedStudent.value?.id == student.id;
+                  final hasAvatar = student.avatarUrl != null && student.avatarUrl!.isNotEmpty;
 
                   return GestureDetector(
-                    onTap: () => service.selectStudent(student),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      margin: const EdgeInsets.only(right: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    onTap: () {
+                      service.selectStudent(student);
+                      Get.back();
+                    },
+                    child: Container(
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        color: isSelected
+                            ? AppColors.primary.withValues(alpha: 0.05)
+                            : AppColors.surfaceContainerLowest,
+                        borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.primary.withValues(alpha: 0.1),
-                          width: 1.5,
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.outlineVariant.withValues(alpha: 0.5),
+                          width: isSelected ? 1.8 : 1,
                         ),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                )
-                              ]
-                            : [],
                       ),
+                      padding: const EdgeInsets.all(14),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(1.5),
-                            decoration: BoxDecoration(
-                              color: isSelected ? Colors.white.withValues(alpha: 0.3) : AppColors.primary.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: CircleAvatar(
-                              radius: 14,
-                              backgroundColor: Colors.white,
-                              backgroundImage: student.avatarUrl != null
-                                  ? NetworkImage(student.avatarUrl!)
-                                  : null,
-                              child: student.avatarUrl == null
-                                  ? Icon(Icons.person,
-                                      size: 16,
-                                      color: isSelected ? AppColors.primary : AppColors.primary)
-                                  : null,
+                          CircleAvatar(
+                            radius: 26,
+                            backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+                            backgroundImage: hasAvatar ? NetworkImage(student.avatarUrl!) : null,
+                            child: !hasAvatar
+                                ? const Icon(Icons.face_rounded, size: 28, color: AppColors.primary)
+                                : null,
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  student.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: AppColors.onBackground,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  student.classroomName != null ? 'Lớp: ${student.classroomName}' : 'Chưa xếp lớp',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.8),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            student.name.split(' ').last,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                              color: isSelected ? Colors.white : AppColors.onSurface,
+                          if (isSelected)
+                            const Icon(
+                              Icons.check_circle_rounded,
+                              color: AppColors.primary,
+                              size: 24,
                             ),
-                          ),
                         ],
                       ),
                     ),
                   );
-                });
-              },
+                },
+              )),
             ),
-          );
-        }),
-      ],
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
     );
+  }
+
+  Widget _buildStudentSelector(BuildContext context, ParentStudentService service) {
+    return Obx(() {
+      final student = service.selectedStudent.value;
+      if (student == null) return const SizedBox.shrink();
+      final hasAvatar = student.avatarUrl != null && student.avatarUrl!.isNotEmpty;
+
+      return GestureDetector(
+        onTap: () => _showStudentSelectionBottomSheet(context, service),
+        child: Column(
+          children: [
+            Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                      width: 2,
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    radius: 26,
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+                    backgroundImage: hasAvatar ? NetworkImage(student.avatarUrl!) : null,
+                    child: !hasAvatar
+                        ? const Icon(Icons.face_rounded, size: 28, color: AppColors.primary)
+                        : null,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.swap_horiz_rounded,
+                    size: 12,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              student.name.split(' ').last,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppColors.onSurface,
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   void _runWithStudentGuard(ParentStudentService service, VoidCallback action) {
@@ -346,7 +427,7 @@ class ParentHomeView extends StatelessWidget {
           crossAxisCount: 4,
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
-          childAspectRatio: 0.72,
+          childAspectRatio: 0.88,
           children: [
             QuickFeatureCard(
               icon: Icons.schedule_rounded,

@@ -26,15 +26,21 @@ class ScheduleRepository {
 
   Future<List<ScheduleItem>> getFullDailySchedule(String classroomId, DateTime date, {bool isParent = false}) async {
     try {
-      // 1. Lấy TKB của thứ đó
-      final dayOfWeek = date.weekday + 1; 
-      final scheduleData = await _scheduleProvider.getByDay(classroomId, dayOfWeek);
-      final allSchedules = scheduleData.map((e) => ScheduleModel.fromJson(e)).toList();
-
-      // 2. Lấy danh sách bài học của ngày đó
+      // 1. & 2. Lấy TKB của thứ đó và danh sách bài học của ngày đó song song (Fix N+1/Sequential query)
       final dateStr = DateFormat('yyyy-MM-dd').format(date);
       final lessonStatus = isParent ? AppDatabase.statusPublished : null;
-      final lessonData = await _lessonProvider.getByDate(classroomId, dateStr, status: lessonStatus);
+
+      final dayOfWeek = date.weekday + 1;
+
+      final futureResults = await Future.wait([
+        _scheduleProvider.getByDay(classroomId, dayOfWeek),
+        _lessonProvider.getByDate(classroomId, dateStr, status: lessonStatus),
+      ]);
+
+      final scheduleData = futureResults[0] as List<dynamic>;
+      final lessonData = futureResults[1] as List<dynamic>;
+
+      final allSchedules = scheduleData.map((e) => ScheduleModel.fromJson(e)).toList();
       final lessons = lessonData.map((e) => LessonModel.fromJson(e)).toList();
 
       List<ScheduleItem> results = [];

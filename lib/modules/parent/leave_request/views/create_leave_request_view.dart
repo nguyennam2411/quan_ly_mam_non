@@ -7,7 +7,7 @@ import '../../../../core/services/parent_student_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
 import '../../../../global_widgets/images/image_picker_grid.dart';
 import '../controllers/parent_leave_request_controller.dart';
@@ -31,13 +31,8 @@ class CreateLeaveRequestView extends GetView<ParentLeaveRequestController> {
       },
       child: Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(
-          leading: const CircleBackButton(),
-          title: Text(
-            AppStrings.leaveRequestCreateTitle,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
+        appBar: MainAppBar(
+          title: AppStrings.leaveRequestCreateTitle,
         ),
         body: Form(
           key: controller.formKey,

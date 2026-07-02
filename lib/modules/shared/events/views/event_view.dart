@@ -4,9 +4,13 @@ import 'package:intl/intl.dart';
 import '../controllers/event_controller.dart';
 import 'event_detail_view.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/values/app_database.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/values/user_role.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/state/app_empty_state.dart';
+import '../../../../global_widgets/state/app_loading.dart';
+
+import '../../../../global_widgets/images/custom_cached_image.dart';
 
 class EventView extends GetView<EventController> {
   const EventView({super.key});
@@ -17,10 +21,10 @@ class EventView extends GetView<EventController> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Sự kiện & Ngoại khóa', style: TextStyle(color: AppColors.onBackground, fontWeight: FontWeight.bold)),
+      appBar: const MainAppBar(
+        title: 'Sự kiện & Ngoại khóa',
         backgroundColor: Colors.white,
-        elevation: 0,
+        showBackButton: false,
       ),
       floatingActionButton: isTeacher ? FloatingActionButton(
         backgroundColor: AppColors.primary,
@@ -29,19 +33,20 @@ class EventView extends GetView<EventController> {
       ) : null,
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const AppLoading();
         }
         if (controller.events.isEmpty) {
-          return const Center(child: Text('Chưa có sự kiện nào.'));
+          return const AppEmptyState(
+            title: 'Chưa có sự kiện nào',
+            description: 'Các sự kiện của trường học sẽ được cập nhật tại đây.',
+            icon: Icons.celebration_rounded,
+          );
         }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: controller.events.length,
           itemBuilder: (context, index) {
             final event = controller.events[index];
-            final reg = controller.getRegistration(event.id!);
-            final isPastDeadline = DateTime.now().isAfter(event.deadlineDate);
-            
             return Card(
               margin: const EdgeInsets.only(bottom: 16),
               clipBehavior: Clip.antiAlias,
@@ -52,17 +57,11 @@ class EventView extends GetView<EventController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (event.imageUrl != null && event.imageUrl!.isNotEmpty)
-                      Image.network(
-                        event.imageUrl!,
+                      CustomCachedImage(
+                        imageUrl: event.imageUrl!,
                         height: 140,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          height: 140,
-                          width: double.infinity,
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.image_not_supported, color: Colors.grey, size: 50),
-                        ),
                       ),
                     Padding(
                       padding: const EdgeInsets.all(16),

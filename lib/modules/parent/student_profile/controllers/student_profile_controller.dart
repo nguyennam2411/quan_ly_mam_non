@@ -13,6 +13,9 @@ import '../../../../core/services/cloudinary_service.dart';
 import '../../../../core/services/parent_student_service.dart';
 import '../../../../core/values/app_media_folders.dart';
 import '../../../../core/values/app_strings.dart';
+import 'package:quan_ly_mam_non/routes/app_routes.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 class StudentProfileController extends GetxController {
   final HealthRecordRepository _healthRepository;
@@ -33,8 +36,11 @@ class StudentProfileController extends GetxController {
   final Rxn<HealthRecordModel> latestHealth = Rxn<HealthRecordModel>();
   final RxList<StudentGuardianModel> guardians = <StudentGuardianModel>[].obs;
   
-  final RxBool isLoading = false.obs;
+  final RxBool isLoading = false.obs; // Dùng cho tải/cập nhật Avatar
+  final RxBool isHealthLoading = false.obs; // Dùng riêng cho tải chỉ số phát triển
   final RxBool isGuardiansLoading = false.obs;
+
+  final RxBool hasRegisteredFace = false.obs;
 
   @override
   void onInit() {
@@ -43,15 +49,29 @@ class StudentProfileController extends GetxController {
       _studentRx.value = Get.arguments as StudentModel;
       fetchLatestHealth();
       fetchGuardians();
+      checkFaceRegistration();
     } else {
       Get.back();
       AppDialogs.error(message: AppStrings.studentProfileNotFound);
     }
   }
 
+  Future<void> checkFaceRegistration() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('student_face_embeddings')
+          .select('id')
+          .eq('student_id', student.id)
+          .maybeSingle();
+      hasRegisteredFace.value = response != null;
+    } catch (e) {
+      debugPrint("Error checking face registration: $e");
+    }
+  }
+
   Future<void> fetchLatestHealth() async {
     try {
-      isLoading.value = true;
+      isHealthLoading.value = true;
       final history = await _healthRepository.getStudentGrowthHistory(student.id);
       if (history.isNotEmpty) {
         latestHealth.value = history.last;
@@ -59,7 +79,7 @@ class StudentProfileController extends GetxController {
     } catch (e) {
       AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
-      isLoading.value = false;
+      isHealthLoading.value = false;
     }
   }
 
@@ -184,6 +204,30 @@ class StudentProfileController extends GetxController {
       AppDialogs.error(message: AppErrorMessage.from(e));
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> registerStudentFace() async {
+    try {
+      // Mở trực tiếp màn hình FaceScannerView ở chế độ đăng ký
+      final result = await Get.toNamed(
+        Routes.ATTENDANCE_FACE,
+        arguments: {
+          'mode': 'register',
+          'studentId': student.id,
+          'studentName': student.name,
+        },
+      );
+
+      if (result == true) {
+        hasRegisteredFace.value = true;
+        // Chờ hiệu ứng đóng màn hình (Get.back) hoàn tất rồi mới hiện thông báo thành công để tránh giật lag
+        Future.delayed(const Duration(milliseconds: 350), () {
+          AppDialogs.success(message: 'Đăng ký nhận diện khuôn mặt bé thành công!');
+        });
+      }
+    } catch (e) {
+      AppDialogs.error(message: AppErrorMessage.from(e));
     }
   }
 }

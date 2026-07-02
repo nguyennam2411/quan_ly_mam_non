@@ -9,10 +9,10 @@ import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/headers/page_header.dart';
 import '../../../../global_widgets/headers/section_header.dart';
 import '../../../../global_widgets/inputs/app_search_bar.dart';
-import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/chips/filter_tabs.dart';
-import '../../../../global_widgets/leave_request/leave_request_card.dart';
+import '../../../../modules/shared/widgets/leave_request/leave_request_card.dart';
 import '../controllers/teacher_leave_request_controller.dart';
 import 'leave_request_detail_modal.dart';
 

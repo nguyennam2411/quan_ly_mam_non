@@ -169,7 +169,7 @@ class AttendanceController extends GetxController {
   }
 
   // Cập nhật trạng thái local
-  void updateStatus(int index, String status) {
+  void updateStatus(int index, String status, {String method = AppDatabase.methodManual}) {
     if (isFuture) return; // Không cho phép điểm danh ngày tương lai
     
     // 1. Lấy dữ liệu hiện tại của học sinh này
@@ -204,7 +204,7 @@ class AttendanceController extends GetxController {
       studentId: item.student.id,
       date: selectedDate.value.toIso8601String().split('T')[0],
       status: status,
-      method: AppDatabase.methodManual, 
+      method: method, 
       checkinTime: currentTime,
       classroomId: currentClassId, 
       teacherId: AuthService.to.currentUser.value?.id,
@@ -221,8 +221,9 @@ class AttendanceController extends GetxController {
     if (isFuture) return; // Không cho phép điểm danh ngày tương lai
     
     for (var i = 0; i < studentsWithAttendance.length; i++) {
-      // Chỉ update những bé chưa có trạng thái hoặc đang vắng (ko đụng vào vắng có phép)
-      if (studentsWithAttendance[i].attendance?.status != AppDatabase.statusAbsentExcused) {
+      final currentStatus = studentsWithAttendance[i].attendance?.status;
+      // Chỉ update những bé chưa có trạng thái hoặc đang vắng không phép (không đè lên vắng có phép hoặc bé đã có mặt)
+      if (currentStatus != AppDatabase.statusAbsentExcused && currentStatus != AppDatabase.statusPresent) {
         updateStatus(i, AppDatabase.statusPresent);
       }
     }

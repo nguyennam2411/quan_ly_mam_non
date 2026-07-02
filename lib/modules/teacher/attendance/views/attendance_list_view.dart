@@ -4,12 +4,13 @@ import '../../../../core/utils/dialog.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_strings.dart';
+import '../../../../core/values/app_database.dart';
 import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/headers/section_header.dart';
 import '../../../../global_widgets/buttons/primary_button.dart';
 import '../../../../global_widgets/inputs/app_search_bar.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
-import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../controllers/attendance_controller.dart';
 import '../widgets/attendance_item_card.dart';
 import '../../../../routes/app_routes.dart';
@@ -267,7 +268,7 @@ class AttendanceListView extends GetView<AttendanceController> {
             ),
           ),
 
-          // Nút quét QR - chỉ hiện khi điểm danh hôm nay
+          // Nút quét QR & Nút quét khuôn mặt - chỉ hiện khi điểm danh hôm nay
           if (controller.isToday) ...[
             const SizedBox(width: AppConstants.paddingM),
             SizedBox(
@@ -289,6 +290,34 @@ class AttendanceListView extends GetView<AttendanceController> {
                 ),
                 child: const Icon(
                   Icons.qr_code_scanner_rounded,
+                  color: AppColors.primary,
+                  size: 26,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              height: AppConstants.buttonHeight,
+              width: AppConstants.buttonHeight,
+              child: OutlinedButton(
+                onPressed: () async {
+                  await Get.toNamed(
+                    Routes.ATTENDANCE_FACE,
+                    arguments: {
+                      'mode': 'attendance',
+                      'classroomId': controller.currentClassId,
+                    },
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.primary, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppConstants.radiusM),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                child: const Icon(
+                  Icons.face_rounded,
                   color: AppColors.primary,
                   size: 26,
                 ),

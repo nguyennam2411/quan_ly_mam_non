@@ -8,7 +8,7 @@ import '../../../../../core/values/app_strings.dart';
 import '../../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../../global_widgets/headers/page_header.dart';
 import '../../../../../global_widgets/headers/section_header.dart';
-import '../../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../../global_widgets/state/app_loading.dart';
 import '../../../../../global_widgets/state/app_empty_state.dart';
 import '../controllers/attendance_history_controller.dart';
 

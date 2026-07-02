@@ -5,8 +5,10 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../data/models/invoice_model.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/buttons/primary_button.dart';
 import '../controllers/parent_invoice_controller.dart';
+import '../../../../global_widgets/images/custom_cached_image.dart';
 
 class ParentPaymentGatewayView extends GetView<ParentInvoiceController> {
   final InvoiceModel invoice;
@@ -23,15 +25,8 @@ class ParentPaymentGatewayView extends GetView<ParentInvoiceController> {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceContainerLowest,
-      appBar: AppBar(
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: const Text(
-          'Thanh toán chuyển khoản',
-          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
-        ),
-        centerTitle: true,
+      appBar: const MainAppBar(
+        title: 'Thanh toán chuyển khoản',
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.paddingL),
@@ -60,13 +55,11 @@ class ParentPaymentGatewayView extends GetView<ParentInvoiceController> {
               ),
               child: Column(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      'https://img.vietqr.io/image/970436-1041252698-compact2.png?amount=${invoice.totalAmount.toInt()}&addInfo=$transferContent&accountName=DOAN QUY NHAN',
-                      height: 300,
-                      fit: BoxFit.contain,
-                    ),
+                  CustomCachedImage(
+                    imageUrl: 'https://img.vietqr.io/image/970436-1041252698-compact2.png?amount=${invoice.totalAmount.toInt()}&addInfo=$transferContent&accountName=DOAN QUY NHAN',
+                    height: 300,
+                    fit: BoxFit.contain,
+                    borderRadius: 16,
                   ),
                   const SizedBox(height: 24),
                   const Text('THÔNG TIN CHUYỂN KHOẢN', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.primary)),
@@ -85,25 +78,11 @@ class ParentPaymentGatewayView extends GetView<ParentInvoiceController> {
             const SizedBox(height: 48),
             
             // Nút Xác nhận
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: () {
-                  controller.confirmPayment(invoice);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.radiusL),
-                  ),
-                ),
-                child: const Text(
-                  'Tôi đã chuyển khoản thành công',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-              ),
-            ),
+            Obx(() => PrimaryButton(
+                  text: 'Tôi đã chuyển khoản thành công',
+                  isLoading: controller.isLoading.value,
+                  onPressed: () => controller.confirmPayment(invoice),
+                )),
             
             const SizedBox(height: 16),
             const Text(

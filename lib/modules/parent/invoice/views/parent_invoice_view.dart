@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/values/app_constants.dart';
 import '../../../../core/values/app_database.dart';
-import '../../../../global_widgets/buttons/circle_back_button.dart';
+import '../../../../global_widgets/headers/main_app_bar.dart';
+import '../../../../global_widgets/chips/filter_tabs.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../../../../global_widgets/state/app_empty_state.dart';
 import '../../../../global_widgets/chips/status_badge.dart';
 import '../controllers/parent_invoice_controller.dart';
@@ -17,18 +19,8 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        leading: const CircleBackButton(),
-        title: Text(
-          'Học phí',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-          ),
-        ),
-        centerTitle: true,
+      appBar: const MainAppBar(
+        title: 'Học phí',
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,19 +35,26 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
     );
   }
 
+  String _mapValueToLabel(String value) {
+    if (value == AppDatabase.invoiceStatusUnpaid) return 'Chưa đóng';
+    if (value == AppDatabase.invoiceStatusPaid) return 'Đã đóng';
+    return 'Tất cả';
+  }
+
+  String _mapLabelToValue(String label) {
+    if (label == 'Chưa đóng') return AppDatabase.invoiceStatusUnpaid;
+    if (label == 'Đã đóng') return AppDatabase.invoiceStatusPaid;
+    return 'ALL';
+  }
+
   Widget _buildFilterTabs() {
     return Container(
       height: 50,
       margin: const EdgeInsets.symmetric(horizontal: AppConstants.paddingL),
-      child: Obx(() => ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          _buildTab('ALL', 'Tất cả'),
-          const SizedBox(width: 8),
-          _buildTab(AppDatabase.invoiceStatusUnpaid, 'Chưa đóng'),
-          const SizedBox(width: 8),
-          _buildTab(AppDatabase.invoiceStatusPaid, 'Đã đóng'),
-        ],
+      child: Obx(() => FilterTabs(
+        statuses: const ['Tất cả', 'Chưa đóng', 'Đã đóng'],
+        selectedStatus: _mapValueToLabel(controller.selectedStatus.value),
+        onStatusChanged: (label) => controller.selectedStatus.value = _mapLabelToValue(label),
       )),
     );
   }
@@ -93,32 +92,10 @@ class ParentInvoiceView extends GetView<ParentInvoiceController> {
     );
   }
 
-  Widget _buildTab(String statusValue, String label) {
-    final isSelected = controller.selectedStatus.value == statusValue;
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (selected) {
-        if (selected) controller.selectedStatus.value = statusValue;
-      },
-      selectedColor: AppColors.primary,
-      backgroundColor: AppColors.onSurface.withValues(alpha: 0.05),
-      labelStyle: TextStyle(
-        color: isSelected ? AppColors.onPrimary : AppColors.onSurfaceVariant,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.radiusM),
-        side: BorderSide.none,
-      ),
-      showCheckmark: false,
-    );
-  }
-
   Widget _buildInvoiceList() {
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return const AppLoading();
       }
 
       final invoices = controller.filteredInvoices;

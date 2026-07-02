@@ -9,7 +9,7 @@ import '../../../../global_widgets/headers/main_app_bar.dart';
 import '../../../../global_widgets/headers/page_header.dart';
 import '../../../../global_widgets/headers/section_header.dart';
 import '../../../../global_widgets/charts/app_line_chart.dart';
-import '../../../../global_widgets/dialogs/app_loading.dart';
+import '../../../../global_widgets/state/app_loading.dart';
 import '../controllers/parent_health_controller.dart';
 
 class ParentHealthView extends GetView<ParentHealthController> {

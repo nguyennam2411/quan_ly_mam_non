@@ -41,12 +41,16 @@ class HomeWelcomeHeader extends StatelessWidget {
             const Icon(Icons.calendar_today_rounded,
                 size: 18, color: AppColors.primary),
             const SizedBox(width: 8),
-            Text(
-              DateHelper.formatFullDate(DateTime.now()),
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
+            Expanded(
+              child: Text(
+                DateHelper.formatFullDate(DateTime.now()),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

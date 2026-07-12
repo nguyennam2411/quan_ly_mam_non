@@ -57,7 +57,21 @@ class TeacherInvoiceController extends GetxController {
 
   Future<void> markAsPaid(String invoiceId) async {
     try {
+      // 1. Cập nhật hoá đơn hiện tại
       await repository.updateInvoiceStatus(invoiceId, AppDatabase.invoiceStatusPaid);
+      
+      // 2. Tìm học sinh của hoá đơn này
+      final invoice = allInvoices.firstWhereOrNull((i) => i.id == invoiceId);
+      if (invoice != null) {
+        // 3. Lấy tất cả hoá đơn nợ cũ và tự động gạch nợ (vì đã thu gộp)
+        final unpaidInvoices = await repository.getUnpaidInvoicesByStudent(invoice.studentId);
+        for (var old in unpaidInvoices) {
+          if (old.status == AppDatabase.invoiceStatusOverdue && old.id != null && old.id != invoiceId) {
+            await repository.updateInvoiceStatus(old.id!, AppDatabase.invoiceStatusPaid);
+          }
+        }
+      }
+
       Get.snackbar('Thành công', 'Đã xác nhận thu tiền thành công!');
       // Refresh list
       fetchInvoices();

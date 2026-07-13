@@ -46,7 +46,11 @@ class InvoiceProvider {
         .from(AppDatabase.tableInvoices)
         .select()
         .eq(AppDatabase.colStudentId, studentId)
-        .eq(AppDatabase.colStatus, AppDatabase.invoiceStatusUnpaid);
+        .inFilter(AppDatabase.colStatus, [
+          AppDatabase.invoiceStatusUnpaid,
+          AppDatabase.invoiceStatusOverdue,
+          AppDatabase.pending,
+        ]);
   }
 
   // Giáo viên/Kế toán: Cập nhật trạng thái hoá đơn

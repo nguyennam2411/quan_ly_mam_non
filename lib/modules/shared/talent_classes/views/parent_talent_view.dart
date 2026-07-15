@@ -49,9 +49,109 @@ class ParentTalentView extends GetView<ParentTalentController> {
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      child: InkWell(
+        onTap: () => _showClassDetailBottomSheet(talentClass),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.star, color: AppColors.primary, size: 28),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          talentClass.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          talentClass.scheduleInfo,
+                          style: const TextStyle(color: Colors.grey, fontSize: 14),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Học phí', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(
+                        '${talentClass.feePerMonth} đ/tháng',
+                        style: const TextStyle(
+                          color: AppColors.onSurface,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Obx(() {
+                    final isEnrolled = controller.isEnrolled(talentClass.id!);
+                    return ElevatedButton(
+                      onPressed: () {
+                        if (isEnrolled) {
+                          _showCancelDialog(talentClass);
+                        } else {
+                          _showEnrollDialog(talentClass);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isEnrolled ? Colors.red.withOpacity(0.1) : AppColors.primary,
+                        foregroundColor: isEnrolled ? Colors.red : Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                      child: Text(
+                        isEnrolled ? 'Hủy đăng ký' : 'Đăng ký học',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showClassDetailBottomSheet(TalentClassModel talentClass) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -64,75 +164,65 @@ class ParentTalentView extends GetView<ParentTalentController> {
                   ),
                   child: const Icon(Icons.star, color: AppColors.primary, size: 28),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        talentClass.name,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        talentClass.scheduleInfo,
-                        style: const TextStyle(color: Colors.grey, fontSize: 14),
-                      ),
-                    ],
+                  child: Text(
+                    talentClass.name,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.onSurface,
+                    ),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 24),
+            _buildDetailRow(Icons.calendar_month, 'Lịch học', talentClass.scheduleInfo),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Học phí', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    Text(
-                      '${talentClass.feePerMonth} đ/tháng',
-                      style: const TextStyle(
-                        color: AppColors.onSurface,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
+            _buildDetailRow(Icons.monetization_on_outlined, 'Học phí', '${talentClass.feePerMonth} đ/tháng'),
+            const SizedBox(height: 16),
+            _buildDetailRow(Icons.info_outline, 'Mô tả', talentClass.description ?? 'Chưa có thông tin mô tả chi tiết cho môn học này.'),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () => Get.back(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                Obx(() {
-                  final isEnrolled = controller.isEnrolled(talentClass.id!);
-                  return ElevatedButton(
-                    onPressed: () {
-                      if (isEnrolled) {
-                        _showCancelDialog(talentClass);
-                      } else {
-                        _showEnrollDialog(talentClass);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isEnrolled ? Colors.red.withOpacity(0.1) : AppColors.primary,
-                      foregroundColor: isEnrolled ? Colors.red : Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                    child: Text(
-                      isEnrolled ? 'Hủy đăng ký' : 'Đăng ký học',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  );
-                }),
-              ],
+                child: const Text('Đóng', style: TextStyle(fontSize: 16, color: Colors.white)),
+              ),
             ),
           ],
         ),
       ),
+      isScrollControlled: true,
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: Colors.grey, size: 20),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500)),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(color: AppColors.onSurface, fontSize: 15, height: 1.4),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

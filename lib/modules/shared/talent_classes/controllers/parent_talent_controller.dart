@@ -4,6 +4,8 @@ import '../../../../data/models/talent_enrollment_model.dart';
 import '../../../../data/repositories/talent_repository.dart';
 
 import '../../../../data/providers/invoice_provider.dart';
+import '../../../../core/services/parent_student_service.dart';
+import '../../../../core/values/app_database.dart';
 
 class ParentTalentController extends GetxController {
   final TalentRepository _repository = TalentRepository();
@@ -13,12 +15,16 @@ class ParentTalentController extends GetxController {
   final RxList<TalentEnrollmentModel> myEnrollments = <TalentEnrollmentModel>[].obs;
   final RxBool isLoading = true.obs;
 
-  final String currentStudentId = 'student-uuid-here'; // Replace with actual current user student ID logic
+  String get currentStudentId {
+    final student = ParentStudentService.to.selectedStudent.value;
+    return student?.id ?? '';
+  }
 
   @override
   void onInit() {
     super.onInit();
     fetchData();
+    ever(ParentStudentService.to.selectedStudent, (_) => fetchData());
   }
 
   Future<void> fetchData() async {
@@ -26,7 +32,7 @@ class ParentTalentController extends GetxController {
       isLoading.value = true;
       // Fetch all classes
       final classes = await _repository.getAllTalentClasses();
-      availableClasses.assignAll(classes.where((c) => c.isActive).toList());
+      availableClasses.assignAll(classes.where((c) => c.status == AppDatabase.statusActive).toList());
 
       // Fetch my enrollments
       final enrollments = await _repository.getEnrollmentsByStudents([currentStudentId]);

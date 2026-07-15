@@ -23,8 +23,8 @@ class TalentClassModel {
   @JsonKey(name: AppDatabase.colScheduleInfo)
   final String scheduleInfo;
 
-  @JsonKey(name: 'is_active')
-  final bool isActive;
+  @JsonKey(name: AppDatabase.colStatus)
+  final String status;
 
   @JsonKey(name: AppDatabase.colCreatedAt)
   final DateTime? createdAt;
@@ -36,7 +36,7 @@ class TalentClassModel {
     this.teacherId,
     this.feePerMonth = 0,
     required this.scheduleInfo,
-    this.isActive = true,
+    this.status = AppDatabase.statusActive,
     this.createdAt,
   });
 

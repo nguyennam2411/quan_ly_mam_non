@@ -24,6 +24,17 @@ class StudentProvider {
     return response;
   }
 
+  Future<List<Map<String, dynamic>>> getStudentsByIds(List<String> studentIds) async {
+    if (studentIds.isEmpty) return [];
+    final response = await _client
+        .from(AppDatabase.tableStudents)
+        .select('*, ${AppDatabase.tableClassrooms}(${AppDatabase.colName}, ${AppDatabase.colGradeId}, ${AppDatabase.tableGrades}(${AppDatabase.colName}))')
+        .inFilter(AppDatabase.colId, studentIds)
+        .order(AppDatabase.colName);
+    
+    return List<Map<String, dynamic>>.from(response);
+  }
+
   Future<List<Map<String, dynamic>>> getStudentsByClassroom(String classroomId) async {
     final response = await _client
         .from(AppDatabase.tableStudents)

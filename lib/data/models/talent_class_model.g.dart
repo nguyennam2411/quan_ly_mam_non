@@ -14,7 +14,7 @@ TalentClassModel _$TalentClassModelFromJson(Map<String, dynamic> json) =>
       teacherId: json['teacher_id'] as String?,
       feePerMonth: (json['fee_per_month'] as num?)?.toInt() ?? 0,
       scheduleInfo: json['schedule_info'] as String,
-      isActive: json['is_active'] as bool? ?? true,
+      status: json['status'] as String? ?? AppDatabase.statusActive,
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
@@ -28,6 +28,6 @@ Map<String, dynamic> _$TalentClassModelToJson(TalentClassModel instance) =>
       'teacher_id': instance.teacherId,
       'fee_per_month': instance.feePerMonth,
       'schedule_info': instance.scheduleInfo,
-      'is_active': instance.isActive,
+      'status': instance.status,
       'created_at': instance.createdAt?.toIso8601String(),
     };

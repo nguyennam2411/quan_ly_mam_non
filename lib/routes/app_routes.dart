@@ -58,4 +58,6 @@ abstract class Routes {
   // --- Bổ sung chức năng Năng khiếu bị thiếu ở đây ---
   static const PARENT_TALENT = '/parent/talent';
   static const TEACHER_TALENT = '/teacher/talent';
+  static const TEACHER_TALENT_ATTENDANCE = '/teacher/talent-attendance';
+  static const TEACHER_TALENT_STUDENTS = '/teacher/talent-students';
 }

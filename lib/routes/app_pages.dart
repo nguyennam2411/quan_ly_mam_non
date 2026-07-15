@@ -86,6 +86,9 @@ import '../modules/parent/student_profile/views/student_profile_detail_view.dart
 // Talent Classes
 import '../modules/shared/talent_classes/bindings/teacher_talent_binding.dart';
 import '../modules/shared/talent_classes/views/teacher_talent_view.dart';
+import '../modules/shared/talent_classes/bindings/teacher_talent_attendance_binding.dart';
+import '../modules/shared/talent_classes/views/teacher_talent_attendance_view.dart';
+import '../modules/shared/talent_classes/views/teacher_talent_student_list_view.dart';
 import '../modules/shared/talent_classes/bindings/parent_talent_binding.dart';
 import '../modules/shared/talent_classes/views/parent_talent_view.dart';
 
@@ -315,6 +318,16 @@ class AppPages {
       name: Routes.TEACHER_TALENT,
       page: () => const TeacherTalentView(),
       binding: TeacherTalentBinding(),
+    ),
+    GetPage(
+      name: Routes.TEACHER_TALENT_ATTENDANCE,
+      page: () => const TeacherTalentAttendanceView(),
+      binding: TeacherTalentAttendanceBinding(),
+    ),
+    GetPage(
+      name: Routes.TEACHER_TALENT_STUDENTS,
+      page: () => const TeacherTalentStudentListView(),
+      binding: TeacherTalentAttendanceBinding(),
     ),
     GetPage(
       name: Routes.PARENT_TALENT,

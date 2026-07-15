@@ -15,12 +15,27 @@ class TalentProvider {
     await _supabase.from(AppDatabase.tableTalentClasses).insert(data);
   }
 
+  Future<void> updateTalentClass(String classId, Map<String, dynamic> data) async {
+    await _supabase
+        .from(AppDatabase.tableTalentClasses)
+        .update(data)
+        .eq('id', classId);
+  }
+
   Future<List<dynamic>> getEnrollmentsByStudents(List<String> studentIds) async {
     if (studentIds.isEmpty) return [];
     return await _supabase
         .from(AppDatabase.tableTalentEnrollments)
         .select()
         .inFilter(AppDatabase.colStudentId, studentIds);
+  }
+
+  Future<List<dynamic>> getEnrollmentsByClass(String classId) async {
+    return await _supabase
+        .from(AppDatabase.tableTalentEnrollments)
+        .select()
+        .eq(AppDatabase.colTalentClassId, classId)
+        .eq(AppDatabase.colStatus, 'APPROVED');
   }
 
   Future<void> submitEnrollment(Map<String, dynamic> data) async {
@@ -42,7 +57,7 @@ class TalentProvider {
   Future<void> submitAttendance(Map<String, dynamic> data) async {
     await _supabase.from(AppDatabase.tableTalentAttendance).upsert(
       data,
-      onConflict: '${AppDatabase.colStudentId}, ${AppDatabase.colTalentClassId}, ${AppDatabase.colDate}',
+      onConflict: '${AppDatabase.colStudentId},${AppDatabase.colTalentClassId},${AppDatabase.colDate}',
     );
   }
 }

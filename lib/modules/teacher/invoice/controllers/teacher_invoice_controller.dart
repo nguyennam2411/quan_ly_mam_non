@@ -3,6 +3,7 @@ import '../../../../core/services/auth_service.dart';
 import '../../../../core/values/app_database.dart';
 import '../../../../data/models/invoice_model.dart';
 import '../../../../data/repositories/invoice_repository.dart';
+import '../../../../data/repositories/talent_repository.dart';
 
 class TeacherInvoiceController extends GetxController {
   final InvoiceRepository repository;
@@ -132,6 +133,10 @@ class TeacherInvoiceController extends GetxController {
         studentIds.map((id) => repository.getUnpaidInvoicesByStudent(id))
       );
 
+      final talentRepo = TalentRepository();
+      final allTalentClasses = await talentRepo.getAllTalentClasses();
+      final allTalentEnrollments = await talentRepo.getEnrollmentsByStudents(studentIds);
+
       List<InvoiceModel> newInvoices = [];
       List<Future<void>> updateStatusFutures = [];
 
@@ -150,10 +155,18 @@ class TeacherInvoiceController extends GetxController {
           {'name': 'K.phí XH hóa P.vụ bữa ăn', 'amount': 700000.0},
           {'name': 'Điện nước', 'amount': 65000.0},
           {'name': 'Vệ sinh phí', 'amount': 38000.0},
-          {'name': 'Anh văn', 'amount': 100000.0},
-          {'name': 'Vẽ', 'amount': 90000.0},
-          {'name': 'Bóng đá', 'amount': 90000.0},
         ];
+
+        final studentEnrollments = allTalentEnrollments.where((e) => e.studentId == studentId && e.status == 'APPROVED').toList();
+        for (var enrollment in studentEnrollments) {
+          final tClass = allTalentClasses.firstWhereOrNull((c) => c.id == enrollment.talentClassId);
+          if (tClass != null && tClass.feePerMonth > 0) {
+            fixedFees.add({
+              'name': tClass.name,
+              'amount': tClass.feePerMonth.toDouble(),
+            });
+          }
+        }
 
         for (var fee in fixedFees) {
           final feeAmount = fee['amount'] as double;
